@@ -903,7 +903,7 @@
                 </svg>
                 BHDS
             </a>
-            <div class="header-actions">
+            <div class="header-actions" style="display: none;">
                 <a href="admin.html" class="icon-btn" aria-label="Trang Quản trị" title="Quản lý món ăn">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1127,7 +1127,7 @@
         // ==========================================
         // CẤU HÌNH MẶC ĐỊNH CHO DISCORD WEBHOOK TẠI ĐÂY
         // ==========================================
-        const DISCORD_WEBHOOK_URL = ''; // Nhập URL Discord Webhook ở đây
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1523364147801362602/tOGL13hqlQkkbn-QKv2oCpOcw5tB7452o89XVB7M2Fd2c8-nVT2u3x4Cf1nGAYLLei6s'; // Nhập URL Discord Webhook ở đây
         // ==========================================
 
         // Danh sách các món ăn mặc định
@@ -1273,11 +1273,9 @@
         // Trạng thái cấu hình Discord Webhook hoạt động
         let activeWebhookUrl = DISCORD_WEBHOOK_URL;
 
-        // Tải cấu hình Discord từ localStorage nếu có để hỗ trợ kiểm thử
+        // Tải cấu hình Discord cố định từ mã nguồn
         function loadDiscordConfig() {
-            const savedWebhook = localStorage.getItem('bhds_discord_webhook');
-            
-            if (savedWebhook) activeWebhookUrl = savedWebhook;
+            activeWebhookUrl = DISCORD_WEBHOOK_URL;
 
             // Đồng bộ dữ liệu vào Form Cài đặt
             document.getElementById('config-webhook').value = activeWebhookUrl;
