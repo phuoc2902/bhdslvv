@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHDS Admin - Quản Lý Thực Đơn</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables - Design System */
+        :root {
+            --bg-primary: #050b07;
+            --bg-secondary: #0c140e;
+            --bg-card: rgba(12, 20, 14, 0.75);
+            --bg-card-hover: rgba(20, 33, 23, 0.88);
+            --border-color: rgba(255, 255, 255, 0.07);
+            --border-focus: rgba(34, 197, 94, 0.4);
+            --text-primary: #f0fdf4;
+            --text-secondary: #9cd0b3;
+            --text-muted: #4b5563;
+            --primary: #22c55e;
+            --primary-hover: #16a34a;
+            --primary-glow: rgba(34, 197, 94, 0.2);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.2);
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Base Reset & Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(34, 197, 94, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, textarea {
+            font-family: inherit;
+            color: inherit;
+        }
+
+        /* App Container */
+        .app-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem 3rem 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+            background-color: rgba(11, 15, 25, 0.8);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: var(--font-display);
+        }
+
+        .logo svg {
+            stroke: #22c55e;
+            stroke-width: 2.5;
+            width: 28px;
+            height: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Circular Action Button */
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Primary Button Style */
+        .btn-action {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-back {
+            color: var(--text-secondary);
+        }
+        
+        .btn-back:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero Banner */
+        .hero {
+            padding: 2rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .hero-text h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .hero-text p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .btn-reset {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-reset:hover {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Workspace Grid Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (min-width: 992px) {
+            .workspace {
+                grid-template-columns: 1.7fr 1fr;
+            }
+        }
+
+        /* Card Panel */
+        .card-panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Food List Styles */
+        .food-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .food-item-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .food-item-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .food-item-img {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .food-item-details {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .food-item-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .food-item-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .food-item-price {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        .food-item-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-icon-action {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-edit:hover {
+            color: var(--primary);
+            background-color: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-icon-action svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #16a34a 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.9rem 1.5rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px var(--primary-glow);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-cancel {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-cancel:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Success & Error Popups */
+        .popup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .popup-modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .popup-modal.open .popup-card {
+            transform: scale(1);
+        }
+
+        .popup-icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem auto;
+        }
+
+        .popup-icon-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            box-shadow: 0 0 15px var(--success-glow);
+        }
+
+        .popup-icon-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .popup-icon-circle svg {
+            width: 32px;
+            height: 32px;
+            stroke-width: 2.5;
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .btn-popup-close {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-popup-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Empty state style */
+        .empty-catalog-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-catalog-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo" aria-label="BHDS Home">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                BHDS Admin
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="btn-action btn-back">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Quay lại Menu
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="app-container">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Quản lý thực đơn</h1>
+                <p>Thêm mới, chỉnh sửa thông tin món ăn, giá tiền hoặc xóa món. Dữ liệu sẽ tự động đồng bộ sang trang chủ.</p>
+            </div>
+            <button id="btn-reset-default" class="btn-reset">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" />
+                </svg>
+                Khôi phục thực đơn gốc
+            </button>
+        </section>
+
+        <!-- Workspace Layout -->
+        <div class="workspace">
+            
+            <!-- Food List Panel (Left) -->
+            <section class="card-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                        Danh sách món hiện tại
+                    </h2>
+                    <span id="catalog-count" style="font-size: 0.85rem; background: rgba(34, 197, 94, 0.15); color: var(--primary); padding: 0.2rem 0.6rem; border-radius: var(--radius-full); font-weight: 700;">
+                        0 món
+                    </span>
+                </div>
+                
+                <div class="food-list-container" id="food-list-container">
+                    <!-- Food item rows will be dynamically rendered here -->
+                </div>
+            </section>
+
+            <!-- Editor Form Panel (Right) -->
+            <aside class="card-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title" id="form-panel-title">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Thêm món ăn mới
+                    </h2>
+                </div>
+                
+                <form id="food-editor-form">
+                    <input type="hidden" id="edit-food-id">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="food-name">Tên món ăn *</label>
+                        <input type="text" id="food-name" class="form-control" placeholder="Ví dụ: Nem cuốn tôm thịt" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="food-price">Giá bán (VNĐ) *</label>
+                        <input type="number" id="food-price" class="form-control" placeholder="Ví dụ: 65000" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="food-image">Đường dẫn ảnh (URL) *</label>
+                        <input type="url" id="food-image" class="form-control" placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh bất kỳ..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="food-desc">Mô tả chi tiết *</label>
+                        <textarea id="food-desc" class="form-control" placeholder="Nguyên liệu chi tiết, nước sốt đi kèm..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" id="btn-save-food" class="btn-submit">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Thêm món ăn</span>
+                    </button>
+                    
+                    <button type="button" id="btn-cancel-edit" class="btn-cancel" style="display: none;">
+                        Hủy bỏ sửa đổi
+                    </button>
+                </form>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Pop-up Alert Modal (Success/Failure) -->
+    <div class="popup-modal" id="popup-result">
+        <div class="popup-card">
+            <div id="popup-icon" class="popup-icon-circle popup-icon-success">
+                <!-- Icon will be inserted dynamically -->
+            </div>
+            <h3 class="popup-title" id="popup-title">Thành công!</h3>
+            <p class="popup-text" id="popup-text">Thao tác của bạn đã được thực hiện.</p>
+            <button class="btn-popup-close" id="btn-popup-close">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BHDS Admin Panel. Bản quyền thuộc về thiết kế HTML/JS tĩnh.</p>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // Danh sách các món ăn mặc định của hệ thống
+        // Danh sách các món ăn mặc định của hệ thống
+        const DEFAULT_FOOD_CATALOG = [
+            {
+                id: 1,
+                name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
+                description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
+                price: 62000,
+                image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 2,
+                name: "Xúc Xích Lốc Xoáy",
+                description: "Xúc xúc chiên tạo hình lốc xoáy giòn ngon rưới tương cà tương ớt.",
+                price: 42000,
+                image: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 3,
+                name: "Khoai Tây Chiên",
+                description: "Khoai tây chiên sợi vàng giòn rụm ăn kèm tương ớt ngọt cay.",
+                price: 42000,
+                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 4,
+                name: "Gà Vòng",
+                description: "Vòng thịt gà tẩm bột chiên vàng ươm giòn rụm bên ngoài, mềm ngọt bên trong.",
+                price: 45000,
+                image: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 5,
+                name: "Single Combo",
+                description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
+                price: 88000,
+                image: "https://images.unsplash.com/photo-1585647347384-2593bc35786b?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 6,
+                name: "Couple Combo",
+                description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
+                price: 121000,
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 7,
+                name: "Food Combo",
+                description: "Combo ẩm thực trọn vẹn gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt + 1 đồ ăn nóng tùy chọn.",
+                price: 121000,
+                image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 8,
+                name: "Refresh Combo",
+                description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
+                price: 78000,
+                image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 9,
+                name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
+                description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
+                price: 38000,
+                image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 10,
+                name: "Aquafina (Chai)",
+                description: "Nước suối tinh khiết đóng chai Aquafina mát lạnh tiện lợi.",
+                price: 28000,
+                image: "https://images.unsplash.com/photo-1608885898957-a599fb18ec3f?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 11,
+                name: "Nước Đóng Chai Đồng Giá 39K (Twister / Ô Long / Sting / Pepsi lon)",
+                description: "Lựa chọn các dòng Twister, Trà Ô Long TEA+ mát lạnh, nước tăng lực Sting dâu hoặc Pepsi lon.",
+                price: 39000,
+                image: "https://images.unsplash.com/photo-1527960472437-9653955db39f?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 12,
+                name: "Trà Vải BHD",
+                description: "Trà trái cây vị vải thơm lừng kèm thạch vải dai giòn ngọt lịm.",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 13,
+                name: "Trà Mãng Cầu BHD",
+                description: "Trà mãng cầu chua chua ngọt ngọt kết hợp thạch trái cây giải nhiệt cực đã.",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1595981267035-7b04ec82a897?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 14,
+                name: "Trà Đào BHD",
+                description: "Trà đào thơm ngát trứ danh kết hợp cùng miếng đào lát giòn ngọt mọng nước.",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 15,
+                name: "Strawberry Mojito",
+                description: "Sự kết hợp hoàn hảo giữa soda ga nhẹ, dâu tây ngọt thơm và lá bạc hà tươi mát.",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 16,
+                name: "Blue Ocean Mojito",
+                description: "Mojito đại dương xanh hương vị trái cây nhiệt đới tươi mát mang đậm không khí biển khơi.",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+            }
+        ];
+
+        let foodCatalog = [];
+        let isEditing = false;
+
+        // Tiện ích định dạng tiền tệ
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+        }
+
+        // Tải danh sách từ localStorage
+        function loadCatalog() {
+            const savedCatalog = localStorage.getItem('bhds_cine_catalog');
+            if (savedCatalog) {
+                try {
+                    foodCatalog = JSON.parse(savedCatalog);
+                } catch (e) {
+                    console.error("Lỗi dữ liệu, khôi phục mặc định", e);
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                    saveCatalogToStorage();
+                }
+            } else {
+                foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                saveCatalogToStorage();
+            }
+            renderFoodList();
+        }
+
+        // Lưu danh sách vào localStorage
+        function saveCatalogToStorage() {
+            localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+            document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
+        }
+
+        // Hiển thị danh sách món lên bảng bên trái
+        function renderFoodList() {
+            const container = document.getElementById('food-list-container');
+            
+            if (foodCatalog.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-catalog-state">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <p>Chưa có món ăn nào trong thực đơn của bạn.</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Hãy điền form bên phải để thêm món ăn mới!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = foodCatalog.map(food => `
+                <div class="food-item-row" id="food-row-${food.id}">
+                    <img src="${food.image}" alt="${food.name}" class="food-item-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&auto=format&fit=crop&q=80';">
+                    <div class="food-item-details">
+                        <div class="food-item-name">${food.name}</div>
+                        <div class="food-item-desc">${food.description}</div>
+                        <div class="food-item-price">${formatCurrency(food.price)}</div>
+                    </div>
+                    <div class="food-item-actions">
+                        <button class="btn-icon-action btn-edit" onclick="initiateEdit(${food.id})" title="Chỉnh sửa món">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button class="btn-icon-action btn-delete" onclick="deleteFood(${food.id})" title="Xóa món">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
+        }
+
+        // Khởi tạo chỉnh sửa một món ăn
+        function initiateEdit(id) {
+            const food = foodCatalog.find(item => item.id === id);
+            if (!food) return;
+
+            isEditing = true;
+            
+            // Điền thông tin vào form
+            document.getElementById('edit-food-id').value = food.id;
+            document.getElementById('food-name').value = food.name;
+            document.getElementById('food-price').value = food.price;
+            document.getElementById('food-image').value = food.image;
+            document.getElementById('food-desc').value = food.description;
+
+            // Cập nhật tiêu đề & nút form
+            document.getElementById('form-panel-title').innerHTML = `
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Chỉnh sửa món ăn
+            `;
+            
+            const btnSubmit = document.getElementById('btn-save-food');
+            btnSubmit.querySelector('span').textContent = "Lưu thay đổi";
+            
+            // Hiện nút Hủy
+            document.getElementById('btn-cancel-edit').style.display = "block";
+            
+            // Cuộn tới form trên màn hình nhỏ
+            document.getElementById('food-editor-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hủy bỏ trạng thái chỉnh sửa
+        function cancelEdit() {
+            isEditing = false;
+            document.getElementById('food-editor-form').reset();
+            document.getElementById('edit-food-id').value = "";
+
+            // Reset tiêu đề & nút
+            document.getElementById('form-panel-title').innerHTML = `
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Thêm món ăn mới
+            `;
+            
+            const btnSubmit = document.getElementById('btn-save-food');
+            btnSubmit.querySelector('span').textContent = "Thêm món ăn";
+            
+            document.getElementById('btn-cancel-edit').style.display = "none";
+        }
+
+        // Lưu / Cập nhật món ăn
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('food-name').value.trim();
+            const price = parseInt(document.getElementById('food-price').value);
+            const image = document.getElementById('food-image').value.trim();
+            const description = document.getElementById('food-desc').value.trim();
+
+            if (isEditing) {
+                // Đang sửa
+                const id = parseInt(document.getElementById('edit-food-id').value);
+                const index = foodCatalog.findIndex(item => item.id === id);
+                
+                if (index !== -1) {
+                    foodCatalog[index] = { id, name, price, image, description };
+                    saveCatalogToStorage();
+                    renderFoodList();
+                    cancelEdit();
+                    showPopup("Thành công!", "Thông tin món ăn đã được cập nhật.", true);
+                } else {
+                    showPopup("Lỗi!", "Không tìm thấy món ăn cần cập nhật.", false);
+                }
+            } else {
+                // Thêm mới
+                // Tạo ID tự tăng
+                const maxId = foodCatalog.reduce((max, item) => item.id > max ? item.id : max, 0);
+                const newFood = {
+                    id: maxId + 1,
+                    name,
+                    price,
+                    image,
+                    description
+                };
+
+                foodCatalog.push(newFood);
+                saveCatalogToStorage();
+                renderFoodList();
+                document.getElementById('food-editor-form').reset();
+                showPopup("Thành công!", "Đã thêm món ăn mới vào thực đơn.", true);
+            }
+        }
+
+        // Xóa món ăn
+        function deleteFood(id) {
+            const food = foodCatalog.find(item => item.id === id);
+            if (!food) return;
+
+            if (confirm(`Bạn có chắc chắn muốn xóa món "${food.name}" khỏi thực đơn?`)) {
+                // Nếu đang chỉnh sửa chính món này, hủy chế độ sửa trước
+                const currentEditId = document.getElementById('edit-food-id').value;
+                if (currentEditId && parseInt(currentEditId) === id) {
+                    cancelEdit();
+                }
+
+                foodCatalog = foodCatalog.filter(item => item.id !== id);
+                saveCatalogToStorage();
+                renderFoodList();
+                showPopup("Đã xóa!", "Món ăn đã được xóa khỏi thực đơn.", true);
+            }
+        }
+
+        // Khôi phục danh sách món mặc định gốc
+        function resetToDefault() {
+            if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS. Bạn vẫn muốn tiếp tục?")) {
+                cancelEdit();
+                foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                saveCatalogToStorage();
+                renderFoodList();
+                showPopup("Đã khôi phục!", "Thực đơn đã quay về trạng thái mặc định ban đầu.", true);
+            }
+        }
+
+        // Popup Alerts
+        function showPopup(title, message, isSuccess) {
+            const popup = document.getElementById('popup-result');
+            const popupIcon = document.getElementById('popup-icon');
+            const popupTitle = document.getElementById('popup-title');
+            const popupText = document.getElementById('popup-text');
+
+            popupTitle.textContent = title;
+            popupText.textContent = message;
+
+            if (isSuccess) {
+                popupIcon.className = "popup-icon-circle popup-icon-success";
+                popupIcon.innerHTML = `
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+            } else {
+                popupIcon.className = "popup-icon-circle popup-icon-danger";
+                popupIcon.innerHTML = `
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                `;
+            }
+
+            popup.classList.add('open');
+        }
+
+        function closePopup() {
+            document.getElementById('popup-result').classList.remove('open');
+        }
+
+        // Khởi chạy khi load trang
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCatalog();
+
+            // Đăng ký submit form
+            document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
+
+            // Đăng ký nút hủy sửa
+            document.getElementById('btn-cancel-edit').addEventListener('click', cancelEdit);
+
+            // Đăng ký nút reset mặc định
+            document.getElementById('btn-reset-default').addEventListener('click', resetToDefault);
+
+            // Đăng ký nút đóng alert
+            document.getElementById('btn-popup-close').addEventListener('click', closePopup);
+            document.getElementById('popup-result').addEventListener('click', (e) => {
+                if (e.target.id === 'popup-result') closePopup();
+            });
+        });
+    </script>
+</body>
+</html>
