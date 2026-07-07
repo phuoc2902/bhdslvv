@@ -1305,26 +1305,75 @@
         // Khởi tạo hiển thị danh sách món ăn
         function renderFoodCatalog() {
             const container = document.getElementById('food-grid-container');
-            container.innerHTML = foodCatalog.map(food => `
-                <article class="food-card" data-id="${food.id}">
-                    <div class="food-img-container">
-                        <img src="${food.image}" alt="${food.name}" class="food-img" loading="lazy">
-                    </div>
-                    <div class="food-card-info">
-                        <h3 class="food-title">${food.name}</h3>
-                        <p class="food-description">${food.description}</p>
-                        <div class="food-footer">
-                            <span class="food-price">${formatCurrency(food.price)}</span>
-                            <button class="btn-add" onclick="addToCart(${food.id})">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Thêm vào giỏ
-                            </button>
+            container.innerHTML = foodCatalog.map(food => {
+                let optionsHtml = '';
+                if (food.id === 1) {
+                    optionsHtml = `
+                        <div class="food-options" style="margin-bottom: 1rem;">
+                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Hương vị bắp:</label>
+                            <select id="option-select-1" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(1)">
+                                <option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>
+                                <option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>
+                                <option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>
+                            </select>
                         </div>
-                    </div>
-                </article>
-            `).join('');
+                    `;
+                } else if (food.id === 9) {
+                    optionsHtml = `
+                        <div class="food-options" style="margin-bottom: 1rem;">
+                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Loại nước ngọt:</label>
+                            <select id="option-select-9" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                <option value="Pepsi">Pepsi</option>
+                                <option value="7Up">7Up</option>
+                                <option value="Mirinda Cam">Mirinda Cam</option>
+                                <option value="Lipton Chanh">Lipton Chanh</option>
+                            </select>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <article class="food-card" data-id="${food.id}">
+                        <div class="food-img-container">
+                            <img src="${food.image}" alt="${food.name}" class="food-img" loading="lazy">
+                        </div>
+                        <div class="food-card-info">
+                            <h3 class="food-title">${food.name}</h3>
+                            <p class="food-description">${food.description}</p>
+                            ${optionsHtml}
+                            <div class="food-footer">
+                                <span class="food-price">${formatCurrency(food.price)}</span>
+                                <button class="btn-add" onclick="addToCart(${food.id})">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Thêm vào giỏ
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Cập nhật giá hiển thị trên card khi thay đổi tùy chọn
+        function updateCardPrice(foodId) {
+            const card = document.querySelector(`.food-card[data-id="${foodId}"]`);
+            if (!card) return;
+            const foodItem = foodCatalog.find(item => item.id === foodId);
+            if (!foodItem) return;
+            
+            let extra = 0;
+            const selectEl = document.getElementById(`option-select-${foodId}`);
+            if (selectEl) {
+                const selectedOption = selectEl.options[selectEl.selectedIndex];
+                extra = parseInt(selectedOption.getAttribute('data-extra') || '0');
+            }
+            
+            const priceEl = card.querySelector('.food-price');
+            if (priceEl) {
+                priceEl.textContent = formatCurrency(foodItem.price + extra);
+            }
         }
 
         // Hàm tiện ích định dạng tiền tệ Việt Nam
@@ -1337,16 +1386,32 @@
             const foodItem = foodCatalog.find(item => item.id === foodId);
             if (!foodItem) return;
 
-            const existingItem = cart.find(item => item.id === foodId);
+            let selectedOption = '';
+            let extraPrice = 0;
+
+            const selectEl = document.getElementById(`option-select-${foodId}`);
+            if (selectEl) {
+                selectedOption = selectEl.value;
+                const optionEl = selectEl.options[selectEl.selectedIndex];
+                extraPrice = parseInt(optionEl.getAttribute('data-extra') || '0');
+            }
+
+            const itemPrice = foodItem.price + extraPrice;
+            const displayName = selectedOption ? `${foodItem.name} (${selectedOption})` : foodItem.name;
+            const cartKey = `${foodId}_${selectedOption}`;
+
+            const existingItem = cart.find(item => item.cartKey === cartKey);
 
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
                 cart.push({
+                    cartKey: cartKey,
                     id: foodItem.id,
-                    name: foodItem.name,
-                    price: foodItem.price,
-                    quantity: 1
+                    name: displayName,
+                    price: itemPrice,
+                    quantity: 1,
+                    option: selectedOption
                 });
             }
 
@@ -1357,8 +1422,8 @@
         }
 
         // Tăng số lượng món
-        function increaseQty(id) {
-            const item = cart.find(x => x.id === id);
+        function increaseQty(cartKey) {
+            const item = cart.find(x => x.cartKey === cartKey);
             if (item) {
                 item.quantity += 1;
                 updateCartUI();
@@ -1366,12 +1431,12 @@
         }
 
         // Giảm số lượng món
-        function decreaseQty(id) {
-            const item = cart.find(x => x.id === id);
+        function decreaseQty(cartKey) {
+            const item = cart.find(x => x.cartKey === cartKey);
             if (item) {
                 item.quantity -= 1;
                 if (item.quantity <= 0) {
-                    removeFromCart(id);
+                    removeFromCart(cartKey);
                 } else {
                     updateCartUI();
                 }
@@ -1379,8 +1444,8 @@
         }
 
         // Xóa món khỏi giỏ
-        function removeFromCart(id) {
-            cart = cart.filter(x => x.id !== id);
+        function removeFromCart(cartKey) {
+            cart = cart.filter(x => x.cartKey !== cartKey);
             updateCartUI();
         }
 
@@ -1428,20 +1493,20 @@
                             </div>
                             
                             <div class="cart-qty-control">
-                                <button class="cart-qty-btn" onclick="decreaseQty(${item.id})" aria-label="Giảm số lượng">
+                                <button class="cart-qty-btn" onclick="decreaseQty('${item.cartKey}')" aria-label="Giảm số lượng">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
                                     </svg>
                                 </button>
                                 <span class="cart-qty-num">${item.quantity}</span>
-                                <button class="cart-qty-btn" onclick="increaseQty(${item.id})" aria-label="Tăng số lượng">
+                                <button class="cart-qty-btn" onclick="increaseQty('${item.cartKey}')" aria-label="Tăng số lượng">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                                     </svg>
                                 </button>
                             </div>
 
-                            <button class="cart-item-remove" onclick="removeFromCart(${item.id})" aria-label="Xóa món ăn">
+                            <button class="cart-item-remove" onclick="removeFromCart('${item.cartKey}')" aria-label="Xóa món ăn">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -1691,9 +1756,54 @@
             
             showPopup("Lưu thành công", "Cấu hình Discord đã được cập nhật.", true);
         }
+        // Kiểm tra và kích hoạt chế độ admin bí mật
+        function initSecretAdmin() {
+            const isAdmin = sessionStorage.getItem('bhds_is_admin') === 'true';
+            const headerActions = document.querySelector('.header-actions');
+            
+            if (isAdmin && headerActions) {
+                headerActions.style.display = 'flex';
+            }
+
+            let logoClickCount = 0;
+            let logoClickTimeout;
+
+            const logoEl = document.querySelector('.logo');
+            if (logoEl) {
+                logoEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logoClickCount++;
+                    clearTimeout(logoClickTimeout);
+
+                    logoClickTimeout = setTimeout(() => {
+                        logoClickCount = 0;
+                    }, 3000); // Reset count after 3 seconds
+
+                    if (logoClickCount >= 5) {
+                        logoClickCount = 0;
+                        const pin = prompt("Nhập mã PIN quản trị để tiếp tục:");
+                        if (pin === "2902" || pin === "1234") {
+                            sessionStorage.setItem('bhds_is_admin', 'true');
+                            if (headerActions) {
+                                headerActions.style.display = 'flex';
+                            }
+                            showPopup("Chào Admin!", "Chế độ quản trị đã được kích hoạt.", true);
+                            setTimeout(() => {
+                                window.location.href = "admin.html";
+                            }, 1000);
+                        } else if (pin !== null) {
+                            showPopup("Lỗi", "Mã PIN không chính xác!", false);
+                        }
+                    }
+                });
+            }
+        }
 
         // Đăng ký Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Khởi tạo chế độ admin bí mật
+            initSecretAdmin();
+
             // Tải danh sách món ăn từ localStorage trước
             loadFoodCatalog();
 

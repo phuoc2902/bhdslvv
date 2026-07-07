@@ -714,6 +714,12 @@
 
     <!-- JS Logic -->
     <script>
+        // Kiểm tra quyền truy cập Admin ngay lập tức
+        if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
+            alert("Bạn không có quyền truy cập trang này!");
+            window.location.href = "index.html";
+        }
+
         // Danh sách các món ăn mặc định của hệ thống
         // Danh sách các món ăn mặc định của hệ thống
         const DEFAULT_FOOD_CATALOG = [
