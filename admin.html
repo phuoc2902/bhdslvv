@@ -590,6 +590,9 @@
             margin-top: auto;
         }
     </style>
+    <!-- Firebase SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -718,6 +721,23 @@
 
     <!-- JS Logic -->
     <script>
+        // ==========================================
+        // CẤU HÌNH FIREBASE REALTIME DATABASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBk-WEVyhyHYp5imW_a1FNlV1l25sujKhY",
+            authDomain: "bhdlvv.firebaseapp.com",
+            databaseURL: "https://bhdlvv-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bhdlvv",
+            storageBucket: "bhdlvv.firebasestorage.app",
+            messagingSenderId: "519114521085",
+            appId: "1:519114521085:web:19ee84f5409f37bf53c194",
+            measurementId: "G-Z9WFEJH5W9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        // ==========================================
+
         // Kiểm tra quyền truy cập Admin ngay lập tức
         if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
             alert("Bạn không có quyền truy cập trang này!");
@@ -798,71 +818,44 @@
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
         }
 
-        // Tải danh sách từ localStorage
+        // Tải danh sách từ Firebase Realtime Database
         function loadCatalog() {
-            const savedCatalog = localStorage.getItem('bhds_cine_catalog');
-            if (savedCatalog) {
-                try {
-                    foodCatalog = JSON.parse(savedCatalog);
-                    
-                    let updated = false;
-
-                    // Lọc bỏ thức ăn nóng (IDs 2, 3, 4, 7) và các loại trà (IDs 12, 13, 14)
-                    const idsToRemove = [2, 3, 4, 7, 12, 13, 14];
-                    const originalLength = foodCatalog.length;
-                    foodCatalog = foodCatalog.filter(food => !idsToRemove.includes(food.id));
-                    if (foodCatalog.length !== originalLength) {
-                        updated = true;
-                    }
-
-                    // Cập nhật ảnh mới cục bộ nếu có
-                    foodCatalog.forEach(food => {
-                        if (food.id === 1 && food.image !== './assets/bap.png') {
-                            food.image = './assets/bap.png';
-                            updated = true;
-                        }
-                        if (food.id === 5 && food.image !== './assets/singlecombo.png') {
-                            food.image = './assets/singlecombo.png';
-                            updated = true;
-                        }
-                        if (food.id === 6 && food.image !== './assets/couplecombo.png') {
-                            food.image = './assets/couplecombo.png';
-                            updated = true;
-                        }
-                        if (food.id === 8 && food.image !== './assets/prefreshcb.png') {
-                            food.image = './assets/prefreshcb.png';
-                            updated = true;
-                        }
-                        if (food.id === 9 && food.image !== './assets/nuocngotly.png') {
-                            food.image = './assets/nuocngotly.png';
-                            updated = true;
-                        }
-                        if (food.id === 10 && food.image !== './assets/aquafina.png') {
-                            food.image = './assets/aquafina.png';
-                            updated = true;
-                        }
-                        if (food.id === 11 && food.image !== './assets/nuocngotlon.png') {
-                            food.image = './assets/nuocngotlon.png';
-                            updated = true;
-                        }
-                    });
-                    if (updated) {
-                        saveCatalogToStorage();
-                    }
-                } catch (e) {
-                    console.error("Lỗi dữ liệu, khôi phục mặc định", e);
+            database.ref('foodCatalog').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    foodCatalog = data;
+                    localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+                } else {
                     foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                    saveCatalogToStorage();
+                    database.ref('foodCatalog').set(foodCatalog);
                 }
-            } else {
-                foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                saveCatalogToStorage();
-            }
-            renderFoodList();
+                renderFoodList();
+            }, (error) => {
+                console.error("Lỗi dữ liệu từ Firebase, khôi phục từ localStorage:", error);
+                const savedCatalog = localStorage.getItem('bhds_cine_catalog');
+                if (savedCatalog) {
+                    try {
+                        foodCatalog = JSON.parse(savedCatalog);
+                    } catch (e) {
+                        foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                    }
+                } else {
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                }
+                renderFoodList();
+            });
         }
 
-        // Lưu danh sách vào localStorage
+        // Lưu danh sách vào Firebase Realtime Database (đồng bộ dự phòng localStorage)
         function saveCatalogToStorage() {
+            database.ref('foodCatalog').set(foodCatalog)
+                .then(() => {
+                    console.log("Đã cập nhật danh sách món ăn lên Firebase thành công.");
+                })
+                .catch((error) => {
+                    console.error("Lỗi cập nhật danh sách lên Firebase:", error);
+                    alert("Có lỗi xảy ra khi lưu lên máy chủ: " + error.message);
+                });
             localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
             document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
         }

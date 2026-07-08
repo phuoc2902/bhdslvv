@@ -908,7 +908,7 @@
         }
 
         .cart-toggle-mobile:active {
-            transform: translateY(0);
+            transform: scale(0.92);
         }
 
         .cart-toggle-mobile .badge {
@@ -950,15 +950,54 @@
         }
 
         .btn-complaint-float:active {
-            transform: translateY(0);
+            transform: scale(0.92);
+        }
+
+        /* Zalo Floating Button */
+        .btn-zalo-float {
+            position: fixed;
+            bottom: 100px; /* Default on desktop where mobile cart is hidden */
+            right: 20px;
+            background: linear-gradient(135deg, #0084ff 0%, #0056c6 100%); /* Zalo Blue */
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 86, 198, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+            text-decoration: none; /* Make sure anchor styling is clean */
+        }
+
+        .btn-zalo-float:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 86, 198, 0.6);
+            background: linear-gradient(135deg, #2997ff 0%, #0045a3 100%);
+        }
+
+        .btn-zalo-float:active {
+            transform: scale(0.92);
         }
 
         @media (max-width: 991px) {
             .cart-toggle-mobile {
                 display: flex;
+                bottom: 180px; /* Moved up to make room for Zalo button */
+            }
+            .btn-zalo-float {
+                bottom: 100px; /* Zalo button sits between complaint (bottom 20) and cart (bottom 180) on mobile */
             }
         }
     </style>
+    <!-- Firebase SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -1125,6 +1164,11 @@
         </div>
     </div>
 
+    <!-- Floating Zalo Button -->
+    <a href="https://zalo.me/g/xclnxkmdtrh9mzvn2apl" target="_blank" rel="noopener noreferrer" id="btn-zalo-float" class="btn-zalo-float" aria-label="Liên hệ Zalo" style="padding: 0; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <img src="./assets/zalo.png" alt="Zalo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+    </a>
+
     <!-- Floating Mobile Cart Button (Enlarged and styled) -->
     <button id="btn-cart-mobile" class="cart-toggle-mobile" aria-label="Xem giỏ hàng">
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; position: relative;">
@@ -1265,6 +1309,23 @@
     <!-- Logic JS -->
     <script>
         // ==========================================
+        // CẤU HÌNH FIREBASE REALTIME DATABASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBk-WEVyhyHYp5imW_a1FNlV1l25sujKhY",
+            authDomain: "bhdlvv.firebaseapp.com",
+            databaseURL: "https://bhdlvv-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bhdlvv",
+            storageBucket: "bhdlvv.firebasestorage.app",
+            messagingSenderId: "519114521085",
+            appId: "1:519114521085:web:19ee84f5409f37bf53c194",
+            measurementId: "G-Z9WFEJH5W9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        // ==========================================
+
+        // ==========================================
         // CẤU HÌNH MẶC ĐỊNH CHO DISCORD WEBHOOK TẠI ĐÂY
         // ==========================================
         const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1523364147801362602/tOGL13hqlQkkbn-QKv2oCpOcw5tB7452o89XVB7M2Fd2c8-nVT2u3x4Cf1nGAYLLei6s'; // Nhập URL Discord Webhook ở đây
@@ -1340,66 +1401,35 @@
         // Danh sách các món ăn hoạt động (sẽ load từ localStorage)
         let foodCatalog = [];
 
-        // Load danh sách món từ localStorage hoặc khởi tạo mặc định
+        // Load danh sách món từ Firebase Realtime Database
         function loadFoodCatalog() {
-            const savedCatalog = localStorage.getItem('bhds_cine_catalog');
-            if (savedCatalog) {
-                try {
-                    foodCatalog = JSON.parse(savedCatalog);
-                    
-                    let updated = false;
-
-                    // Lọc bỏ thức ăn nóng (IDs 2, 3, 4, 7) và các loại trà (IDs 12, 13, 14)
-                    const idsToRemove = [2, 3, 4, 7, 12, 13, 14];
-                    const originalLength = foodCatalog.length;
-                    foodCatalog = foodCatalog.filter(food => !idsToRemove.includes(food.id));
-                    if (foodCatalog.length !== originalLength) {
-                        updated = true;
-                    }
-
-                    // Cập nhật ảnh mới cục bộ nếu có
-                    foodCatalog.forEach(food => {
-                        if (food.id === 1 && food.image !== './assets/bap.png') {
-                            food.image = './assets/bap.png';
-                            updated = true;
-                        }
-                        if (food.id === 5 && food.image !== './assets/singlecombo.png') {
-                            food.image = './assets/singlecombo.png';
-                            updated = true;
-                        }
-                        if (food.id === 6 && food.image !== './assets/couplecombo.png') {
-                            food.image = './assets/couplecombo.png';
-                            updated = true;
-                        }
-                        if (food.id === 8 && food.image !== './assets/prefreshcb.png') {
-                            food.image = './assets/prefreshcb.png';
-                            updated = true;
-                        }
-                        if (food.id === 9 && food.image !== './assets/nuocngotly.png') {
-                            food.image = './assets/nuocngotly.png';
-                            updated = true;
-                        }
-                        if (food.id === 10 && food.image !== './assets/aquafina.png') {
-                            food.image = './assets/aquafina.png';
-                            updated = true;
-                        }
-                        if (food.id === 11 && food.image !== './assets/nuocngotlon.png') {
-                            food.image = './assets/nuocngotlon.png';
-                            updated = true;
-                        }
-                    });
-                    if (updated) {
-                        localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-                    }
-                } catch (e) {
-                    console.error("Lỗi parse catalog từ localStorage, dùng mặc định:", e);
-                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+            database.ref('foodCatalog').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    foodCatalog = data;
+                    // Đồng bộ dự phòng vào localStorage
                     localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+                } else {
+                    // Nếu chưa có dữ liệu trên Firebase, khởi tạo bằng danh sách mặc định
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                    database.ref('foodCatalog').set(foodCatalog);
                 }
-            } else {
-                foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-            }
+                // Tự động render lại giao diện khi dữ liệu thay đổi
+                renderFoodCatalog();
+            }, (error) => {
+                console.error("Lỗi đọc dữ liệu từ Firebase, dùng dự phòng localStorage:", error);
+                const savedCatalog = localStorage.getItem('bhds_cine_catalog');
+                if (savedCatalog) {
+                    try {
+                        foodCatalog = JSON.parse(savedCatalog);
+                    } catch (e) {
+                        foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                    }
+                } else {
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                }
+                renderFoodCatalog();
+            });
         }
 
         // Quản lý trạng thái Giỏ Hàng bằng Mảng
