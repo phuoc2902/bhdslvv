@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHDS Lê Văn Việt - System Architecture Diagram</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --card-hover: #1f2937;
+            --border-color: #374151;
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.15);
+            --secondary: #3b82f6;
+            --secondary-glow: rgba(59, 130, 246, 0.15);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.15);
+            --danger: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-outfit: 'Outfit', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-outfit);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Workspace Grid */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1.8fr 1.2fr;
+            }
+        }
+
+        /* Diagram Canvas Area */
+        .canvas-container {
+            position: relative;
+            padding: 2.5rem;
+            overflow: auto;
+            background: radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.6) 0%, var(--bg-color) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 600px;
+        }
+
+        .diagram-wrapper {
+            position: relative;
+            width: 850px;
+            height: 520px;
+            margin: auto;
+        }
+
+        .svg-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Connection paths styles */
+        .connection-line {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 2.5;
+            transition: var(--transition);
+        }
+
+        .connection-line.active {
+            stroke: var(--primary);
+            filter: drop-shadow(0 0 4px var(--primary));
+        }
+
+        .connection-line.secondary-active {
+            stroke: var(--secondary);
+            filter: drop-shadow(0 0 4px var(--secondary));
+        }
+
+        /* Dash flow animation */
+        .flow-dots {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-dasharray: 6, 12;
+            stroke-linecap: round;
+            animation: flow 25s linear infinite;
+            display: none;
+        }
+
+        .flow-dots.active {
+            display: block;
+            stroke: var(--primary);
+        }
+
+        .flow-dots.secondary-active {
+            display: block;
+            stroke: var(--secondary);
+        }
+
+        @keyframes flow {
+            to {
+                stroke-dashoffset: -360px;
+            }
+        }
+
+        /* Node/Card Styling */
+        .node {
+            position: absolute;
+            z-index: 10;
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            width: 200px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .node:hover, .node.selected {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 30px var(--primary-glow);
+        }
+
+        .node.blue-node:hover, .node.blue-node.selected {
+            border-color: var(--secondary);
+            box-shadow: 0 8px 30px var(--secondary-glow);
+        }
+
+        .node.warning-node:hover, .node.warning-node.selected {
+            border-color: var(--warning);
+            box-shadow: 0 8px 30px var(--warning-glow);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .node-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .node:hover .node-icon, .node.selected .node-icon {
+            background: var(--primary);
+            color: white;
+        }
+
+        .node.blue-node:hover .node-icon, .node.blue-node.selected .node-icon {
+            background: var(--secondary);
+        }
+
+        .node.warning-node:hover .node-icon, .node.warning-node.selected .node-icon {
+            background: var(--warning);
+        }
+
+        .node-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .node-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* Node coordinates (Manual positioning on canvas) */
+        #node-dev { top: 30px; left: 20px; }
+        #node-github { top: 30px; left: 290px; }
+        #node-actions { top: 30px; left: 580px; }
+        
+        #node-client { top: 220px; left: 160px; }
+        #node-admin { top: 220px; left: 450px; }
+
+        #node-discord-order { top: 400px; left: 20px; }
+        #node-discord-complaint { top: 400px; left: 290px; }
+        #node-firebase { top: 400px; left: 580px; }
+
+        /* Detail Panel */
+        .detail-panel {
+            background: rgba(17, 24, 39, 0.95);
+            border-left: 1px solid var(--border-color);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-title-container h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .detail-title-container p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .detail-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 4px;
+        }
+
+        .detail-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .flow-details-list {
+            list-style: none;
+        }
+
+        .flow-details-list li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .flow-details-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Code Block Component */
+        .code-container {
+            background-color: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+
+        .code-header {
+            background-color: #0f172a;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-body {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #34d399;
+            line-height: 1.4;
+            max-height: 250px;
+        }
+
+        /* Empty state for Detail panel */
+        .empty-detail-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-detail-state svg {
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        /* Info Banner */
+        .footer-banner {
+            padding: 1rem 2rem;
+            text-align: center;
+            background: #0f172a;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-banner strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-title">
+            <h1>BHDS Lê Văn Việt</h1>
+            <p>Hệ thống Tải thực đơn, Đặt hàng & Xử lý phản hồi tự động</p>
+        </div>
+        <div>
+            <span class="badge">Sơ đồ Kiến trúc Hệ thống</span>
+        </div>
+    </header>
+
+    <!-- Workspace -->
+    <div class="workspace">
+        
+        <!-- Canvas Area -->
+        <div class="canvas-container">
+            <div class="diagram-wrapper" id="diagram-container">
+                <svg class="svg-backdrop" id="diagram-svg">
+                    <defs>
+                        <!-- Glow filters -->
+                        <filter id="glow-green" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+                    <!-- Background Connection Lines (Base) -->
+                    <path id="line-dev-github" class="connection-line" />
+                    <path id="line-github-actions" class="connection-line" />
+                    <path id="line-actions-client" class="connection-line" />
+                    <path id="line-actions-admin" class="connection-line" />
+                    <path id="line-client-discord-order" class="connection-line" />
+                    <path id="line-client-discord-complaint" class="connection-line" />
+                    <path id="line-admin-firebase" class="connection-line" />
+                    <path id="line-firebase-client" class="connection-line" />
+
+                    <!-- Animated Flow Dots -->
+                    <path id="flow-dev-github" class="flow-dots" />
+                    <path id="flow-github-actions" class="flow-dots" />
+                    <path id="flow-actions-client" class="flow-dots" />
+                    <path id="flow-actions-admin" class="flow-dots" />
+                    <path id="flow-client-discord-order" class="flow-dots" />
+                    <path id="flow-client-discord-complaint" class="flow-dots" />
+                    <path id="flow-admin-firebase" class="flow-dots" />
+                    <path id="flow-firebase-client" class="flow-dots" />
+                </svg>
+
+                <!-- Cards (Nodes) -->
+                
+                <!-- Section: Dev/Pipeline -->
+                <div class="node warning-node" id="node-dev" onclick="selectNode('dev')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <span class="node-title">obfuscate.js (Dev)</span>
+                    </div>
+                    <p class="node-desc">Môi trường phát triển cục bộ và thuật toán bảo mật/mã hóa code.</p>
+                </div>
+
+                <div class="node warning-node" id="node-github" onclick="selectNode('github')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <span class="node-title">GitHub Repo</span>
+                    </div>
+                    <p class="node-desc">Nơi lưu trữ mã nguồn, kích hoạt build tự động khi có git push.</p>
+                </div>
+
+                <div class="node warning-node" id="node-actions" onclick="selectNode('actions')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <span class="node-title">GitHub Actions</span>
+                    </div>
+                    <p class="node-desc">CI/CD: obfuscate mã nguồn HTML/JS rồi deploy lên Github Pages.</p>
+                </div>
+
+                <!-- Section: Pages (Hosting) -->
+                <div class="node" id="node-client" onclick="selectNode('client')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
+                        <span class="node-title">index.html (Khách)</span>
+                    </div>
+                    <p class="node-desc">Giao diện đặt đồ ăn, chọn rạp/ghế cinema, gửi thông tin qua Discord.</p>
+                </div>
+
+                <div class="node" id="node-admin" onclick="selectNode('admin')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </div>
+                        <span class="node-title">admin.html (Admin)</span>
+                    </div>
+                    <p class="node-desc">Quản lý thực đơn, tải ảnh trực tiếp, cập nhật Realtime DB.</p>
+                </div>
+
+                <!-- Section: Endpoints/Databases -->
+                <div class="node blue-node" id="node-discord-order" onclick="selectNode('discord-order')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                        </div>
+                        <span class="node-title">Discord Order Bot</span>
+                    </div>
+                    <p class="node-desc">Nhận thông báo tự động chi tiết đơn hàng (món ăn, số ghế, SĐT).</p>
+                </div>
+
+                <div class="node blue-node" id="node-discord-complaint" onclick="selectNode('discord-complaint')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <span class="node-title">Discord Support Bot</span>
+                    </div>
+                    <p class="node-desc">Kênh tách biệt nhận khiếu nại (Complaints) của khách hàng.</p>
+                </div>
+
+                <div class="node blue-node" id="node-firebase" onclick="selectNode('firebase')">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.89 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.89 8-4M4 7c0-2.21 3.582-4 8-4s8 1.89 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.89-8-4" />
+                            </svg>
+                        </div>
+                        <span class="node-title">Firebase Database</span>
+                    </div>
+                    <p class="node-desc">Đồng bộ danh sách thực đơn (Catalog) thời gian thực hai chiều.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel" id="detail-panel">
+            <div class="empty-detail-state" id="empty-state">
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+                <h3>Chọn một thành phần</h3>
+                <p style="font-size: 0.85rem; margin-top: 4px;">Nhấp vào bất kỳ thẻ nào trên sơ đồ để xem chi tiết luồng hoạt động, cấu trúc bảo mật và code mẫu.</p>
+            </div>
+            
+            <div id="detail-content" style="display: none;">
+                <div class="detail-header">
+                    <div class="node-icon" id="detail-icon" style="width: 36px; height: 36px; font-size: 1.25rem;"></div>
+                    <div class="detail-title-container">
+                        <h2 id="detail-title">Tên thành phần</h2>
+                        <p id="detail-subtitle">Vai trò trong hệ thống</p>
+                    </div>
+                </div>
+                <div class="detail-badge" id="detail-badge-tech">Công nghệ</div>
+
+                <div class="detail-section">
+                    <div class="section-title">Mô tả luồng hoạt động</div>
+                    <p class="detail-text" id="detail-desc">Chi tiết...</p>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-title">Kết nối & Bảo mật</div>
+                    <ul class="flow-details-list" id="detail-flows">
+                        <li>Luồng 1</li>
+                        <li>Luồng 2</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section" id="code-section">
+                    <div class="section-title">Đoạn code đặc trưng</div>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span id="code-file">filename.js</span>
+                            <span style="color: var(--primary);">ACTIVE SNIPPET</span>
+                        </div>
+                        <pre class="code-body"><code id="code-content"></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-banner">
+        Hệ thống được thiết kế với cơ chế <strong>Tự động hóa</strong> và <strong>Bảo mật đầu cuối</strong>. Nhấp vào các thẻ để xem cơ chế chuyển ảnh Base64 và phân kênh Discord Webhook.
+    </div>
+
+    <script>
+        // Database of components data
+        const nodeData = {
+            'dev': {
+                title: 'obfuscate.js (Môi trường Dev)',
+                subtitle: 'Source Code & Thuật toán Bảo mật',
+                tech: 'NodeJS / JavaScript-Obfuscator',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>`,
+                badgeClass: 'warning-node',
+                desc: 'Mã nguồn gốc (index.html, admin.html) chứa các cấu hình quan trọng như API key của Firebase, địa chỉ Discord Webhook và mã PIN đăng nhập Admin. Để bảo vệ các dữ liệu này khỏi sự nhòm ngó thông qua F12 ở trình duyệt của khách hàng, tệp `obfuscate.js` sử dụng thư viện `javascript-obfuscator` để mã hóa và gây nhiễu toàn bộ code Javascript trước khi phân phối lên máy chủ.',
+                flows: [
+                    'Mã hóa toàn bộ chuỗi ký tự (Strings) thành định dạng hex/base64.',
+                    'Xáo trộn cấu trúc điều khiển để chống dịch ngược dòng mã.',
+                    'Chạy trực tiếp cục bộ hoặc chạy trong Github Actions runner trước khi deploy.',
+                    'Bảo vệ mã PIN đăng nhập (2902, 1234) và các Webhook nhạy cảm.'
+                ],
+                codeFile: 'obfuscate.js',
+                code: `const obfuscator = require('javascript-obfuscator');
+const options = {
+    compact: true,
+    controlFlowFlattening: true,
+    numbersToExpressions: true,
+    simplify: true,
+    stringArray: true,
+    stringArrayEncoding: ['base64'],
+    splitStrings: true
+};
+// Đọc file gốc và ghi đè bằng phiên bản obfuscated`
+            },
+            'github': {
+                title: 'GitHub Repository',
+                subtitle: 'Quản lý Phiên bản & Kích hoạt CI/CD',
+                tech: 'Git / GitHub Version Control',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>`,
+                badgeClass: 'warning-node',
+                desc: 'Kho lưu trữ mã nguồn đóng vai trò trung tâm lưu trữ toàn bộ lịch sử chỉnh sửa. Khi lập trình viên thực hiện lệnh `git push origin main`, GitHub sẽ nhận các tệp mã nguồn mới nhất và ngay lập tức gửi tín hiệu kích hoạt quy trình làm việc tự động (Workflow) được cấu hình trong thư mục `.github/workflows`.',
+                flows: [
+                    'Lưu trữ an toàn các tệp mã nguồn tĩnh (HTML, CSS, JS, CNAME).',
+                    'Lắng nghe sự kiện đẩy code lên nhánh chính (branch `main`).',
+                    'Không lưu trữ trực tiếp thư mục `node_modules` (sẽ được cài đặt tự động ở runner).'
+                ],
+                codeFile: 'git command',
+                code: `git add admin.html index.html
+git commit -m "feat: separate complaint bot webhook & update design"
+git push origin main
+# Kích hoạt deploy.yml tự động`
+            },
+            'actions': {
+                title: 'GitHub Actions (CI/CD Pipeline)',
+                subtitle: 'Tự động hóa Đóng gói & Deploy',
+                tech: 'GitHub Actions / YAML Workflow',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>`,
+                badgeClass: 'warning-node',
+                desc: 'Workflow `deploy.yml` tự động khởi chạy một máy ảo (runner) để biên dịch. Runner thực hiện cài đặt thư viện mã hóa, chạy tệp script obfuscate.js để bảo vệ mã nguồn, tạo thư mục build tĩnh sạch sẽ, và đẩy toàn bộ sản phẩm đã mã hóa lên nhánh `gh-pages` để phân phối trực tiếp.',
+                flows: [
+                    'Khởi chạy môi trường ubuntu-latest.',
+                    'Cài đặt Node.js và thư viện javascript-obfuscator.',
+                    'Thực thi `node obfuscate.js` ghi đè trực tiếp mã độc giả lập.',
+                    'Đẩy mã nguồn tĩnh đã được mã hóa an toàn lên hosting GitHub Pages.'
+                ],
+                codeFile: 'deploy.yml',
+                code: `- name: Install Obfuscator
+  run: npm install javascript-obfuscator
+- name: Obfuscate Files
+  run: node obfuscate.js
+- name: Deploy to GitHub Pages
+  uses: JamesIves/github-pages-deploy-action@v4
+  with:
+    folder: .
+    branch: gh-pages`
+            },
+            'client': {
+                title: 'index.html (Giao diện Khách hàng)',
+                subtitle: 'Đặt món ăn & Thanh toán trực tuyến',
+                tech: 'HTML5 / Vanilla CSS / ES6 JavaScript',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>`,
+                badgeClass: '',
+                desc: 'Trang đặt hàng chính thức dành cho người dùng cuối. Giao diện tối ưu di động với các tính năng: tải menu đồ ăn động thời gian thực, giỏ hàng tự động tính toán giá tiền (bao gồm cả nhân đôi giá ghế cặp Cinema), tích hợp mã QR thanh toán Momo, form gửi khiếu nại (Complaints) và thông báo đơn hàng.',
+                flows: [
+                    'Tải dữ liệu thực đơn động từ Firebase Realtime Database.',
+                    'Lưu trữ giỏ hàng, thông tin khách hàng trong LocalStorage để tránh mất dữ liệu khi tải lại trang.',
+                    'Gửi đơn hàng chi tiết qua Discord Webhook chính.',
+                    'Gửi góp ý/khiếu nại qua Discord Webhook khiếu nại độc lập.'
+                ],
+                codeFile: 'index.html',
+                code: `// Gửi khiếu nại sang Bot độc lập
+const COMPLAINT_WEBHOOK_URL = "https://discord.com/api/webhooks/...";
+fetch(COMPLAINT_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: \`📢 **KHIẾU NẠI MỚI**\\nNội dung: \${text}\` })
+});`
+            },
+            'admin': {
+                title: 'admin.html (Bảng quản trị)',
+                subtitle: 'Quản lý Thực đơn & Tải ảnh Thiết bị',
+                tech: 'Firebase SDK / Canvas API / Responsive CSS',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>`,
+                badgeClass: '',
+                desc: 'Giao diện bí mật được ẩn giấu (kích hoạt bằng cách nhấp 5 lần vào logo BHDS và nhập PIN bảo mật). Admin có thể thêm mới món ăn bằng cách dán URL ảnh hoặc chọn trực tiếp tệp ảnh từ điện thoại/máy tính của mình. Ứng dụng sẽ nén ảnh về dạng JPEG và chuyển thành chuỗi Base64 cực kỳ nhỏ gọn để lưu trữ trực tiếp vào Realtime DB.',
+                flows: [
+                    'Bảo mật ẩn logo + xác thực PIN trước khi mở khóa giao diện.',
+                    'Đọc tệp hình ảnh từ bộ nhớ máy qua FileReader.',
+                    'Sử dụng Canvas API nén ảnh về kích thước tối đa 500px, chất lượng 70% để tiết kiệm bộ nhớ.',
+                    'Đồng bộ hóa tức thì các thay đổi lên cơ sở dữ liệu Firebase.'
+                ],
+                codeFile: 'admin.html',
+                code: `// Hàm nén ảnh sang Base64
+function resizeAndCompressImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // Tính toán tỷ lệ và vẽ ảnh vào canvas 500x500
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            }
+        }
+    });
+}`
+            },
+            'discord-order': {
+                title: 'Discord Order Bot Webhook',
+                subtitle: 'Kênh nhận thông báo Đơn hàng mới',
+                tech: 'Discord Webhook API',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`,
+                badgeClass: 'blue-node',
+                desc: 'Webhook chuyên dụng tiếp nhận toàn bộ thông tin thanh toán và đơn đặt đồ ăn từ trang `index.html`. Sau khi khách hàng hoàn tất việc xác nhận thanh toán (Momo/Tiền mặt), đơn hàng sẽ được gửi thẳng vào kênh chat của quản lý để nhân viên kịp thời chuẩn bị món và giữ ghế.',
+                flows: [
+                    'Nhận chuỗi JSON chứa các embeds đẹp mắt.',
+                    'Hiển thị tên khách hàng, số điện thoại, danh sách món ăn đã chọn.',
+                    'Hiển thị số rạp chiếu phim (Rạp) và số ghế (Ghế đơn/ghế đôi) tương ứng.'
+                ],
+                codeFile: 'Discord JSON Payload',
+                code: `{
+  "username": "BHDS Lê Văn Việt - ĐƠN HÀNG",
+  "embeds": [{
+    "title": "🎬 ĐƠN ĐẶT MÓN MỚI",
+    "color": 65280,
+    "fields": [
+      { "name": "Khách hàng", "value": "Nguyễn Văn A" },
+      { "name": "Chi tiết", "value": "2x Bắp ngọt, 1x Coca-cola" },
+      { "name": "Vị trí", "value": "Rạp 3 - Ghế G12, G13" }
+    ]
+  }]
+}`
+            },
+            'discord-complaint': {
+                title: 'Discord Complaint Bot Webhook',
+                subtitle: 'Kênh xử lý Khiếu nại độc lập',
+                tech: 'Discord Webhook API (Kênh bảo mật)',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`,
+                badgeClass: 'blue-node',
+                desc: 'Được thiết lập độc lập so với bot nhận đơn hàng thông thường. Kênh này nhận các tin nhắn đóng góp, phản hồi hoặc khiếu nại chất lượng dịch vụ của khách hàng. Việc tách riêng webhook giúp quản trị viên dễ phân loại công việc và tăng tính bảo mật thông tin nội bộ.',
+                flows: [
+                    'Tách biệt luồng thông tin để tránh làm nhiễu kênh nhận đơn đặt món hàng ngày.',
+                    'Chuyển tiếp tức thì ý kiến khách hàng đến bộ phận chăm sóc khách hàng.',
+                    'Sử dụng biến hằng `COMPLAINT_WEBHOOK_URL` riêng biệt.'
+                ],
+                codeFile: 'complaint.js',
+                code: `// Payload gửi về kênh CSKH
+const payload = {
+    content: "⚠️ **CÓ PHẢN HỒI KHIẾU NẠI MỚI!**",
+    embeds: [{
+        description: complaintText,
+        timestamp: new Date().toISOString()
+    }]
+};`
+            },
+            'firebase': {
+                title: 'Firebase Realtime Database',
+                subtitle: 'Cơ sở dữ liệu Thực đơn đồng bộ tức thời',
+                tech: 'Firebase Web SDK v8 / NoSQL Database',
+                icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.89 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.89 8-4M4 7c0-2.21 3.582-4 8-4s8 1.89 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.89-8-4" /></svg>`,
+                badgeClass: 'blue-node',
+                desc: 'Cơ sở dữ liệu thời gian thực không SQL (NoSQL). Firebase giữ vai trò liên kết chặt chẽ giữa khách hàng và quản lý. Bất cứ khi nào quản trị viên sửa giá, đổi tên hoặc tải ảnh món ăn mới lên từ trang Admin, dữ liệu sẽ được cập nhật đồng bộ tức thời xuống màn hình gọi món của tất cả khách hàng đang mở trang Web mà không cần tải lại.',
+                flows: [
+                    'Lưu trữ thực đơn dưới key node \`/foodCatalog\`.',
+                    'Đồng bộ thay đổi qua sự kiện \`.on(\'value\')\` của Firebase Database.',
+                    'Tích hợp lưu trữ dự phòng ở LocalStorage máy khách đề phòng khi mất kết nối mạng.'
+                ],
+                codeFile: 'firebase integration',
+                code: `// Đăng ký nhận cập nhật menu thời gian thực
+database.ref('foodCatalog').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        foodCatalog = data;
+        renderFoodList();
+    }
+});`
+            }
+        };
+
+        // Render connectors on window load & resize
+        function drawAllConnectors() {
+            // Dev -> Github
+            drawConnector('node-dev', 'node-github', 'line-dev-github', 'flow-dev-github', 'right', 'left');
+            // Github -> Actions
+            drawConnector('node-github', 'node-actions', 'line-github-actions', 'flow-github-actions', 'right', 'left');
+            // Actions -> Client
+            drawConnector('node-actions', 'node-client', 'line-actions-client', 'flow-actions-client', 'bottom', 'top');
+            // Actions -> Admin
+            drawConnector('node-actions', 'node-admin', 'line-actions-admin', 'bottom', 'top');
+            // Client -> Discord Order
+            drawConnector('node-client', 'node-discord-order', 'line-client-discord-order', 'flow-client-discord-order', 'bottom', 'top');
+            // Client -> Discord Complaint
+            drawConnector('node-client', 'node-discord-complaint', 'line-client-discord-complaint', 'bottom', 'top');
+            // Admin -> Firebase
+            drawConnector('node-admin', 'node-firebase', 'line-admin-firebase', 'flow-admin-firebase', 'bottom', 'top');
+            // Firebase -> Client (Realtime sync loop back)
+            drawConnector('node-firebase', 'node-client', 'line-firebase-client', 'flow-firebase-client', 'left', 'right');
+        }
+
+        function drawConnector(fromId, toId, lineId, flowId, fromSocket, toSocket) {
+            const container = document.getElementById('diagram-container');
+            const fromEl = document.getElementById(fromId);
+            const toEl = document.getElementById(toId);
+            const lineEl = document.getElementById(lineId);
+            const flowEl = document.getElementById(flowId);
+
+            if (!container || !fromEl || !toEl || !lineEl || !flowEl) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const fromRect = fromEl.getBoundingClientRect();
+            const toRect = toEl.getBoundingClientRect();
+
+            let x1, y1, x2, y2;
+
+            // From coordinates relative to container
+            if (fromSocket === 'right') {
+                x1 = fromRect.right - containerRect.left;
+                y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+            } else if (fromSocket === 'bottom') {
+                x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+                y1 = fromRect.bottom - containerRect.top;
+            } else if (fromSocket === 'left') {
+                x1 = fromRect.left - containerRect.left;
+                y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+            } else {
+                x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+                y1 = fromRect.top - containerRect.top;
+            }
+
+            // To coordinates relative to container
+            if (toSocket === 'left') {
+                x2 = toRect.left - containerRect.left;
+                y2 = toRect.top + toRect.height / 2 - containerRect.top;
+            } else if (toSocket === 'top') {
+                x2 = toRect.left + toRect.width / 2 - containerRect.left;
+                y2 = toRect.top - containerRect.top;
+            } else if (toSocket === 'bottom') {
+                x2 = toRect.left + toRect.width / 2 - containerRect.left;
+                y2 = toRect.bottom - containerRect.top;
+            } else {
+                x2 = toRect.right - containerRect.left;
+                y2 = toRect.top + toRect.height / 2 - containerRect.top;
+            }
+
+            // Draw curved path
+            let d = '';
+            if (fromSocket === 'right' && toSocket === 'left') {
+                const cpX = (x1 + x2) / 2;
+                d = `M ${x1} ${y1} C ${cpX} ${y1}, ${cpX} ${y2}, ${x2} ${y2}`;
+            } else if (fromSocket === 'bottom' && toSocket === 'top') {
+                const cpY = (y1 + y2) / 2;
+                d = `M ${x1} ${y1} C ${x1} ${cpY}, ${x2} ${cpY}, ${x2} ${y2}`;
+            } else if (fromSocket === 'left' && toSocket === 'right') {
+                // Loop back path for Firebase -> Client (curved outwards to the left)
+                const cpX = Math.min(x1, x2) - 40;
+                d = `M ${x1} ${y1} C ${cpX} ${y1 + 40}, ${cpX} ${y2 - 40}, ${x2} ${y2}`;
+            } else {
+                d = `M ${x1} ${y1} L ${x2} ${y2}`;
+            }
+
+            lineEl.setAttribute('d', d);
+            flowEl.setAttribute('d', d);
+        }
+
+        // Selection logic
+        let currentSelectedId = null;
+
+        function selectNode(nodeId) {
+            // Remove previous selections
+            document.querySelectorAll('.node').forEach(node => {
+                node.classList.remove('selected');
+            });
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.classList.remove('active', 'secondary-active');
+            });
+            document.querySelectorAll('.flow-dots').forEach(flow => {
+                flow.classList.remove('active', 'secondary-active');
+            });
+
+            const nodeEl = document.getElementById(`node-${nodeId}`);
+            if (!nodeEl) return;
+
+            // Set selected node style
+            nodeEl.classList.add('selected');
+            currentSelectedId = nodeId;
+
+            // Highlight connections related to this node
+            highlightConnections(nodeId);
+
+            // Populate detail panel
+            const data = nodeData[nodeId];
+            if (data) {
+                document.getElementById('empty-state').style.display = 'none';
+                const content = document.getElementById('detail-content');
+                content.style.display = 'block';
+
+                document.getElementById('detail-icon').innerHTML = data.icon;
+                document.getElementById('detail-title').textContent = data.title;
+                document.getElementById('detail-subtitle').textContent = data.subtitle;
+                
+                const badge = document.getElementById('detail-badge-tech');
+                badge.textContent = data.tech;
+                badge.className = 'detail-badge ' + (data.badgeClass || '');
+
+                document.getElementById('detail-desc').textContent = data.desc;
+
+                // Flows list
+                const flowsList = document.getElementById('detail-flows');
+                flowsList.innerHTML = data.flows.map(flow => `<li>${flow}</li>`).join('');
+
+                // Code block
+                if (data.code) {
+                    document.getElementById('code-section').style.display = 'block';
+                    document.getElementById('code-file').textContent = data.codeFile;
+                    document.getElementById('code-content').textContent = data.code;
+                } else {
+                    document.getElementById('code-section').style.display = 'none';
+                }
+                
+                // Scroll details to top
+                document.getElementById('detail-panel').scrollTop = 0;
+            }
+        }
+
+        function highlightConnections(nodeId) {
+            // Active states based on selected node
+            const connections = {
+                'dev': ['line-dev-github', 'flow-dev-github'],
+                'github': ['line-dev-github', 'flow-dev-github', 'line-github-actions', 'flow-github-actions'],
+                'actions': ['line-github-actions', 'flow-github-actions', 'line-actions-client', 'flow-actions-client', 'line-actions-admin', 'flow-actions-admin'],
+                'client': ['line-client-discord-order', 'flow-client-discord-order', 'line-client-discord-complaint', 'flow-client-discord-complaint'],
+                'admin': ['line-admin-firebase', 'flow-admin-firebase'],
+                'discord-order': ['line-client-discord-order', 'flow-client-discord-order'],
+                'discord-complaint': ['line-client-discord-complaint', 'flow-client-discord-complaint'],
+                'firebase': ['line-admin-firebase', 'flow-admin-firebase', 'line-firebase-client', 'flow-firebase-client']
+            };
+
+            const activeList = connections[nodeId] || [];
+            activeList.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const isSecondary = nodeId === 'dev' || nodeId === 'github' || nodeId === 'actions';
+                    el.classList.add(isSecondary ? 'secondary-active' : 'active');
+                }
+            });
+        }
+
+        // Initialize & Events
+        window.addEventListener('load', () => {
+            drawAllConnectors();
+            // Select dev by default to showcase layout
+            selectNode('dev');
+        });
+        window.addEventListener('resize', drawAllConnectors);
+
+    </script>
+</body>
+</html>
