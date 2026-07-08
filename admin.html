@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BHDS Admin - Quản Lý Thực Đơn</title>
+    <title>BHDS Lê Văn Việt Admin - Quản Lý Thực Đơn</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,6 +132,12 @@
             stroke-width: 2.5;
             width: 28px;
             height: 28px;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
         .header-actions {
@@ -590,11 +596,9 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo" aria-label="BHDS Home">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-                BHDS Admin
+            <a href="index.html" class="logo" aria-label="BHDS Lê Văn Việt Home">
+                <img src="./logo.png" alt="BHDS Logo">
+                BHDS Lê Văn Việt Admin
             </a>
             <div class="header-actions">
                 <a href="index.html" class="btn-action btn-back">
@@ -709,7 +713,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 BHDS Admin Panel. Bản quyền thuộc về thiết kế HTML/JS tĩnh.</p>
+        <p>&copy; 2026 BHDS Lê Văn Việt Admin Panel. Bản quyền thuộc về thiết kế HTML/JS tĩnh.</p>
     </footer>
 
     <!-- JS Logic -->
@@ -720,106 +724,55 @@
             window.location.href = "index.html";
         }
 
-        // Danh sách các món ăn mặc định của hệ thống
-        // Danh sách các món ăn mặc định của hệ thống
         const DEFAULT_FOOD_CATALOG = [
             {
                 id: 1,
                 name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
                 description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
                 price: 62000,
-                image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 2,
-                name: "Xúc Xích Lốc Xoáy",
-                description: "Xúc xúc chiên tạo hình lốc xoáy giòn ngon rưới tương cà tương ớt.",
-                price: 42000,
-                image: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 3,
-                name: "Khoai Tây Chiên",
-                description: "Khoai tây chiên sợi vàng giòn rụm ăn kèm tương ớt ngọt cay.",
-                price: 42000,
-                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 4,
-                name: "Gà Vòng",
-                description: "Vòng thịt gà tẩm bột chiên vàng ươm giòn rụm bên ngoài, mềm ngọt bên trong.",
-                price: 45000,
-                image: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&auto=format&fit=crop&q=80"
+                image: "./bap.png"
             },
             {
                 id: 5,
                 name: "Single Combo",
                 description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
                 price: 88000,
-                image: "https://images.unsplash.com/photo-1585647347384-2593bc35786b?w=500&auto=format&fit=crop&q=80"
+                image: "./singlecombo.png"
             },
             {
                 id: 6,
                 name: "Couple Combo",
                 description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
                 price: 121000,
-                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 7,
-                name: "Food Combo",
-                description: "Combo ẩm thực trọn vẹn gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt + 1 đồ ăn nóng tùy chọn.",
-                price: 121000,
-                image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=500&auto=format&fit=crop&q=80"
+                image: "./couplecombo.png"
             },
             {
                 id: 8,
                 name: "Refresh Combo",
                 description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
                 price: 78000,
-                image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=500&auto=format&fit=crop&q=80"
+                image: "./prefreshcb.png"
             },
             {
                 id: 9,
                 name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
                 description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
                 price: 38000,
-                image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=80"
+                image: "./nuocngotly.png"
             },
             {
                 id: 10,
                 name: "Aquafina (Chai)",
                 description: "Nước suối tinh khiết đóng chai Aquafina mát lạnh tiện lợi.",
                 price: 28000,
-                image: "https://images.unsplash.com/photo-1608885898957-a599fb18ec3f?w=500&auto=format&fit=crop&q=80"
+                image: "./aquafina.png"
             },
             {
                 id: 11,
                 name: "Nước Đóng Chai Đồng Giá 39K (Twister / Ô Long / Sting / Pepsi lon)",
                 description: "Lựa chọn các dòng Twister, Trà Ô Long TEA+ mát lạnh, nước tăng lực Sting dâu hoặc Pepsi lon.",
                 price: 39000,
-                image: "https://images.unsplash.com/photo-1527960472437-9653955db39f?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 12,
-                name: "Trà Vải BHD",
-                description: "Trà trái cây vị vải thơm lừng kèm thạch vải dai giòn ngọt lịm.",
-                price: 48000,
-                image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 13,
-                name: "Trà Mãng Cầu BHD",
-                description: "Trà mãng cầu chua chua ngọt ngọt kết hợp thạch trái cây giải nhiệt cực đã.",
-                price: 48000,
-                image: "https://images.unsplash.com/photo-1595981267035-7b04ec82a897?w=500&auto=format&fit=crop&q=80"
-            },
-            {
-                id: 14,
-                name: "Trà Đào BHD",
-                description: "Trà đào thơm ngát trứ danh kết hợp cùng miếng đào lát giòn ngọt mọng nước.",
-                price: 48000,
-                image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=500&auto=format&fit=crop&q=80"
+                image: "./nuocngotlon.png"
             },
             {
                 id: 15,
@@ -851,6 +804,51 @@
             if (savedCatalog) {
                 try {
                     foodCatalog = JSON.parse(savedCatalog);
+                    
+                    let updated = false;
+
+                    // Lọc bỏ thức ăn nóng (IDs 2, 3, 4, 7) và các loại trà (IDs 12, 13, 14)
+                    const idsToRemove = [2, 3, 4, 7, 12, 13, 14];
+                    const originalLength = foodCatalog.length;
+                    foodCatalog = foodCatalog.filter(food => !idsToRemove.includes(food.id));
+                    if (foodCatalog.length !== originalLength) {
+                        updated = true;
+                    }
+
+                    // Cập nhật ảnh mới cục bộ nếu có
+                    foodCatalog.forEach(food => {
+                        if (food.id === 1 && food.image !== './bap.png') {
+                            food.image = './bap.png';
+                            updated = true;
+                        }
+                        if (food.id === 5 && food.image !== './singlecombo.png') {
+                            food.image = './singlecombo.png';
+                            updated = true;
+                        }
+                        if (food.id === 6 && food.image !== './couplecombo.png') {
+                            food.image = './couplecombo.png';
+                            updated = true;
+                        }
+                        if (food.id === 8 && food.image !== './prefreshcb.png') {
+                            food.image = './prefreshcb.png';
+                            updated = true;
+                        }
+                        if (food.id === 9 && food.image !== './nuocngotly.png') {
+                            food.image = './nuocngotly.png';
+                            updated = true;
+                        }
+                        if (food.id === 10 && food.image !== './aquafina.png') {
+                            food.image = './aquafina.png';
+                            updated = true;
+                        }
+                        if (food.id === 11 && food.image !== './nuocngotlon.png') {
+                            food.image = './nuocngotlon.png';
+                            updated = true;
+                        }
+                    });
+                    if (updated) {
+                        saveCatalogToStorage();
+                    }
                 } catch (e) {
                     console.error("Lỗi dữ liệu, khôi phục mặc định", e);
                     foodCatalog = [...DEFAULT_FOOD_CATALOG];
@@ -1028,7 +1026,7 @@
 
         // Khôi phục danh sách món mặc định gốc
         function resetToDefault() {
-            if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS. Bạn vẫn muốn tiếp tục?")) {
+            if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Lê Văn Việt. Bạn vẫn muốn tiếp tục?")) {
                 cancelEdit();
                 foodCatalog = [...DEFAULT_FOOD_CATALOG];
                 saveCatalogToStorage();
