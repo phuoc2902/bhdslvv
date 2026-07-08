@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -580,6 +580,296 @@
             margin-bottom: 1rem;
         }
 
+        /* Tab Styles */
+        .tabs-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .tab-badge {
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-full);
+            line-height: 1;
+            display: none;
+        }
+
+        /* Order Workspace Layout */
+        .orders-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 968px) {
+            .orders-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .order-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .select-filter {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .select-filter:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        /* Order Cards */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .order-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .order-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .order-card.selected {
+            background: rgba(34, 197, 94, 0.06);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
+        }
+
+        .order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .order-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .order-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-preparing {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-cancelled {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Order Details */
+        .order-detail-view {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .order-items-list {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .order-item-row strong {
+            color: var(--primary);
+        }
+
+        /* Order Actions */
+        .order-actions-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-status-change {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-family: var(--font-display);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-status-prep {
+            background-color: #3b82f6;
+        }
+
+        .btn-status-prep:hover {
+            background-color: #2563eb;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-status-complete {
+            background-color: #10b981;
+        }
+
+        .btn-status-complete:hover {
+            background-color: #059669;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-status-cancel {
+            background-color: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-status-cancel:hover {
+            background-color: var(--danger);
+            color: white;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -617,89 +907,160 @@
     <!-- Main Container -->
     <main class="app-container">
         
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-text">
-                <h1>Quản lý thực đơn</h1>
-                <p>Thêm mới, chỉnh sửa thông tin món ăn, giá tiền hoặc xóa món. Dữ liệu sẽ tự động đồng bộ sang trang chủ.</p>
-            </div>
-            <button id="btn-reset-default" class="btn-reset">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" />
+        <!-- Tabs Navigation -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" id="tab-btn-catalog" onclick="switchTab('catalog')">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                Khôi phục thực đơn gốc
+                Quản lý Thực đơn
             </button>
-        </section>
+            <button class="tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                Quản lý Đơn hàng
+                <span class="tab-badge" id="pending-orders-badge">0</span>
+            </button>
+        </nav>
 
-        <!-- Workspace Layout -->
-        <div class="workspace">
-            
-            <!-- Food List Panel (Left) -->
-            <section class="card-panel">
-                <div class="panel-header">
-                    <h2 class="panel-title">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                        </svg>
-                        Danh sách món hiện tại
-                    </h2>
-                    <span id="catalog-count" style="font-size: 0.85rem; background: rgba(34, 197, 94, 0.15); color: var(--primary); padding: 0.2rem 0.6rem; border-radius: var(--radius-full); font-weight: 700;">
-                        0 món
-                    </span>
+        <!-- Tab Content: Catalog -->
+        <div id="tab-content-catalog" class="tab-content" style="display: block;">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-text">
+                    <h1>Quản lý thực đơn</h1>
+                    <p>Thêm mới, chỉnh sửa thông tin món ăn, giá tiền hoặc xóa món. Dữ liệu sẽ tự động đồng bộ sang trang chủ.</p>
                 </div>
-                
-                <div class="food-list-container" id="food-list-container">
-                    <!-- Food item rows will be dynamically rendered here -->
-                </div>
+                <button id="btn-reset-default" class="btn-reset">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" />
+                    </svg>
+                    Khôi phục thực đơn gốc
+                </button>
             </section>
 
-            <!-- Editor Form Panel (Right) -->
-            <aside class="card-panel">
-                <div class="panel-header">
-                    <h2 class="panel-title" id="form-panel-title">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Thêm món ăn mới
-                    </h2>
-                </div>
+            <!-- Workspace Layout -->
+            <div class="workspace">
                 
-                <form id="food-editor-form">
-                    <input type="hidden" id="edit-food-id">
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="food-name">Tên món ăn *</label>
-                        <input type="text" id="food-name" class="form-control" placeholder="Ví dụ: Nem cuốn tôm thịt" required>
+                <!-- Food List Panel (Left) -->
+                <section class="card-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Danh sách món hiện tại
+                        </h2>
+                        <span id="catalog-count" style="font-size: 0.85rem; background: rgba(34, 197, 94, 0.15); color: var(--primary); padding: 0.2rem 0.6rem; border-radius: var(--radius-full); font-weight: 700;">
+                            0 món
+                        </span>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label" for="food-price">Giá bán (VNĐ) *</label>
-                        <input type="number" id="food-price" class="form-control" placeholder="Ví dụ: 65000" min="0" required>
+                    <div class="food-list-container" id="food-list-container">
+                        <!-- Food item rows will be dynamically rendered here -->
                     </div>
+                </section>
 
-                    <div class="form-group">
-                        <label class="form-label" for="food-image">Đường dẫn ảnh (URL) *</label>
-                        <input type="url" id="food-image" class="form-control" placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh bất kỳ..." required>
+                <!-- Editor Form Panel (Right) -->
+                <aside class="card-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title" id="form-panel-title">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Thêm món ăn mới
+                        </h2>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label" for="food-desc">Mô tả chi tiết *</label>
-                        <textarea id="food-desc" class="form-control" placeholder="Nguyên liệu chi tiết, nước sốt đi kèm..." required></textarea>
-                    </div>
-                    
-                    <button type="submit" id="btn-save-food" class="btn-submit">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Thêm món ăn</span>
-                    </button>
-                    
-                    <button type="button" id="btn-cancel-edit" class="btn-cancel" style="display: none;">
-                        Hủy bỏ sửa đổi
-                    </button>
-                </form>
-            </aside>
+                    <form id="food-editor-form">
+                        <input type="hidden" id="edit-food-id">
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="food-name">Tên món ăn *</label>
+                            <input type="text" id="food-name" class="form-control" placeholder="Ví dụ: Nem cuốn tôm thịt" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="food-price">Giá bán (VNĐ) *</label>
+                            <input type="number" id="food-price" class="form-control" placeholder="Ví dụ: 65000" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="food-image">Đường dẫn ảnh (URL) *</label>
+                            <input type="url" id="food-image" class="form-control" placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh bất kỳ..." required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="food-desc">Mô tả chi tiết *</label>
+                            <textarea id="food-desc" class="form-control" placeholder="Nguyên liệu chi tiết, nước sốt đi kèm..." required></textarea>
+                        </div>
+                        
+                        <button type="submit" id="btn-save-food" class="btn-submit">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Thêm món ăn</span>
+                        </button>
+                        
+                        <button type="button" id="btn-cancel-edit" class="btn-cancel" style="display: none;">
+                            Hủy bỏ sửa đổi
+                        </button>
+                    </form>
+                </aside>
+            </div>
         </div>
+
+        <!-- Tab Content: Orders -->
+        <div id="tab-content-orders" class="tab-content" style="display: none;">
+            <div class="orders-layout">
+                <!-- Left panel: Order list with filter -->
+                <section class="card-panel">
+                    <div class="order-list-header">
+                        <h2 class="panel-title" style="margin-bottom: 0;">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Đơn hàng nhận được
+                        </h2>
+                        <select id="filter-order-status" class="select-filter" onchange="renderOrderList()">
+                            <option value="all">Tất cả</option>
+                            <option value="pending">Chờ xử lý</option>
+                            <option value="preparing">Đang làm</option>
+                            <option value="completed">Hoàn thành</option>
+                            <option value="cancelled">Đã hủy</option>
+                        </select>
+                    </div>
+                    
+                    <div class="order-list" id="order-list-container">
+                        <div class="empty-catalog-state" style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48" stroke-width="1.5" style="stroke: var(--text-muted); margin-bottom: 1rem;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            <p>Đang tải danh sách đơn hàng...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right panel: Order details -->
+                <aside class="card-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Chi tiết đơn hàng
+                        </h2>
+                    </div>
+                    
+                    <div id="order-details-container">
+                        <p style="text-align: center; color: var(--text-muted); margin: 3rem 0;">Chọn một đơn hàng để xem chi tiết.</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
     </main>
 
     <!-- Pop-up Alert Modal (Success/Failure) -->
@@ -736,6 +1097,12 @@
             }
         } catch (e) {}
 
+        let activeTab = 'catalog';
+        let orders = {};
+        let discordQueue = [];
+        let isProcessingDiscordQueue = false;
+
+        const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
 
         if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
             alert("Bạn không có quyền truy cập trang này!");
@@ -1089,19 +1456,342 @@
             document.getElementById('popup-result').classList.remove('open');
         }
 
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            
+            document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+            document.getElementById(`tab-content-${tabId}`).style.display = 'block';
+        }
+
+        function initOrdersListener() {
+            if (!database) return;
+            database.ref('orders').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    let hasNewPending = false;
+                    Object.keys(data).forEach(key => {
+                        const order = data[key];
+                        if (order.status === 'pending' && (!orders[key] || orders[key].status !== 'pending')) {
+                            hasNewPending = true;
+                        }
+                    });
+
+                    orders = data;
+                    
+                    if (hasNewPending) {
+                        playNotificationSound();
+                    }
+
+                    queueUnsentOrders();
+                } else {
+                    orders = {};
+                }
+                renderOrderList();
+                updatePendingBadge();
+            });
+        }
+
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const playBeep = (delay, freq, duration) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + delay + duration);
+                    osc.start(audioCtx.currentTime + delay);
+                    osc.stop(audioCtx.currentTime + delay + duration);
+                };
+
+                playBeep(0, 523.25, 0.15);
+                playBeep(0.2, 659.25, 0.2);
+            } catch (e) {
+                console.warn("Autoplay audio blocked or not supported:", e);
+            }
+        }
+
+        let selectedOrderId = null;
+        function renderOrderList() {
+            const container = document.getElementById('order-list-container');
+            if (!container) return;
+
+            const filterStatus = document.getElementById('filter-order-status').value;
+            
+            const orderList = Object.keys(orders).map(key => ({
+                key: key,
+                ...orders[key]
+            })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            const filteredList = orderList.filter(o => filterStatus === 'all' || o.status === filterStatus);
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `<div class="empty-catalog-state" style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48" stroke-width="1.5" style="stroke: var(--text-muted); margin-bottom: 1rem;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <p>Không có đơn hàng nào phù hợp.</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filteredList.map(order => {
+                const dateStr = new Date(order.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(order.createdAt).toLocaleDateString('vi-VN');
+                const isSelected = order.key === selectedOrderId ? 'selected' : '';
+                
+                let statusText = 'Chờ xử lý';
+                if (order.status === 'preparing') statusText = 'Đang làm';
+                else if (order.status === 'completed') statusText = 'Hoàn thành';
+                else if (order.status === 'cancelled') statusText = 'Đã hủy';
+
+                return `
+                    <div class="order-card ${isSelected}" onclick="selectOrder('${order.key}')">
+                        <div class="order-meta">
+                            <div class="order-title">${order.theater} - Ghế ${order.seat}</div>
+                            <div class="order-subtitle">${order.customerName} • ${dateStr}</div>
+                            <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${order.totalPrice.toLocaleString('vi-VN')}đ</div>
+                        </div>
+                        <span class="status-badge status-${order.status}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+
+            if (selectedOrderId) {
+                renderOrderDetails();
+            }
+        }
+
+        function selectOrder(key) {
+            selectedOrderId = key;
+            renderOrderList();
+            renderOrderDetails();
+        }
+
+        function renderOrderDetails() {
+            const container = document.getElementById('order-details-container');
+            if (!container) return;
+
+            const order = orders[selectedOrderId];
+            if (!order) {
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); margin: 3rem 0;">Chọn một đơn hàng để xem chi tiết.</p>`;
+                return;
+            }
+
+            const dateStr = new Date(order.createdAt).toLocaleString('vi-VN');
+            let statusText = 'Chờ xử lý';
+            if (order.status === 'preparing') statusText = 'Đang làm';
+            else if (order.status === 'completed') statusText = 'Hoàn thành';
+            else if (order.status === 'cancelled') statusText = 'Đã hủy';
+
+            let itemsHtml = order.items.map(item => `
+                <div class="order-item-row">
+                    <span>${item.name} <strong>x${item.quantity}</strong></span>
+                    <span>${(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
+                </div>
+            `).join('');
+
+            let paymentMethodText = order.paymentMethod === 'cash' ? 'Tiền mặt' : 'QR MoMo/Chuyển khoản';
+            let cashAmountHtml = order.paymentMethod === 'cash' ? `
+                <div class="detail-row">
+                    <span class="detail-label">Khách đưa:</span>
+                    <span class="detail-value">${order.cashAmount.toLocaleString('vi-VN')}đ</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Thối lại:</span>
+                    <span class="detail-value" style="color: #22c55e;">${(order.cashAmount - order.totalPrice).toLocaleString('vi-VN')}đ</span>
+                </div>
+            ` : '';
+
+            let actionsHtml = '';
+            if (order.status === 'pending') {
+                actionsHtml = `
+                    <div class="order-actions-container">
+                        <button class="btn-status-change btn-status-prep" onclick="updateOrderStatus('${selectedOrderId}', 'preparing')">Nhận đơn (Đang làm)</button>
+                        <button class="btn-status-change btn-status-cancel" onclick="updateOrderStatus('${selectedOrderId}', 'cancelled')">Hủy đơn</button>
+                    </div>
+                `;
+            } else if (order.status === 'preparing') {
+                actionsHtml = `
+                    <div class="order-actions-container">
+                        <button class="btn-status-change btn-status-complete" onclick="updateOrderStatus('${selectedOrderId}', 'completed')">Hoàn thành</button>
+                        <button class="btn-status-change btn-status-cancel" onclick="updateOrderStatus('${selectedOrderId}', 'cancelled')">Hủy đơn</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="order-detail-view">
+                    <div class="detail-row">
+                        <span class="detail-label">Mã đơn:</span>
+                        <span class="detail-value">${order.id}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Khách hàng:</span>
+                        <span class="detail-value">${order.customerName}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Vị trí:</span>
+                        <span class="detail-value">${order.theater} - Ghế ${order.seat}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Ghi chú:</span>
+                        <span class="detail-value">${order.note || 'Không có'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Thời gian đặt:</span>
+                        <span class="detail-value">${dateStr}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Trạng thái:</span>
+                        <span class="status-badge status-${order.status}">${statusText}</span>
+                    </div>
+                    
+                    <div style="font-weight: 700; margin-top: 0.5rem;">Danh sách món đã đặt:</div>
+                    <div class="order-items-list">
+                        ${itemsHtml}
+                    </div>
+
+                    <div class="detail-row" style="border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                        <span class="detail-label">Phương thức:</span>
+                        <span class="detail-value">${paymentMethodText}</span>
+                    </div>
+                    ${cashAmountHtml}
+                    <div class="detail-row" style="font-size: 1.1rem; border-top: 2px solid var(--primary); padding-top: 0.5rem;">
+                        <span class="detail-label" style="font-weight: 700; color: var(--text-primary);">Tổng thanh toán:</span>
+                        <span class="detail-value" style="font-size: 1.15rem; color: var(--primary); font-weight: 800;">${order.totalPrice.toLocaleString('vi-VN')}đ</span>
+                    </div>
+
+                    ${actionsHtml}
+                </div>
+            `;
+        }
+
+        function updateOrderStatus(key, newStatus) {
+            if (!database) return;
+            database.ref(`orders/${key}`).update({
+                status: newStatus
+            }).then(() => {
+                if (selectedOrderId === key) {
+                    renderOrderDetails();
+                }
+            });
+        }
+
+        function updatePendingBadge() {
+            const badge = document.getElementById('pending-orders-badge');
+            if (!badge) return;
+
+            const pendingCount = Object.keys(orders).filter(key => orders[key].status === 'pending').length;
+            if (pendingCount > 0) {
+                badge.textContent = pendingCount;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function queueUnsentOrders() {
+            Object.keys(orders).forEach(key => {
+                const order = orders[key];
+                if (order.status === 'pending' && !order.sentToDiscord) {
+                    if (!discordQueue.some(item => item.key === key)) {
+                        discordQueue.push({
+                            key: key,
+                            order: order
+                        });
+                    }
+                }
+            });
+
+            if (discordQueue.length > 0 && !isProcessingDiscordQueue) {
+                processDiscordQueue();
+            }
+        }
+
+        async function processDiscordQueue() {
+            if (discordQueue.length === 0) {
+                isProcessingDiscordQueue = false;
+                return;
+            }
+
+            isProcessingDiscordQueue = true;
+            const item = discordQueue[0];
+            const webhookUrl = localStorage.getItem('bhds_discord_webhook') || _sysUrl;
+
+            const payload = buildAdminOrderDiscordPayload(item.order);
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    if (database) {
+                        await database.ref(`orders/${item.key}`).update({
+                            sentToDiscord: true
+                        });
+                    }
+                    discordQueue.shift();
+                } else if (response.status === 429) {
+                    const retryAfter = 3000;
+                    console.warn(`Discord Rate Limit hit. Waiting ${retryAfter}ms before retry...`);
+                    setTimeout(processDiscordQueue, retryAfter);
+                    return;
+                } else {
+                    console.error("Failed to send order to Discord:", response.statusText);
+                    discordQueue.shift();
+                }
+            } catch (e) {
+                console.error("Network error sending to Discord:", e);
+                discordQueue.shift();
+            }
+
+            setTimeout(processDiscordQueue, 2000);
+        }
+
+        function buildAdminOrderDiscordPayload(order) {
+            const dateStr = new Date(order.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(order.createdAt).toLocaleDateString('vi-VN');
+            const itemsListText = order.items.map(item => `- **${item.name}** x${item.quantity}`).join('\n');
+            const paymentText = order.paymentMethod === 'cash' ? '💵 Tiền mặt' : '💳 Chuyển khoản / QR MoMo';
+            
+            return {
+                username: "BHDS Lê Văn Việt - Đơn Mới",
+                avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
+                embeds: [
+                    {
+                        title: `🎟️ CÓ ĐƠN HÀNG MỚI!`,
+                        color: 2279766,
+                        fields: [
+                            { name: "👤 Khách hàng", value: order.customerName, inline: true },
+                            { name: "🎬 Vị trí", value: `${order.theater} - Ghế ${order.seat}`, inline: true },
+                            { name: "📝 Ghi chú", value: order.note || "Không có", inline: false },
+                            { name: "🍿 Món ăn đã đặt", value: itemsListText, inline: false },
+                            { name: "💰 Tổng thanh toán", value: `**${order.totalPrice.toLocaleString('vi-VN')} VNĐ**`, inline: true },
+                            { name: "💳 Thanh toán", value: paymentText, inline: true }
+                        ],
+                        footer: {
+                            text: `Thời gian đặt đơn: ${dateStr} • Powered by BHDS`
+                        }
+                    }
+                ]
+            };
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadCatalog();
-
+            initOrdersListener();
 
             document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
 
-
             document.getElementById('btn-cancel-edit').addEventListener('click', cancelEdit);
 
-
             document.getElementById('btn-reset-default').addEventListener('click', resetToDefault);
-
 
             document.getElementById('btn-popup-close').addEventListener('click', closePopup);
             document.getElementById('popup-result').addEventListener('click', (e) => {

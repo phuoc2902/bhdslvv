@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHDS Lê Văn Việt - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi</title>
-    <meta name="description" content="Trang đặt món ăn trực tuyến nhanh chóng với thực đơn phong phú, giao hàng siêu tốc. Đơn hàng sẽ được chuyển trực tiếp qua Discord Webhook tiện lợi.">
-    <meta name="keywords" content="đặt đồ ăn, food delivery, order food, discord webhook, bhds lê văn việt">
+    <meta name="description" content="Trang đặt món ăn trực tuyến nhanh chóng với thực đơn phong phú, giao hàng siêu tốc và phục vụ tận nơi tại rạp.">
+    <meta name="keywords" content="đặt đồ ăn, food delivery, order food, đặt món rạp chiếu phim, bhds lê văn việt">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2102,45 +2102,79 @@
             const customerSeat = document.getElementById('customer-seat').value.trim();
             const customerNote = document.getElementById('customer-note').value.trim();
 
-            const discordPayload = buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote);
-
-
             const btnConfirm = document.getElementById('btn-payment-confirm');
             const originalBtnConfirmHTML = btnConfirm.innerHTML;
 
             btnConfirm.disabled = true;
             btnConfirm.innerHTML = `<span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> <span>Đang xử lý...</span>`;
 
+            const orderData = {
+                id: 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                customerName: customerName,
+                theater: customerTheater,
+                seat: customerSeat,
+                note: customerNote,
+                items: cart.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    option: item.option || ""
+                })),
+                totalPrice: cart.reduce((total, item) => total + (item.price * item.quantity), 0),
+                paymentMethod: selectedPaymentMethod,
+                cashAmount: selectedPaymentMethod === 'cash' ? selectedCashAmount : 0,
+                status: 'pending',
+                sentToDiscord: false,
+                createdAt: new Date().toISOString()
+            };
+
             try {
-                const response = await fetch(activeWebhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(discordPayload)
-                });
-
-                if (response.ok) {
-
+                if (database) {
+                    await database.ref('orders').push(orderData);
                     cart = [];
                     updateCartUI();
                     document.getElementById('checkout-form').reset();
-
                     closePaymentModal();
                     showPopup(
                         "Đặt hàng thành công!",
-                        "Cảm ơn bạn đã đặt món! Đơn hàng đã được chuyển tiếp thành công đến bếp của chúng tôi.",
+                        "Cảm ơn bạn đã đặt món! Đơn hàng đã được ghi nhận trên hệ thống và chuyển đến bếp.",
                         true
                     );
                 } else {
-                    const errText = await response.text();
-                    throw new Error(`Mã lỗi: ${response.status} - ${errText}`);
+                    throw new Error("Không thể kết nối máy chủ Firebase. Chuyển sang dự phòng gửi trực tiếp.");
                 }
             } catch (error) {
-                closePaymentModal();
-                showPopup(
-                    "Đã xảy ra lỗi!",
-                    `Không thể gửi đơn hàng đến bếp. Chi tiết lỗi: ${error.message}`,
-                    false
-                );
+                console.warn(error.message);
+                try {
+                    const discordPayload = buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote);
+                    const response = await fetch(activeWebhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(discordPayload)
+                    });
+
+                    if (response.ok) {
+                        cart = [];
+                        updateCartUI();
+                        document.getElementById('checkout-form').reset();
+                        closePaymentModal();
+                        showPopup(
+                            "Đặt hàng thành công!",
+                            "Cảm ơn bạn đã đặt món! Đơn hàng của bạn đã được gửi trực tiếp đến hệ thống bếp.",
+                            true
+                        );
+                    } else {
+                        const errText = await response.text();
+                        throw new Error(`Mã lỗi: ${response.status} - ${errText}`);
+                    }
+                } catch (fallbackError) {
+                    closePaymentModal();
+                    showPopup(
+                        "Đã xảy ra lỗi!",
+                        `Không thể gửi đơn hàng đến bếp. Chi tiết lỗi: ${fallbackError.message}`,
+                        false
+                    );
+                }
             } finally {
                 btnConfirm.disabled = false;
                 btnConfirm.innerHTML = originalBtnConfirmHTML;
@@ -2447,9 +2481,9 @@
                                 body: JSON.stringify(payload)
                             });
 
-                            if (!response.ok) {
-                                throw new Error("Gửi không thành công qua Discord");
-                            }
+                             if (!response.ok) {
+                                 throw new Error("Gửi phản hồi thất bại");
+                             }
                         }
 
                         popupComplaint.classList.remove('open');
