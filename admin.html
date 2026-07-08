@@ -848,13 +848,28 @@
 
         // Lưu danh sách vào Firebase Realtime Database (đồng bộ dự phòng localStorage)
         function saveCatalogToStorage() {
-            database.ref('foodCatalog').set(foodCatalog)
+            let adminPin = sessionStorage.getItem('bhds_admin_pin');
+            if (!adminPin) {
+                adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật thực đơn:");
+                if (adminPin) {
+                    sessionStorage.setItem('bhds_admin_pin', adminPin);
+                } else {
+                    alert("Cập nhật thất bại: Cần có mã PIN để ghi đè thực đơn.");
+                    return;
+                }
+            }
+
+            const updates = {};
+            updates['/foodCatalog'] = foodCatalog;
+            updates['/auth_pin'] = adminPin;
+
+            database.ref().update(updates)
                 .then(() => {
                     console.log("Đã cập nhật danh sách món ăn lên Firebase thành công.");
                 })
                 .catch((error) => {
                     console.error("Lỗi cập nhật danh sách lên Firebase:", error);
-                    alert("Có lỗi xảy ra khi lưu lên máy chủ: " + error.message);
+                    alert("Không thể lưu lên máy chủ: Mã PIN không chính xác hoặc không có quyền ghi. Vui lòng thử lại!");
                 });
             localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
             document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;

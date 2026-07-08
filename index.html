@@ -2076,6 +2076,7 @@
                         const pin = prompt("Nhập mã PIN quản trị để tiếp tục:");
                         if (pin === "2902" || pin === "1234") {
                             sessionStorage.setItem('bhds_is_admin', 'true');
+                            sessionStorage.setItem('bhds_admin_pin', pin);
                             if (headerActions) {
                                 headerActions.style.display = 'flex';
                             }
