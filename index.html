@@ -874,6 +874,12 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* Cart Floating Toggle on Mobile */
         .cart-toggle-mobile {
             position: fixed;
@@ -1139,6 +1145,27 @@
             <span style="font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Khiếu Nại</span>
         </div>
     </button>
+
+    <!-- Movie Advertisement Ads Modal -->
+    <div class="popup-modal" id="popup-ads" style="z-index: 300;">
+        <div class="popup-card" style="max-width: 440px; padding: 0; background: transparent; border: none; box-shadow: none; position: relative; transform: scale(0.9);">
+            <!-- Close Button X -->
+            <button id="btn-ads-close" style="position: absolute; top: -15px; right: -15px; width: 36px; height: 36px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10; transition: var(--transition); outline: none;">
+                &times;
+            </button>
+            
+            <!-- Poster Image -->
+            <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.1); position: relative;">
+                <img src="./holinhtrangsi.jpg" alt="Phim Mới: Hồ Linh Tráng Sĩ" style="width: 100%; height: auto; display: block;">
+                
+                <!-- Countdown Overlay Badge -->
+                <div id="ads-countdown" style="position: absolute; bottom: 15px; right: 15px; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); color: white; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.15);">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b; animation: pulse 1.2s infinite;"></span>
+                    <span>Tự đóng sau <strong id="ads-secs">5</strong>s</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Payment QR Modal -->
     <div class="popup-modal" id="popup-payment">
@@ -1934,6 +1961,63 @@
             
             showPopup("Lưu thành công", "Cấu hình Discord đã được cập nhật.", true);
         }
+        // Cấu hình và hiển thị Quảng cáo Poster phim mới
+        function initAdsPopup() {
+            const popupAds = document.getElementById('popup-ads');
+            const btnAdsClose = document.getElementById('btn-ads-close');
+            const adsSecs = document.getElementById('ads-secs');
+
+            if (!popupAds) return;
+
+            // Check if ads was already shown in this session to prevent spamming
+            const adsShown = sessionStorage.getItem('bhds_ads_shown') === 'true';
+            if (adsShown) {
+                popupAds.classList.remove('open');
+                return;
+            }
+
+            // Show ads
+            popupAds.classList.add('open');
+
+            let countdown = 5;
+            let adsInterval;
+            let adsTimeout;
+
+            const closeAds = () => {
+                clearInterval(adsInterval);
+                clearTimeout(adsTimeout);
+                popupAds.classList.remove('open');
+                sessionStorage.setItem('bhds_ads_shown', 'true');
+            };
+
+            if (btnAdsClose) {
+                btnAdsClose.addEventListener('click', closeAds);
+            }
+            
+            // Allow closing by clicking on the overlay background
+            popupAds.addEventListener('click', (e) => {
+                if (e.target.id === 'popup-ads') {
+                    closeAds();
+                }
+            });
+
+            // Countdown timer
+            adsInterval = setInterval(() => {
+                countdown--;
+                if (adsSecs) {
+                    adsSecs.textContent = countdown;
+                }
+                if (countdown <= 0) {
+                    closeAds();
+                }
+            }, 1000);
+
+            // Safety timeout
+            adsTimeout = setTimeout(() => {
+                closeAds();
+            }, 5000);
+        }
+
         // Kiểm tra và kích hoạt chế độ admin bí mật
         function initSecretAdmin() {
             const isAdmin = sessionStorage.getItem('bhds_is_admin') === 'true';
@@ -1991,6 +2075,9 @@
             
             // Tải cấu hình
             loadDiscordConfig();
+
+            // Khởi tạo quảng cáo nếu chưa xem trong phiên này
+            initAdsPopup();
 
             // Form Submit event
             document.getElementById('checkout-form').addEventListener('submit', submitOrder);
