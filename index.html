@@ -985,13 +985,43 @@
             transform: scale(0.92);
         }
 
+        /* Cash Chips for Payment Denominations */
+        .cash-chip {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.03);
+            color: white;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cash-chip:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+        }
+        .cash-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+        }
+
         @media (max-width: 991px) {
             .cart-toggle-mobile {
                 display: flex;
-                bottom: 180px; /* Moved up to make room for Zalo button */
+                top: 15px;
+                bottom: auto;
+                right: 15px;
+                z-index: 200; /* floating above header content */
             }
             .btn-zalo-float {
-                bottom: 100px; /* Zalo button sits between complaint (bottom 20) and cart (bottom 180) on mobile */
+                bottom: 100px; /* Zalo stays at bottom 100px */
             }
         }
     </style>
@@ -1220,23 +1250,62 @@
                 </svg>
                 Thanh Toán Đơn Hàng
             </h3>
-            <p class="popup-text" style="font-size: 0.9rem; margin-bottom: 1.25rem;">
-                Quét mã <strong>VNPAY-QR</strong> bên dưới để chuyển khoản hoặc thanh toán bằng <strong>Tiền mặt</strong> tại quầy vé rạp.
-            </p>
             
-            <div style="background: white; padding: 12px; border-radius: var(--radius-lg); display: inline-block; margin: 0 auto 1.25rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 320px;">
-                <img src="./assets/qr_payment.jpg" alt="VNPAY QR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: var(--radius-md); display: block;">
+            <!-- Payment Method Tabs -->
+            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: var(--radius-md); margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
+                <button type="button" id="method-qr" onclick="selectPaymentMethod('qr')" style="flex: 1; padding: 8px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--primary); color: white; outline: none;">
+                    Chuyển khoản QR
+                </button>
+                <button type="button" id="method-cash" onclick="selectPaymentMethod('cash')" style="flex: 1; padding: 8px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-secondary); outline: none;">
+                    Tiền mặt tại rạp
+                </button>
             </div>
 
-            <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
-                <a href="./assets/qr_payment.jpg" download="BHDS_VNPAY_QR.jpg" class="btn-submit btn-payment-download" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; padding: 0.6rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Tải mã QR về
-                </a>
+            <!-- QR Container -->
+            <div id="payment-qr-container" style="display: block; text-align: center; width: 100%;">
+                <p class="popup-text" style="font-size: 0.9rem; margin-bottom: 1.25rem;">
+                    Quét mã <strong>VNPAY-QR</strong> bên dưới để chuyển khoản đặt bắp nước.
+                </p>
+                <div style="background: white; padding: 12px; border-radius: var(--radius-lg); display: inline-block; margin: 0 auto 1.25rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 320px;">
+                    <img src="./assets/qr_payment.jpg" alt="VNPAY QR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: var(--radius-md); display: block;">
+                </div>
+                <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
+                    <a href="./assets/qr_payment.jpg" download="BHDS_VNPAY_QR.jpg" class="btn-submit btn-payment-download" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; padding: 0.6rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Tải mã QR về
+                    </a>
+                </div>
             </div>
 
+            <!-- Cash Container -->
+            <div id="payment-cash-container" style="display: none; text-align: left; width: 100%;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem; color: var(--text-secondary);">Tổng tiền cần thanh toán:</span>
+                    <strong style="color: var(--primary); font-size: 1.15rem;" id="cash-payment-total">0 ₫</strong>
+                </div>
+
+                <label class="form-label" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Chọn mệnh giá tiền mặt bạn sẽ đưa:</label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                    <!-- Denomination choices chips -->
+                    <button type="button" class="cash-chip" data-value="exact" onclick="selectExactCashAmount()">Đưa đủ số tiền</button>
+                    <button type="button" class="cash-chip" data-value="50000" onclick="selectCashAmount(50000)">50.000 ₫</button>
+                    <button type="button" class="cash-chip" data-value="100000" onclick="selectCashAmount(100000)">100.000 ₫</button>
+                    <button type="button" class="cash-chip" data-value="200000" onclick="selectCashAmount(200000)">200.000 ₫</button>
+                    <button type="button" class="cash-chip" data-value="500000" onclick="selectCashAmount(500000)">500.000 ₫</button>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label class="form-label" for="cash-amount-input" style="font-size: 0.85rem; color: var(--text-secondary);">Hoặc nhập số tiền lẻ khác (₫):</label>
+                    <input type="number" id="cash-amount-input" class="form-control" placeholder="Ví dụ: 125000" style="background-color: rgba(255, 255, 255, 0.05);" oninput="onCustomCashInput()">
+                </div>
+
+                <!-- Validation and feedback message -->
+                <div id="cash-feedback" style="padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem; border: 1px solid transparent; display: none;"></div>
+            </div>
+
+            <!-- Footer Buttons -->
             <div style="display: flex; gap: 0.75rem; justify-content: center; width: 100%;">
                 <button class="btn-popup-close" id="btn-payment-cancel" style="flex: 1; margin: 0; padding: 0.75rem;">Hủy</button>
                 <button class="btn-submit" id="btn-payment-confirm" style="flex: 1; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; border-radius: var(--radius-md); margin: 0;">
@@ -1781,6 +1850,24 @@
                 { name: "💺 Số ghế", value: customerSeat, inline: true }
             ];
 
+            // Thêm phương thức thanh toán vào Discord Embed
+            if (selectedPaymentMethod === 'qr') {
+                fields.push({ name: "💳 Phương thức thanh toán", value: "Chuyển khoản (VNPAY / QR)", inline: false });
+            } else {
+                const change = selectedCashAmount - totalPrice;
+                let cashDetail = `- Khách đưa: **${formatCurrency(selectedCashAmount)}**\n`;
+                if (change === 0) {
+                    cashDetail += `- Tiền thừa: **Khách đưa vừa đủ, không cần thối**`;
+                } else {
+                    cashDetail += `- Tiền thừa thối lại: **${formatCurrency(change)}**`;
+                }
+                fields.push({ 
+                    name: "💵 Phương thức thanh toán", 
+                    value: `Tiền mặt\n${cashDetail}`, 
+                    inline: false 
+                });
+            }
+
             if (customerNote.trim()) {
                 fields.push({ name: "📝 Ghi chú", value: customerNote, inline: false });
             }
@@ -1791,7 +1878,7 @@
                 embeds: [
                     {
                         title: "🔔 ĐƠN HÀNG MỚI TỪ BHDS LÊ VĂN VIỆT!",
-                        color: 2278750, // Màu xanh lá #22c55e
+                        color: selectedPaymentMethod === 'qr' ? 2278750 : 16753920, // Xanh lá nếu QR, Vàng/Cam nếu Tiền mặt
                         description: description,
                         fields: fields,
                         footer: {
@@ -1850,8 +1937,164 @@
             }
         }
 
+        let selectedPaymentMethod = 'qr';
+        let selectedCashAmount = 0;
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            const btnQr = document.getElementById('method-qr');
+            const btnCash = document.getElementById('method-cash');
+            const qrContainer = document.getElementById('payment-qr-container');
+            const cashContainer = document.getElementById('payment-cash-container');
+            const btnConfirm = document.getElementById('btn-payment-confirm');
+
+            if (method === 'qr') {
+                btnQr.style.background = 'var(--primary)';
+                btnQr.style.color = 'white';
+                btnQr.style.borderColor = 'var(--primary)';
+                btnCash.style.background = 'transparent';
+                btnCash.style.color = 'var(--text-secondary)';
+                
+                qrContainer.style.display = 'block';
+                cashContainer.style.display = 'none';
+                
+                // Enable confirm button for QR code
+                btnConfirm.disabled = false;
+                btnConfirm.style.opacity = '1';
+                btnConfirm.style.cursor = 'pointer';
+            } else {
+                btnCash.style.background = 'var(--primary)';
+                btnCash.style.color = 'white';
+                btnCash.style.borderColor = 'var(--primary)';
+                btnQr.style.background = 'transparent';
+                btnQr.style.color = 'var(--text-secondary)';
+                
+                qrContainer.style.display = 'none';
+                cashContainer.style.display = 'block';
+                
+                // Reset cash selections on switch
+                resetCashPayment();
+            }
+        }
+
+        function resetCashPayment() {
+            selectedCashAmount = 0;
+            document.getElementById('cash-amount-input').value = '';
+            
+            // Remove active class from all chips
+            const chips = document.querySelectorAll('.cash-chip');
+            chips.forEach(chip => chip.classList.remove('active'));
+            
+            validateCashPayment();
+        }
+
+        function selectCashAmount(amount) {
+            selectedCashAmount = amount;
+            document.getElementById('cash-amount-input').value = ''; // clear custom input
+            
+            // Set active class on selected chip
+            const chips = document.querySelectorAll('.cash-chip');
+            chips.forEach(chip => {
+                const valAttr = chip.getAttribute('data-value');
+                if (valAttr === String(amount)) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            
+            validateCashPayment();
+        }
+
+        function selectExactCashAmount() {
+            const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            selectedCashAmount = totalPrice;
+            document.getElementById('cash-amount-input').value = ''; // clear custom input
+            
+            // Set active class on exact chip
+            const chips = document.querySelectorAll('.cash-chip');
+            chips.forEach(chip => {
+                const valAttr = chip.getAttribute('data-value');
+                if (valAttr === 'exact') {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            
+            validateCashPayment();
+        }
+
+        function onCustomCashInput() {
+            // Remove active class from all chips when custom input is edited
+            const chips = document.querySelectorAll('.cash-chip');
+            chips.forEach(chip => chip.classList.remove('active'));
+            
+            const val = document.getElementById('cash-amount-input').value.trim();
+            selectedCashAmount = val ? parseInt(val) : 0;
+            
+            validateCashPayment();
+        }
+
+        function validateCashPayment() {
+            const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const feedbackEl = document.getElementById('cash-feedback');
+            const btnConfirm = document.getElementById('btn-payment-confirm');
+            
+            if (selectedPaymentMethod !== 'cash') {
+                feedbackEl.style.display = 'none';
+                btnConfirm.disabled = false;
+                btnConfirm.style.opacity = '1';
+                btnConfirm.style.cursor = 'pointer';
+                return;
+            }
+
+            if (selectedCashAmount <= 0) {
+                feedbackEl.style.display = 'block';
+                feedbackEl.style.background = 'rgba(255, 255, 255, 0.05)';
+                feedbackEl.style.color = 'var(--text-muted)';
+                feedbackEl.style.borderColor = 'var(--border-color)';
+                feedbackEl.innerHTML = '✍️ Vui lòng chọn hoặc nhập số tiền bạn sẽ đưa.';
+                btnConfirm.disabled = true;
+                btnConfirm.style.opacity = '0.5';
+                btnConfirm.style.cursor = 'not-allowed';
+                return;
+            }
+
+            if (selectedCashAmount < totalPrice) {
+                feedbackEl.style.display = 'block';
+                feedbackEl.style.background = 'rgba(239, 68, 68, 0.15)';
+                feedbackEl.style.color = '#f87171';
+                feedbackEl.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                feedbackEl.innerHTML = `❌ Số tiền đưa không đủ! Bạn cần thanh toán tối thiểu <strong>${formatCurrency(totalPrice)}</strong>.`;
+                btnConfirm.disabled = true;
+                btnConfirm.style.opacity = '0.5';
+                btnConfirm.style.cursor = 'not-allowed';
+            } else {
+                const change = selectedCashAmount - totalPrice;
+                feedbackEl.style.display = 'block';
+                feedbackEl.style.background = 'rgba(34, 197, 94, 0.15)';
+                feedbackEl.style.color = '#4ade80';
+                feedbackEl.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                if (change === 0) {
+                    feedbackEl.innerHTML = `💵 Bạn đưa đủ số tiền: <strong>${formatCurrency(totalPrice)}</strong>. Không cần thối lại.`;
+                } else {
+                    feedbackEl.innerHTML = `💵 Tiền thừa thối lại: <strong>${formatCurrency(change)}</strong>`;
+                }
+                btnConfirm.disabled = false;
+                btnConfirm.style.opacity = '1';
+                btnConfirm.style.cursor = 'pointer';
+            }
+        }
+
         // Mở và đóng modal thanh toán
         function openPaymentModal() {
+            const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            document.getElementById('cash-payment-total').textContent = formatCurrency(totalPrice);
+            
+            // Khởi tạo phương thức thanh toán mặc định là QR
+            selectPaymentMethod('qr');
+            
             document.getElementById('popup-payment').classList.add('open');
         }
 
