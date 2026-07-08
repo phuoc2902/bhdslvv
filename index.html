@@ -1264,7 +1264,7 @@
             <!-- Payment Method Tabs -->
             <div style="display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: var(--radius-md); margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
                 <button type="button" id="method-qr" onclick="selectPaymentMethod('qr')" style="flex: 1; padding: 8px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--primary); color: white; outline: none;">
-                    Chuyển khoản QR
+                    Chuyển khoản MoMo
                 </button>
                 <button type="button" id="method-cash" onclick="selectPaymentMethod('cash')" style="flex: 1; padding: 8px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-secondary); outline: none;">
                     Tiền mặt tại rạp
@@ -1274,13 +1274,13 @@
             <!-- QR Container -->
             <div id="payment-qr-container" style="display: block; text-align: center; width: 100%;">
                 <p class="popup-text" style="font-size: 0.9rem; margin-bottom: 1.25rem;">
-                    Quét mã <strong>VNPAY-QR</strong> bên dưới để chuyển khoản đặt bắp nước.
+                    Quét mã <strong>MoMo</strong> bên dưới để chuyển khoản đặt bắp nước.
                 </p>
                 <div style="background: white; padding: 12px; border-radius: var(--radius-lg); display: inline-block; margin: 0 auto 1.25rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 320px;">
-                    <img src="./assets/qr_payment.jpg" alt="VNPAY QR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: var(--radius-md); display: block;">
+                    <img src="./assets/momo.jpg" alt="MoMo QR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: var(--radius-md); display: block;">
                 </div>
                 <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
-                    <a href="./assets/qr_payment.jpg" download="BHDS_VNPAY_QR.jpg" class="btn-submit btn-payment-download" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; padding: 0.6rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);">
+                    <a href="./assets/momo.jpg" download="BHDS_MOMO_QR.jpg" class="btn-submit btn-payment-download" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; padding: 0.6rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -1299,7 +1299,7 @@
                 <label class="form-label" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Chọn mệnh giá tiền mặt bạn sẽ đưa:</label>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
                     <!-- Denomination choices chips -->
-                    <button type="button" class="cash-chip" data-value="exact" onclick="selectExactCashAmount()">Đưa đủ số tiền</button>
+                    <button type="button" class="cash-chip" data-value="exact" onclick="selectExactCashAmount()" style="grid-column: span 2;">Đưa đủ số tiền</button>
                     <button type="button" class="cash-chip" data-value="50000" onclick="selectCashAmount(50000)">50.000 ₫</button>
                     <button type="button" class="cash-chip" data-value="100000" onclick="selectCashAmount(100000)">100.000 ₫</button>
                     <button type="button" class="cash-chip" data-value="200000" onclick="selectCashAmount(200000)">200.000 ₫</button>
@@ -1405,6 +1405,7 @@
         // CẤU HÌNH MẶC ĐỊNH CHO DISCORD WEBHOOK TẠI ĐÂY
         // ==========================================
         const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1523364147801362602/tOGL13hqlQkkbn-QKv2oCpOcw5tB7452o89XVB7M2Fd2c8-nVT2u3x4Cf1nGAYLLei6s'; // Nhập URL Discord Webhook ở đây
+        const COMPLAINT_WEBHOOK_URL = 'https://discord.com/api/webhooks/1524324768847757346/n3GGcQ-_tZd_LkizMKy4kVyX0S2t5LlE43sODMxPKoAz53VkHw1_hzgmrvq35-hdal8M'; // Webhook nhận tin nhắn khiếu nại của khách hàng
         // ==========================================
 
         // Danh sách các món ăn mặc định
@@ -1859,7 +1860,7 @@
 
             // Thêm phương thức thanh toán vào Discord Embed
             if (selectedPaymentMethod === 'qr') {
-                fields.push({ name: "💳 Phương thức thanh toán", value: "Chuyển khoản (VNPAY / QR)", inline: false });
+                fields.push({ name: "💳 Phương thức thanh toán", value: "Chuyển khoản MoMo", inline: false });
             } else {
                 const change = selectedCashAmount - totalPrice;
                 let cashDetail = `- Khách đưa: **${formatCurrency(selectedCashAmount)}**\n`;
@@ -2043,11 +2044,7 @@
             }
 
             if (selectedCashAmount <= 0) {
-                feedbackEl.style.display = 'block';
-                feedbackEl.style.background = 'rgba(255, 255, 255, 0.05)';
-                feedbackEl.style.color = 'var(--text-muted)';
-                feedbackEl.style.borderColor = 'var(--border-color)';
-                feedbackEl.innerHTML = '✍️ Vui lòng chọn hoặc nhập số tiền bạn sẽ đưa.';
+                feedbackEl.style.display = 'none';
                 btnConfirm.disabled = true;
                 btnConfirm.style.opacity = '0.5';
                 btnConfirm.style.cursor = 'not-allowed';
@@ -2418,7 +2415,7 @@
                     btnSubmit.disabled = true;
                     btnSubmit.innerHTML = `<span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> Đang gửi...`;
                     
-                    const webhookUrl = localStorage.getItem('bhds_discord_webhook') || DISCORD_WEBHOOK_URL;
+                    const webhookUrl = COMPLAINT_WEBHOOK_URL;
                     
                     const payload = {
                         username: "BHDS Lê Văn Việt - Khiếu Nại",
