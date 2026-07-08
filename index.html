@@ -1015,7 +1015,7 @@
         @media (max-width: 991px) {
             .cart-toggle-mobile {
                 display: flex;
-                top: 15px;
+                top: 45vh; /* Position at the middle-right of the viewport */
                 bottom: auto;
                 right: 15px;
                 z-index: 200; /* floating above header content */
@@ -1296,10 +1296,7 @@
                     <button type="button" class="cash-chip" data-value="500000" onclick="selectCashAmount(500000)">500.000 ₫</button>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label class="form-label" for="cash-amount-input" style="font-size: 0.85rem; color: var(--text-secondary);">Hoặc nhập số tiền lẻ khác (₫):</label>
-                    <input type="number" id="cash-amount-input" class="form-control" placeholder="Ví dụ: 125000" style="background-color: rgba(255, 255, 255, 0.05);" oninput="onCustomCashInput()">
-                </div>
+
 
                 <!-- Validation and feedback message -->
                 <div id="cash-feedback" style="padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem; border: 1px solid transparent; display: none;"></div>
@@ -1979,7 +1976,6 @@
 
         function resetCashPayment() {
             selectedCashAmount = 0;
-            document.getElementById('cash-amount-input').value = '';
             
             // Remove active class from all chips
             const chips = document.querySelectorAll('.cash-chip');
@@ -1990,7 +1986,6 @@
 
         function selectCashAmount(amount) {
             selectedCashAmount = amount;
-            document.getElementById('cash-amount-input').value = ''; // clear custom input
             
             // Set active class on selected chip
             const chips = document.querySelectorAll('.cash-chip');
@@ -2009,7 +2004,6 @@
         function selectExactCashAmount() {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             selectedCashAmount = totalPrice;
-            document.getElementById('cash-amount-input').value = ''; // clear custom input
             
             // Set active class on exact chip
             const chips = document.querySelectorAll('.cash-chip');
@@ -2021,17 +2015,6 @@
                     chip.classList.remove('active');
                 }
             });
-            
-            validateCashPayment();
-        }
-
-        function onCustomCashInput() {
-            // Remove active class from all chips when custom input is edited
-            const chips = document.querySelectorAll('.cash-chip');
-            chips.forEach(chip => chip.classList.remove('active'));
-            
-            const val = document.getElementById('cash-amount-input').value.trim();
-            selectedCashAmount = val ? parseInt(val) : 0;
             
             validateCashPayment();
         }
