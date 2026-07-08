@@ -1,14 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHDS Lê Văn Việt Admin - Quản Lý Thực Đơn</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/logo.png">
-    <link rel="shortcut icon" type="image/png" href="assets/logo.png">
-    <link rel="apple-touch-icon" href="assets/logo.png">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -594,104 +589,6 @@
             font-size: 0.85rem;
             margin-top: auto;
         }
-
-        /* Image upload tab styles */
-        .tab-btn {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: transparent;
-            color: var(--text-secondary);
-            outline: none;
-        }
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .upload-dropzone {
-            border: 2px dashed rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.01);
-        }
-        .upload-dropzone:hover {
-            border-color: var(--primary);
-            background: rgba(34, 197, 94, 0.03);
-        }
-        
-        /* Mobile-first adjustments for food items */
-        @media (max-width: 576px) {
-            header {
-                padding: 0.75rem 1rem;
-                margin-bottom: 1rem;
-            }
-            .logo {
-                font-size: 1.2rem;
-            }
-            .logo img {
-                width: 26px;
-                height: 26px;
-            }
-            .btn-action {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.8rem;
-            }
-            .app-container {
-                padding: 0 1rem 2rem 1rem;
-            }
-            .hero {
-                padding: 1.25rem 1rem;
-                margin-bottom: 1.5rem;
-                border-radius: var(--radius-md);
-            }
-            .hero-text h1 {
-                font-size: 1.5rem;
-            }
-            .hero-text p {
-                font-size: 0.85rem;
-            }
-            .btn-reset {
-                width: 100%;
-                justify-content: center;
-                font-size: 0.85rem;
-                padding: 0.5rem 1rem;
-            }
-            .food-item-row {
-                padding: 0.75rem;
-                gap: 0.75rem;
-            }
-            .food-item-img {
-                width: 60px;
-                height: 60px;
-            }
-            .food-item-name {
-                font-size: 0.95rem;
-            }
-            .food-item-desc {
-                font-size: 0.8rem;
-                -webkit-line-clamp: 1;
-            }
-            .food-item-price {
-                font-size: 0.85rem;
-            }
-            .btn-icon-action {
-                width: 32px;
-                height: 32px;
-            }
-            .card-panel {
-                padding: 1rem;
-                border-radius: var(--radius-md);
-            }
-        }
     </style>
     <!-- Firebase SDK (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -781,42 +678,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Hình ảnh món ăn *</label>
-                        
-                        <!-- Toggle Tab between Upload File and Image URL -->
-                        <div style="display: flex; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 0.75rem; border: 1px solid var(--border-color);">
-                            <button type="button" id="img-mode-upload" class="tab-btn active">
-                                Tải ảnh lên
-                            </button>
-                            <button type="button" id="img-mode-url" class="tab-btn">
-                                Nhập Link (URL)
-                            </button>
-                        </div>
-
-                        <!-- Upload File Input Area -->
-                        <div id="image-upload-container" style="display: block;">
-                            <div class="upload-dropzone" id="upload-dropzone">
-                                <input type="file" id="food-image-file" accept="image/*" style="display: none;">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32" stroke-width="2" style="color: var(--text-secondary); margin: 0 auto 0.5rem auto; display: block;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); display: block;" id="upload-text">Nhấp để chọn ảnh từ thiết bị</span>
-                                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Hỗ trợ JPG, PNG, WEBP</span>
-                            </div>
-                        </div>
-
-                        <!-- Image URL Input -->
-                        <div id="image-url-container" style="display: none;">
-                            <input type="url" id="food-image" class="form-control" placeholder="Nhập liên kết ảnh (https://...)">
-                        </div>
-
-                        <!-- Image Preview Box -->
-                        <div id="image-preview-container" style="display: none; margin-top: 0.75rem; position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); height: 120px;">
-                            <img id="image-preview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                            <button type="button" id="btn-remove-preview" style="position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: var(--transition);">
-                                &times;
-                            </button>
-                        </div>
+                        <label class="form-label" for="food-image">Đường dẫn ảnh (URL) *</label>
+                        <input type="url" id="food-image" class="form-control" placeholder="Nhập liên kết ảnh Unsplash hoặc ảnh bất kỳ..." required>
                     </div>
                     
                     <div class="form-group">
@@ -858,24 +721,22 @@
 
     <!-- JS Logic -->
     <script>
-        // ==========================================
-        // CẤU HÌNH FIREBASE REALTIME DATABASE
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBk-WEVyhyHYp5imW_a1FNlV1l25sujKhY",
-            authDomain: "bhdlvv.firebaseapp.com",
-            databaseURL: "https://bhdlvv-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "bhdlvv",
-            storageBucket: "bhdlvv.firebasestorage.app",
-            messagingSenderId: "519114521085",
-            appId: "1:519114521085:web:19ee84f5409f37bf53c194",
-            measurementId: "G-Z9WFEJH5W9"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        // ==========================================
+        function _str(s) {
+            try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
+        }
 
-        // Kiểm tra quyền truy cập Admin ngay lập tức
+        const _cfg = "==QfikzV1gkSFZ0V5oVLHJiOiQWS05WZtVmc1NXYl1mIsICN5EzYzUjZidzMmlDM0UjZ0gTZllTM6IWZ3pTN4ATMyUDNxETOxUjOxIiOiQWSwBXYiwiI1gDMxITN0ETM5ETNiojIklkclRmblN1Zul2ZhN3cl1mIsICcwFmLldWYy9GdzV2chJWZylmZuYndsRGaiJiOiQXZrNWdCV2ZhJ3b0NnIsIid2xGZoJmI6ICZJR3Ylp2byBnIsICcwFmLlNXYiFGdhRWZzFmYlJXam5SM0NXYlhGd192ctEWazFmLiRGdy1CdsVXYmVGZtYndsRGai9yL6MHc0RHaiojIMJVVlNXYiFGdhRmIsISbvNmLwBXYlNXYiVmcpZmL2ZHbkhmYiojIulWYt9GRoRXdhJCLikFaLpWdzVjMsFjVs5kRxE2XX1Wa1AXWIlHa5ZVRX1yaCl3UhpXSBJiOikXZLlGchJye";
+        const firebaseConfig = JSON.parse(_str(_cfg));
+
+        let database = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+            }
+        } catch (e) {}
+
+
         if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
             alert("Bạn không có quyền truy cập trang này!");
             window.location.href = "index.html";
@@ -949,147 +810,51 @@
 
         let foodCatalog = [];
         let isEditing = false;
-        let uploadedImageBase64 = "";
 
-        // Resize and compress image using Canvas to keep Firebase storage small
-        function resizeAndCompressImage(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function (event) {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function () {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        const MAX_WIDTH = 500;
-                        const MAX_HEIGHT = 500;
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
-                            }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
-                            }
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Export to JPEG with 0.7 quality to keep it small (typically under 30KB)
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                        resolve(dataUrl);
-                    };
-                    img.onerror = function (err) {
-                        reject(err);
-                    };
-                };
-                reader.onerror = function (err) {
-                    reject(err);
-                };
-            });
-        }
 
-        // Toggle image input modes (Upload vs URL)
-        function setImageMode(mode) {
-            const uploadBtn = document.getElementById('img-mode-upload');
-            const urlBtn = document.getElementById('img-mode-url');
-            const uploadContainer = document.getElementById('image-upload-container');
-            const urlContainer = document.getElementById('image-url-container');
-            const urlInput = document.getElementById('food-image');
-
-            if (mode === 'upload') {
-                uploadBtn.classList.add('active');
-                urlBtn.classList.remove('active');
-                uploadContainer.style.display = 'block';
-                urlContainer.style.display = 'none';
-                urlInput.required = false;
-            } else {
-                urlBtn.classList.add('active');
-                uploadBtn.classList.remove('active');
-                uploadContainer.style.display = 'none';
-                urlContainer.style.display = 'block';
-                
-                if (!uploadedImageBase64) {
-                    urlInput.required = true;
-                } else {
-                    urlInput.required = false;
-                }
-            }
-        }
-
-        // Show/hide image preview box
-        function showImagePreview(src) {
-            const previewContainer = document.getElementById('image-preview-container');
-            const previewImg = document.getElementById('image-preview');
-            const urlInput = document.getElementById('food-image');
-            
-            if (src) {
-                previewImg.src = src;
-                previewContainer.style.display = 'block';
-                urlInput.required = false;
-            } else {
-                previewContainer.style.display = 'none';
-                previewImg.src = "";
-                
-                const isUrlMode = document.getElementById('image-url-container').style.display === 'block';
-                if (isUrlMode) {
-                    urlInput.required = true;
-                }
-            }
-        }
-
-        // Clear image input and preview
-        function clearImage() {
-            uploadedImageBase64 = "";
-            const fileInput = document.getElementById('food-image-file');
-            if (fileInput) fileInput.value = "";
-            document.getElementById('food-image').value = "";
-            showImagePreview("");
-        }
-
-        // Tiện ích định dạng tiền tệ
         function formatCurrency(number) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
         }
 
-        // Tải danh sách từ Firebase Realtime Database
+
         function loadCatalog() {
-            database.ref('foodCatalog').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    foodCatalog = data;
-                    localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-                } else {
-                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                    database.ref('foodCatalog').set(foodCatalog);
-                }
-                renderFoodList();
-            }, (error) => {
-                console.error("Lỗi dữ liệu từ Firebase, khôi phục từ localStorage:", error);
-                const savedCatalog = localStorage.getItem('bhds_cine_catalog');
-                if (savedCatalog) {
-                    try {
-                        foodCatalog = JSON.parse(savedCatalog);
-                    } catch (e) {
+            if (database) {
+                database.ref('foodCatalog').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        foodCatalog = data;
+                        localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+                    } else {
                         foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                        database.ref('foodCatalog').set(foodCatalog);
                     }
-                } else {
-                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                }
-                renderFoodList();
-            });
+                    renderFoodList();
+                }, (error) => {
+                    console.error("Lỗi dữ liệu từ Firebase, khôi phục từ localStorage:", error);
+                    loadLocalCatalogFallback();
+                });
+            } else {
+                console.warn("Database không khả dụng. Tải dữ liệu từ Local Storage.");
+                loadLocalCatalogFallback();
+            }
         }
 
-        // Lưu danh sách vào Firebase Realtime Database (đồng bộ dự phòng localStorage)
+
+        function loadLocalCatalogFallback() {
+            const savedCatalog = localStorage.getItem('bhds_cine_catalog');
+            if (savedCatalog) {
+                try {
+                    foodCatalog = JSON.parse(savedCatalog);
+                } catch (e) {
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                }
+            } else {
+                foodCatalog = [...DEFAULT_FOOD_CATALOG];
+            }
+            renderFoodList();
+        }
+
+
         function saveCatalogToStorage() {
             let adminPin = sessionStorage.getItem('bhds_admin_pin');
             if (!adminPin) {
@@ -1106,22 +871,27 @@
             updates['/foodCatalog'] = foodCatalog;
             updates['/auth_pin'] = adminPin;
 
-            database.ref().update(updates)
-                .then(() => {
-                    console.log("Đã cập nhật danh sách món ăn lên Firebase thành công.");
-                })
-                .catch((error) => {
-                    console.error("Lỗi cập nhật danh sách lên Firebase:", error);
-                    alert("Không thể lưu lên máy chủ: Mã PIN không chính xác hoặc không có quyền ghi. Vui lòng thử lại!");
-                });
+            if (database) {
+                database.ref().update(updates)
+                    .then(() => {
+                        console.log("Đã cập nhật danh sách món ăn lên Firebase thành công.");
+                    })
+                    .catch((error) => {
+                        console.error("Lỗi cập nhật danh sách lên Firebase:", error);
+                        alert("Không thể lưu lên máy chủ: Mã PIN không chính xác hoặc không có quyền ghi. Vui lòng thử lại!");
+                    });
+            } else {
+                console.warn("Chế độ offline: Chỉ lưu vào bộ nhớ trình duyệt cục bộ.");
+                alert("Đang ở chế độ offline. Đã lưu thay đổi cục bộ vào trình duyệt.");
+            }
             localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
             document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
         }
 
-        // Hiển thị danh sách món lên bảng bên trái
+
         function renderFoodList() {
             const container = document.getElementById('food-list-container');
-            
+
             if (foodCatalog.length === 0) {
                 container.innerHTML = `
                     <div class="empty-catalog-state">
@@ -1157,108 +927,76 @@
                     </div>
                 </div>
             `).join('');
-            
+
             document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
         }
 
-        // Khởi tạo chỉnh sửa một món ăn
+
         function initiateEdit(id) {
             const food = foodCatalog.find(item => item.id === id);
             if (!food) return;
 
             isEditing = true;
-            
-            // Điền thông tin vào form
+
+
             document.getElementById('edit-food-id').value = food.id;
             document.getElementById('food-name').value = food.name;
             document.getElementById('food-price').value = food.price;
+            document.getElementById('food-image').value = food.image;
             document.getElementById('food-desc').value = food.description;
 
-            // Handle image load in edit mode
-            if (food.image && food.image.startsWith('data:image/')) {
-                uploadedImageBase64 = food.image;
-                document.getElementById('food-image').value = "";
-                setImageMode('upload');
-                showImagePreview(food.image);
-            } else {
-                uploadedImageBase64 = "";
-                document.getElementById('food-image').value = food.image || "";
-                setImageMode('url');
-                showImagePreview(food.image);
-            }
 
-            // Cập nhật tiêu đề & nút form
             document.getElementById('form-panel-title').innerHTML = `
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Chỉnh sửa món ăn
             `;
-            
+
             const btnSubmit = document.getElementById('btn-save-food');
             btnSubmit.querySelector('span').textContent = "Lưu thay đổi";
-            
-            // Hiện nút Hủy
+
+
             document.getElementById('btn-cancel-edit').style.display = "block";
-            
-            // Cuộn tới form trên màn hình nhỏ
+
+
             document.getElementById('food-editor-form').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Hủy bỏ trạng thái chỉnh sửa
+
         function cancelEdit() {
             isEditing = false;
             document.getElementById('food-editor-form').reset();
             document.getElementById('edit-food-id').value = "";
-            clearImage();
-            setImageMode('upload'); // Reset back to default tab
 
-            // Reset tiêu đề & nút
+
             document.getElementById('form-panel-title').innerHTML = `
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2" style="color: var(--primary);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Thêm món ăn mới
             `;
-            
+
             const btnSubmit = document.getElementById('btn-save-food');
             btnSubmit.querySelector('span').textContent = "Thêm món ăn";
-            
+
             document.getElementById('btn-cancel-edit').style.display = "none";
         }
 
-        // Lưu / Cập nhật món ăn
+
         function handleFormSubmit(e) {
             e.preventDefault();
 
             const name = document.getElementById('food-name').value.trim();
             const price = parseInt(document.getElementById('food-price').value);
+            const image = document.getElementById('food-image').value.trim();
             const description = document.getElementById('food-desc').value.trim();
 
-            let image = "";
-            const isUploadMode = document.getElementById('image-upload-container').style.display === 'block';
-            
-            if (isUploadMode) {
-                image = uploadedImageBase64;
-            } else {
-                image = document.getElementById('food-image').value.trim();
-            }
-
-            // Fallback
-            if (!image) {
-                image = uploadedImageBase64 || document.getElementById('food-image').value.trim();
-            }
-
-            if (!image) {
-                showPopup("Lỗi!", "Vui lòng tải ảnh lên hoặc điền đường dẫn ảnh.", false);
-                return;
-            }
-
             if (isEditing) {
-                // Đang sửa
+
                 const id = parseInt(document.getElementById('edit-food-id').value);
                 const index = foodCatalog.findIndex(item => item.id === id);
-                
+
                 if (index !== -1) {
                     foodCatalog[index] = { id, name, price, image, description };
                     saveCatalogToStorage();
@@ -1269,8 +1007,8 @@
                     showPopup("Lỗi!", "Không tìm thấy món ăn cần cập nhật.", false);
                 }
             } else {
-                // Thêm mới
-                // Tạo ID tự tăng
+
+
                 const maxId = foodCatalog.reduce((max, item) => item.id > max ? item.id : max, 0);
                 const newFood = {
                     id: maxId + 1,
@@ -1283,18 +1021,18 @@
                 foodCatalog.push(newFood);
                 saveCatalogToStorage();
                 renderFoodList();
-                cancelEdit();
+                document.getElementById('food-editor-form').reset();
                 showPopup("Thành công!", "Đã thêm món ăn mới vào thực đơn.", true);
             }
         }
 
-        // Xóa món ăn
+
         function deleteFood(id) {
             const food = foodCatalog.find(item => item.id === id);
             if (!food) return;
 
             if (confirm(`Bạn có chắc chắn muốn xóa món "${food.name}" khỏi thực đơn?`)) {
-                // Nếu đang chỉnh sửa chính món này, hủy chế độ sửa trước
+
                 const currentEditId = document.getElementById('edit-food-id').value;
                 if (currentEditId && parseInt(currentEditId) === id) {
                     cancelEdit();
@@ -1307,7 +1045,7 @@
             }
         }
 
-        // Khôi phục danh sách món mặc định gốc
+
         function resetToDefault() {
             if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Lê Văn Việt. Bạn vẫn muốn tiếp tục?")) {
                 cancelEdit();
@@ -1318,7 +1056,7 @@
             }
         }
 
-        // Popup Alerts
+
         function showPopup(title, message, isSuccess) {
             const popup = document.getElementById('popup-result');
             const popupIcon = document.getElementById('popup-icon');
@@ -1351,85 +1089,25 @@
             document.getElementById('popup-result').classList.remove('open');
         }
 
-        // Khởi chạy khi load trang
+
         document.addEventListener('DOMContentLoaded', () => {
             loadCatalog();
 
-            // Đăng ký submit form
+
             document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
 
-            // Đăng ký nút hủy sửa
+
             document.getElementById('btn-cancel-edit').addEventListener('click', cancelEdit);
 
-            // Đăng ký nút reset mặc định
+
             document.getElementById('btn-reset-default').addEventListener('click', resetToDefault);
 
-            // Đăng ký nút đóng alert
+
             document.getElementById('btn-popup-close').addEventListener('click', closePopup);
             document.getElementById('popup-result').addEventListener('click', (e) => {
                 if (e.target.id === 'popup-result') closePopup();
             });
-
-            // Đăng ký tab toggles
-            document.getElementById('img-mode-upload').addEventListener('click', () => setImageMode('upload'));
-            document.getElementById('img-mode-url').addEventListener('click', () => setImageMode('url'));
-
-            // Click vào dropzone để kích hoạt input file
-            const dropzone = document.getElementById('upload-dropzone');
-            const fileInput = document.getElementById('food-image-file');
-            if (dropzone && fileInput) {
-                dropzone.addEventListener('click', () => fileInput.click());
-            }
-
-            // Xử lý khi chọn file ảnh
-            if (fileInput) {
-                fileInput.addEventListener('change', async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    if (!file.type.startsWith('image/')) {
-                        showPopup("Lỗi!", "Vui lòng chọn file hình ảnh hợp lệ.", false);
-                        return;
-                    }
-
-                    const uploadText = document.getElementById('upload-text');
-                    const originalText = uploadText.textContent;
-                    uploadText.textContent = "Đang xử lý ảnh...";
-
-                    try {
-                        const compressedBase64 = await resizeAndCompressImage(file);
-                        uploadedImageBase64 = compressedBase64;
-                        showImagePreview(compressedBase64);
-                        uploadText.textContent = originalText;
-                    } catch (err) {
-                        console.error("Lỗi nén ảnh:", err);
-                        showPopup("Lỗi!", "Không thể xử lý hình ảnh này.", false);
-                        uploadText.textContent = originalText;
-                    }
-                });
-            }
-
-            // Nút hủy/xóa preview ảnh
-            document.getElementById('btn-remove-preview').addEventListener('click', (e) => {
-                e.stopPropagation();
-                clearImage();
-            });
-
-            // Lắng nghe input URL để cập nhật preview
-            const urlInput = document.getElementById('food-image');
-            if (urlInput) {
-                urlInput.addEventListener('input', () => {
-                    const urlVal = urlInput.value.trim();
-                    if (urlVal && urlVal.startsWith('http')) {
-                        showImagePreview(urlVal);
-                    } else {
-                        if (!uploadedImageBase64) {
-                            showImagePreview("");
-                        }
-                    }
-                });
-            }
         });
-    </script>
+</script>
 </body>
 </html>

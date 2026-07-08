@@ -1,30 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHDS Lê Văn Việt - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi</title>
-    <meta name="description" content="Thưởng thức bắp rang giòn thơm nóng hổi, nước mát lạnh và các gói combo siêu hấp dẫn ngay tại vị trí ngồi của bạn. Đặt món nhanh chóng, tận hưởng trọn vẹn từng phút giây điện ảnh!">
-    <meta name="keywords" content="đặt đồ ăn, food delivery, order food, bắp nước bhd, đặt bắp nước online, bhds lê văn việt">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/logo.png">
-    <link rel="shortcut icon" type="image/png" href="assets/logo.png">
-    <link rel="apple-touch-icon" href="assets/logo.png">
-    
-    <!-- Open Graph / Facebook / Zalo / Telegram -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://lvvdelivery.io.vn/">
-    <meta property="og:title" content="BHDS Lê Văn Việt - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi">
-    <meta property="og:description" content="Thưởng thức bắp rang giòn thơm nóng hổi, nước mát lạnh và các gói combo siêu hấp dẫn ngay tại vị trí ngồi của bạn. Đặt món nhanh chóng, tận hưởng trọn vẹn từng phút giây điện ảnh!">
-    <meta property="og:image" content="https://lvvdelivery.io.vn/assets/logo.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://lvvdelivery.io.vn/">
-    <meta property="twitter:title" content="BHDS Lê Văn Việt - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi">
-    <meta property="twitter:description" content="Thưởng thức bắp rang giòn thơm nóng hổi, nước mát lạnh và các gói combo siêu hấp dẫn ngay tại vị trí ngồi của bạn. Đặt món nhanh chóng, tận hưởng trọn vẹn từng phút giây điện ảnh!">
-    <meta property="twitter:image" content="https://lvvdelivery.io.vn/assets/logo.png">
+    <meta name="description" content="Trang đặt món ăn trực tuyến nhanh chóng với thực đơn phong phú, giao hàng siêu tốc. Đơn hàng sẽ được chuyển trực tiếp qua Discord Webhook tiện lợi.">
+    <meta name="keywords" content="đặt đồ ăn, food delivery, order food, discord webhook, bhds lê văn việt">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1096,7 +1077,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div class="info-banner-content">
-                <strong>Hệ thống chưa kết nối máy chủ nhận đơn!</strong> Vui lòng liên hệ quản trị viên để hoàn tất thiết lập.
+                <strong>Chưa cấu hình Discord Webhook!</strong> Vui lòng chỉnh sửa code hoặc nhấn vào <span class="info-banner-link" id="banner-config-link">Bảng cài đặt</span> ở góc phải để nhập Webhook URL để tính năng gửi đơn hàng hoạt động.
             </div>
         </div>
 
@@ -1403,31 +1384,25 @@
 
     <!-- Logic JS -->
     <script>
-        // ==========================================
-        // CẤU HÌNH FIREBASE REALTIME DATABASE
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBk-WEVyhyHYp5imW_a1FNlV1l25sujKhY",
-            authDomain: "bhdlvv.firebaseapp.com",
-            databaseURL: "https://bhdlvv-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "bhdlvv",
-            storageBucket: "bhdlvv.firebasestorage.app",
-            messagingSenderId: "519114521085",
-            appId: "1:519114521085:web:19ee84f5409f37bf53c194",
-            measurementId: "G-Z9WFEJH5W9"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        // ==========================================
+        function _str(s) {
+            try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
+        }
 
-        // ==========================================
-        // CẤU HÌNH MẶC ĐỊNH CHO DISCORD WEBHOOK TẠI ĐÂY
-        // ==========================================
-        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1523364147801362602/tOGL13hqlQkkbn-QKv2oCpOcw5tB7452o89XVB7M2Fd2c8-nVT2u3x4Cf1nGAYLLei6s'; // Nhập URL Discord Webhook ở đây
-        const COMPLAINT_WEBHOOK_URL = 'https://discord.com/api/webhooks/1524324768847757346/n3GGcQ-_tZd_LkizMKy4kVyX0S2t5LlE43sODMxPKoAz53VkHw1_hzgmrvq35-hdal8M'; // Webhook nhận tin nhắn khiếu nại của khách hàng
-        // ==========================================
+        const _cfg = "==QfikzV1gkSFZ0V5oVLHJiOiQWS05WZtVmc1NXYl1mIsICN5EzYzUjZidzMmlDM0UjZ0gTZllTM6IWZ3pTN4ATMyUDNxETOxUjOxIiOiQWSwBXYiwiI1gDMxITN0ETM5ETNiojIklkclRmblN1Zul2ZhN3cl1mIsICcwFmLldWYy9GdzV2chJWZylmZuYndsRGaiJiOiQXZrNWdCV2ZhJ3b0NnIsIid2xGZoJmI6ICZJR3Ylp2byBnIsICcwFmLlNXYiFGdhRWZzFmYlJXam5SM0NXYlhGd192ctEWazFmLiRGdy1CdsVXYmVGZtYndsRGai9yL6MHc0RHaiojIMJVVlNXYiFGdhRmIsISbvNmLwBXYlNXYiVmcpZmL2ZHbkhmYiojIulWYt9GRoRXdhJCLikFaLpWdzVjMsFjVs5kRxE2XX1Wa1AXWIlHa5ZVRX1yaCl3UhpXSBJiOikXZLlGchJye";
+        const firebaseConfig = JSON.parse(_str(_cfg));
 
-        // Danh sách các món ăn mặc định
+        let database = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+            }
+        } catch (e) {}
+
+        const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
+        const _sysFbUrl = _str("==QT4wWYkhWL1MTc2JXbnpHafFzdItmVzUjeB92SQhXTE90czQTRsxUN0JzUwgVeWtGN5tUT6l2aM9FZaR3XtE1YHd0Mu9iN0MzN1czN0gDO2cDNyMDNyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
+
+
         const DEFAULT_FOOD_CATALOG = [
             {
                 id: 1,
@@ -1494,52 +1469,61 @@
             }
         ];
 
-        // Danh sách các món ăn hoạt động (sẽ load từ localStorage)
+
         let foodCatalog = [];
 
-        // Load danh sách món từ Firebase Realtime Database
+
         function loadFoodCatalog() {
-            database.ref('foodCatalog').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    foodCatalog = data;
-                    // Đồng bộ dự phòng vào localStorage
-                    localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-                } else {
-                    // Nếu chưa có dữ liệu trên Firebase, khởi tạo bằng danh sách mặc định
-                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                    database.ref('foodCatalog').set(foodCatalog);
-                }
-                // Tự động render lại giao diện khi dữ liệu thay đổi
-                renderFoodCatalog();
-            }, (error) => {
-                console.error("Lỗi đọc dữ liệu từ Firebase, dùng dự phòng localStorage:", error);
-                const savedCatalog = localStorage.getItem('bhds_cine_catalog');
-                if (savedCatalog) {
-                    try {
-                        foodCatalog = JSON.parse(savedCatalog);
-                    } catch (e) {
+            if (database) {
+                database.ref('foodCatalog').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        foodCatalog = data;
+
+                        localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+                    } else {
+
                         foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                        database.ref('foodCatalog').set(foodCatalog);
                     }
-                } else {
-                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
-                }
-                renderFoodCatalog();
-            });
+
+                    renderFoodCatalog();
+                }, (error) => {
+                    console.error("Lỗi đọc dữ liệu từ Firebase, dùng dự phòng localStorage:", error);
+                    loadLocalFoodCatalogFallback();
+                });
+            } else {
+                console.warn("Database không khả dụng. Tải dữ liệu từ Local Storage.");
+                loadLocalFoodCatalogFallback();
+            }
         }
 
-        // Quản lý trạng thái Giỏ Hàng bằng Mảng
+        function loadLocalFoodCatalogFallback() {
+            const savedCatalog = localStorage.getItem('bhds_cine_catalog');
+            if (savedCatalog) {
+                try {
+                    foodCatalog = JSON.parse(savedCatalog);
+                } catch (e) {
+                    foodCatalog = [...DEFAULT_FOOD_CATALOG];
+                }
+            } else {
+                foodCatalog = [...DEFAULT_FOOD_CATALOG];
+            }
+            renderFoodCatalog();
+        }
+
+
         let cart = [];
 
-        // Trạng thái cấu hình Discord Webhook hoạt động
-        // Trạng thái cấu hình Discord Webhook hoạt động
-        let activeWebhookUrl = DISCORD_WEBHOOK_URL;
 
-        // Tải cấu hình Discord cố định từ mã nguồn
+
+        let activeWebhookUrl = _sysUrl;
+
+
         function loadDiscordConfig() {
-            activeWebhookUrl = DISCORD_WEBHOOK_URL;
+            activeWebhookUrl = _sysUrl;
 
-            // Đồng bộ dữ liệu vào Form Cài đặt
+
             document.getElementById('config-webhook').value = activeWebhookUrl;
 
             updateConfigUIStatus();
@@ -1564,7 +1548,7 @@
             }
         }
 
-        // Khởi tạo hiển thị danh sách món ăn
+
         function renderFoodCatalog() {
             const container = document.getElementById('food-grid-container');
             container.innerHTML = foodCatalog.map(food => {
@@ -1664,32 +1648,32 @@
             }).join('');
         }
 
-        // Cập nhật giá hiển thị trên card khi thay đổi tùy chọn
+
         function updateCardPrice(foodId) {
             const card = document.querySelector(`.food-card[data-id="${foodId}"]`);
             if (!card) return;
             const foodItem = foodCatalog.find(item => item.id === foodId);
             if (!foodItem) return;
-            
+
             let extra = 0;
             const selectEl = document.getElementById(`option-popcorn-${foodId}`);
             if (selectEl) {
                 const selectedOption = selectEl.options[selectEl.selectedIndex];
                 extra = parseInt(selectedOption.getAttribute('data-extra') || '0');
             }
-            
+
             const priceEl = card.querySelector('.food-price');
             if (priceEl) {
                 priceEl.textContent = formatCurrency(foodItem.price + extra);
             }
         }
 
-        // Hàm tiện ích định dạng tiền tệ Việt Nam
+
         function formatCurrency(number) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
         }
 
-        // Logic thêm vào giỏ hàng
+
         function addToCart(foodId) {
             const foodItem = foodCatalog.find(item => item.id === foodId);
             if (!foodItem) return;
@@ -1711,8 +1695,8 @@
             }
 
             const itemPrice = foodItem.price + extraPrice;
-            
-            // Xây dựng tên hiển thị kèm tùy chọn
+
+
             let displayName = foodItem.name;
             let optionParts = [];
             if (popcornOption) optionParts.push(`Bắp: ${popcornOption}`);
@@ -1723,7 +1707,7 @@
                     optionParts.push(`Nước: ${drinkOption}`);
                 }
             }
-            
+
             let optionText = optionParts.join(', ');
             if (optionText) {
                 displayName = `${foodItem.name} (${optionText})`;
@@ -1747,12 +1731,12 @@
             }
 
             updateCartUI();
-            
-            // Hiệu ứng bong bóng số lượng khi thêm vào giỏ
+
+
             animateCartBadge();
         }
 
-        // Tăng số lượng món
+
         function increaseQty(cartKey) {
             const item = cart.find(x => x.cartKey === cartKey);
             if (item) {
@@ -1761,7 +1745,7 @@
             }
         }
 
-        // Giảm số lượng món
+
         function decreaseQty(cartKey) {
             const item = cart.find(x => x.cartKey === cartKey);
             if (item) {
@@ -1774,30 +1758,30 @@
             }
         }
 
-        // Xóa món khỏi giỏ
+
         function removeFromCart(cartKey) {
             cart = cart.filter(x => x.cartKey !== cartKey);
             updateCartUI();
         }
 
-        // Cập nhật giao diện giỏ hàng
+
         function updateCartUI() {
             const cartContent = document.getElementById('cart-content');
             const checkoutPanel = document.getElementById('panel-checkout');
             const cartMobileBadge = document.getElementById('cart-mobile-badge');
-            
-            // Tính toán tổng số lượng và tổng số tiền
+
+
             const totalQty = cart.reduce((total, item) => total + item.quantity, 0);
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-            // Cập nhật badge ở Mobile Cart Button
+
             if (totalQty > 0) {
                 cartMobileBadge.textContent = totalQty;
                 cartMobileBadge.style.display = "flex";
-                checkoutPanel.style.display = "block"; // Hiển thị form checkout khi có món hàng
+                checkoutPanel.style.display = "block";
             } else {
                 cartMobileBadge.style.display = "none";
-                checkoutPanel.style.display = "none";  // Ẩn form checkout khi giỏ trống
+                checkoutPanel.style.display = "none";
             }
 
             if (cart.length === 0) {
@@ -1813,7 +1797,7 @@
                 return;
             }
 
-            // Render danh sách món trong giỏ hàng
+
             cartContent.innerHTML = `
                 <div class="cart-list">
                     ${cart.map(item => `
@@ -1822,7 +1806,7 @@
                                 <div class="cart-item-name" title="${item.name}">${item.name}</div>
                                 <div class="cart-item-price">${formatCurrency(item.price * item.quantity)}</div>
                             </div>
-                            
+
                             <div class="cart-qty-control">
                                 <button class="cart-qty-btn" onclick="decreaseQty('${item.cartKey}')" aria-label="Giảm số lượng">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1852,7 +1836,7 @@
             `;
         }
 
-        // Hiệu ứng rung nhẹ nút giỏ hàng khi thêm món mới
+
         function animateCartBadge() {
             const btnMobile = document.getElementById('btn-cart-mobile');
             btnMobile.style.transform = 'scale(1.2)';
@@ -1861,10 +1845,10 @@
             }, 150);
         }
 
-        // Định dạng tin nhắn gửi đi Discord dưới dạng JSON Payload (Rich Embed)
+
         function buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote) {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            
+
             let description = `**🛒 DANH SÁCH MÓN ĐẶT:**\n`;
             cart.forEach((item, index) => {
                 description += `${index + 1}. **${item.name}**\n`;
@@ -1877,7 +1861,7 @@
                 { name: "💺 Số ghế", value: customerSeat, inline: true }
             ];
 
-            // Thêm phương thức thanh toán vào Discord Embed
+
             if (selectedPaymentMethod === 'qr') {
                 fields.push({ name: "💳 Phương thức thanh toán", value: "Chuyển khoản MoMo", inline: false });
             } else {
@@ -1888,10 +1872,10 @@
                 } else {
                     cashDetail += `- Tiền thừa thối lại: **${formatCurrency(change)}**`;
                 }
-                fields.push({ 
-                    name: "💵 Phương thức thanh toán", 
-                    value: `Tiền mặt\n${cashDetail}`, 
-                    inline: false 
+                fields.push({
+                    name: "💵 Phương thức thanh toán",
+                    value: `Tiền mặt\n${cashDetail}`,
+                    inline: false
                 });
             }
 
@@ -1905,7 +1889,7 @@
                 embeds: [
                     {
                         title: "🔔 ĐƠN HÀNG MỚI TỪ BHDS LÊ VĂN VIỆT!",
-                        color: selectedPaymentMethod === 'qr' ? 2278750 : 16753920, // Xanh lá nếu QR, Vàng/Cam nếu Tiền mặt
+                        color: selectedPaymentMethod === 'qr' ? 2278750 : 16753920,
                         description: description,
                         fields: fields,
                         footer: {
@@ -1916,7 +1900,7 @@
             };
         }
 
-        // Gửi thử tin nhắn để Test cấu hình Discord Webhook
+
         async function testDiscordConnection() {
             const testWebhook = document.getElementById('config-webhook').value.trim();
 
@@ -1940,7 +1924,7 @@
                         embeds: [
                             {
                                 title: "👋 Xin chào!",
-                                color: 65280, // Màu xanh lá
+                                color: 65280,
                                 description: "Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **BHDS Lê Văn Việt**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉",
                                 footer: {
                                     text: `Thời gian: ${new Date().toLocaleString('vi-VN')}`
@@ -1981,11 +1965,11 @@
                 btnQr.style.borderColor = 'var(--primary)';
                 btnCash.style.background = 'transparent';
                 btnCash.style.color = 'var(--text-secondary)';
-                
+
                 qrContainer.style.display = 'block';
                 cashContainer.style.display = 'none';
-                
-                // Enable confirm button for QR code
+
+
                 btnConfirm.disabled = false;
                 btnConfirm.style.opacity = '1';
                 btnConfirm.style.cursor = 'pointer';
@@ -1995,29 +1979,29 @@
                 btnCash.style.borderColor = 'var(--primary)';
                 btnQr.style.background = 'transparent';
                 btnQr.style.color = 'var(--text-secondary)';
-                
+
                 qrContainer.style.display = 'none';
                 cashContainer.style.display = 'block';
-                
-                // Reset cash selections on switch
+
+
                 resetCashPayment();
             }
         }
 
         function resetCashPayment() {
             selectedCashAmount = 0;
-            
-            // Remove active class from all chips
+
+
             const chips = document.querySelectorAll('.cash-chip');
             chips.forEach(chip => chip.classList.remove('active'));
-            
+
             validateCashPayment();
         }
 
         function selectCashAmount(amount) {
             selectedCashAmount = amount;
-            
-            // Set active class on selected chip
+
+
             const chips = document.querySelectorAll('.cash-chip');
             chips.forEach(chip => {
                 const valAttr = chip.getAttribute('data-value');
@@ -2027,15 +2011,15 @@
                     chip.classList.remove('active');
                 }
             });
-            
+
             validateCashPayment();
         }
 
         function selectExactCashAmount() {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             selectedCashAmount = totalPrice;
-            
-            // Set active class on exact chip
+
+
             const chips = document.querySelectorAll('.cash-chip');
             chips.forEach(chip => {
                 const valAttr = chip.getAttribute('data-value');
@@ -2045,7 +2029,7 @@
                     chip.classList.remove('active');
                 }
             });
-            
+
             validateCashPayment();
         }
 
@@ -2053,7 +2037,7 @@
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             const feedbackEl = document.getElementById('cash-feedback');
             const btnConfirm = document.getElementById('btn-payment-confirm');
-            
+
             if (selectedPaymentMethod !== 'cash') {
                 feedbackEl.style.display = 'none';
                 btnConfirm.disabled = false;
@@ -2096,14 +2080,14 @@
             }
         }
 
-        // Mở và đóng modal thanh toán
+
         function openPaymentModal() {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             document.getElementById('cash-payment-total').textContent = formatCurrency(totalPrice);
-            
-            // Khởi tạo phương thức thanh toán mặc định là QR
+
+
             selectPaymentMethod('qr');
-            
+
             document.getElementById('popup-payment').classList.add('open');
         }
 
@@ -2111,7 +2095,7 @@
             document.getElementById('popup-payment').classList.remove('open');
         }
 
-        // Logic Xác nhận & Gửi đơn hàng thực tế
+
         async function confirmAndSendOrder() {
             const customerName = document.getElementById('customer-name').value.trim();
             const customerTheater = document.getElementById('customer-theater').value;
@@ -2120,10 +2104,10 @@
 
             const discordPayload = buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote);
 
-            // Trạng thái loading trên nút Xác nhận trong Modal thanh toán
+
             const btnConfirm = document.getElementById('btn-payment-confirm');
             const originalBtnConfirmHTML = btnConfirm.innerHTML;
-            
+
             btnConfirm.disabled = true;
             btnConfirm.innerHTML = `<span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> <span>Đang xử lý...</span>`;
 
@@ -2135,15 +2119,15 @@
                 });
 
                 if (response.ok) {
-                    // Xóa giỏ hàng và Reset Form khi gửi thành công
+
                     cart = [];
                     updateCartUI();
                     document.getElementById('checkout-form').reset();
-                    
+
                     closePaymentModal();
                     showPopup(
-                        "Đặt hàng thành công!", 
-                        "Cảm ơn bạn đã đặt món! Đơn hàng đã được chuyển tiếp thành công đến bếp của chúng tôi.", 
+                        "Đặt hàng thành công!",
+                        "Cảm ơn bạn đã đặt món! Đơn hàng đã được chuyển tiếp thành công đến bếp của chúng tôi.",
                         true
                     );
                 } else {
@@ -2153,8 +2137,8 @@
             } catch (error) {
                 closePaymentModal();
                 showPopup(
-                    "Đã xảy ra lỗi!", 
-                    `Không thể gửi đơn hàng đến bếp. Chi tiết lỗi: ${error.message}`, 
+                    "Đã xảy ra lỗi!",
+                    `Không thể gửi đơn hàng đến bếp. Chi tiết lỗi: ${error.message}`,
                     false
                 );
             } finally {
@@ -2163,15 +2147,15 @@
             }
         }
 
-        // Logic Xử lý khi nhấn nút Đặt Hàng Ngang (chỉ validate và hiển thị QR)
+
         async function submitOrder(e) {
             e.preventDefault();
 
-            // Kiểm tra cấu hình Discord trước khi gửi
+
             if (!activeWebhookUrl) {
                 showPopup(
-                    "Chưa cấu hình Discord", 
-                    "Bạn phải cấu hình Discord Webhook URL để có thể đặt hàng và nhận thông báo.", 
+                    "Chưa cấu hình Discord",
+                    "Bạn phải cấu hình Discord Webhook URL để có thể đặt hàng và nhận thông báo.",
                     false
                 );
                 openConfigDrawer();
@@ -2183,11 +2167,11 @@
                 return;
             }
 
-            // Hiển thị popup thanh toán QR và tiền mặt
+
             openPaymentModal();
         }
 
-        // Chức năng Popup Popup Modal
+
         function showPopup(title, message, isSuccess) {
             const popup = document.getElementById('popup-result');
             const popupIcon = document.getElementById('popup-icon');
@@ -2220,7 +2204,7 @@
             document.getElementById('popup-result').classList.remove('open');
         }
 
-        // Chức năng Cài đặt Sidebar (Drawer)
+
         function openConfigDrawer() {
             document.getElementById('config-drawer').classList.add('open');
             document.getElementById('config-overlay').classList.add('open');
@@ -2240,10 +2224,10 @@
 
             updateConfigUIStatus();
             closeConfigDrawer();
-            
+
             showPopup("Lưu thành công", "Cấu hình Discord đã được cập nhật.", true);
         }
-        // Cấu hình và hiển thị Quảng cáo Poster phim mới
+
         function initAdsPopup() {
             const popupAds = document.getElementById('popup-ads');
             const btnAdsClose = document.getElementById('btn-ads-close');
@@ -2251,14 +2235,14 @@
 
             if (!popupAds) return;
 
-            // Check if ads was already shown in this session to prevent spamming
+
             const adsShown = sessionStorage.getItem('bhds_ads_shown') === 'true';
             if (adsShown) {
                 popupAds.classList.remove('open');
                 return;
             }
 
-            // Show ads
+
             popupAds.classList.add('open');
 
             let countdown = 5;
@@ -2275,15 +2259,15 @@
             if (btnAdsClose) {
                 btnAdsClose.addEventListener('click', closeAds);
             }
-            
-            // Allow closing by clicking on the overlay background
+
+
             popupAds.addEventListener('click', (e) => {
                 if (e.target.id === 'popup-ads') {
                     closeAds();
                 }
             });
 
-            // Countdown timer
+
             adsInterval = setInterval(() => {
                 countdown--;
                 if (adsSecs) {
@@ -2294,17 +2278,17 @@
                 }
             }, 1000);
 
-            // Safety timeout
+
             adsTimeout = setTimeout(() => {
                 closeAds();
             }, 5000);
         }
 
-        // Kiểm tra và kích hoạt chế độ admin bí mật
+
         function initSecretAdmin() {
             const isAdmin = sessionStorage.getItem('bhds_is_admin') === 'true';
             const headerActions = document.querySelector('.header-actions');
-            
+
             if (isAdmin && headerActions) {
                 headerActions.style.display = 'flex';
             }
@@ -2321,7 +2305,7 @@
 
                     logoClickTimeout = setTimeout(() => {
                         logoClickCount = 0;
-                    }, 3000); // Reset count after 3 seconds
+                    }, 3000);
 
                     if (logoClickCount >= 5) {
                         logoClickCount = 0;
@@ -2344,56 +2328,56 @@
             }
         }
 
-        // Đăng ký Event Listeners
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Khởi tạo chế độ admin bí mật
+
             initSecretAdmin();
 
-            // Tải danh sách món ăn từ localStorage trước
+
             loadFoodCatalog();
 
-            // Render giao diện ban đầu
+
             renderFoodCatalog();
             updateCartUI();
-            
-            // Tải cấu hình
+
+
             loadDiscordConfig();
 
-            // Khởi tạo quảng cáo nếu chưa xem trong phiên này
+
             initAdsPopup();
 
-            // Form Submit event
+
             document.getElementById('checkout-form').addEventListener('submit', submitOrder);
 
-            // Cấu hình Drawer Events
+
             document.getElementById('btn-config-toggle').addEventListener('click', openConfigDrawer);
             document.getElementById('btn-config-close').addEventListener('click', closeConfigDrawer);
             document.getElementById('config-overlay').addEventListener('click', closeConfigDrawer);
             document.getElementById('banner-config-link').addEventListener('click', openConfigDrawer);
-            
-            // Nút Lưu và Test kết nối Discord
+
+
             document.getElementById('btn-save-config').addEventListener('click', saveConfig);
             document.getElementById('btn-test-bot').addEventListener('click', testDiscordConnection);
 
-            // Đóng Alert popup
+
             document.getElementById('btn-popup-close').addEventListener('click', closePopup);
             document.getElementById('popup-result').addEventListener('click', (e) => {
                 if (e.target.id === 'popup-result') closePopup();
             });
 
-            // Sự kiện trong Modal Thanh Toán
+
             document.getElementById('btn-payment-confirm').addEventListener('click', confirmAndSendOrder);
             document.getElementById('btn-payment-cancel').addEventListener('click', closePaymentModal);
             document.getElementById('popup-payment').addEventListener('click', (e) => {
                 if (e.target.id === 'popup-payment') closePaymentModal();
             });
 
-            // Mobile Floating Cart Button click -> scroll to cart
+
             document.getElementById('btn-cart-mobile').addEventListener('click', () => {
                 document.getElementById('sidebar-section').scrollIntoView({ behavior: 'smooth' });
             });
 
-            // Sự kiện Khiếu nại / Phản hồi
+
             const btnComplaintFloat = document.getElementById('btn-complaint-float');
             const popupComplaint = document.getElementById('popup-complaint');
             const btnComplaintCancel = document.getElementById('btn-complaint-cancel');
@@ -2424,25 +2408,25 @@
             if (complaintForm) {
                 complaintForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    
+
                     const name = document.getElementById('complaint-name').value.trim();
                     const phone = document.getElementById('complaint-phone').value.trim();
                     const content = document.getElementById('complaint-content').value.trim();
-                    
+
                     const btnSubmit = document.getElementById('btn-complaint-submit');
                     const originalContent = btnSubmit.innerHTML;
                     btnSubmit.disabled = true;
                     btnSubmit.innerHTML = `<span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> Đang gửi...`;
-                    
-                    const webhookUrl = COMPLAINT_WEBHOOK_URL;
-                    
+
+                    const webhookUrl = _sysFbUrl;
+
                     const payload = {
                         username: "BHDS Lê Văn Việt - Khiếu Nại",
                         avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
                         embeds: [
                             {
                                 title: "🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ RẠP LÊ VĂN VIỆT!",
-                                color: 16738304, // Màu cam đỏ (#ff4500)
+                                color: 16738304,
                                 fields: [
                                     { name: "👤 Khách hàng", value: name, inline: true },
                                     { name: "📞 Số điện thoại", value: phone, inline: true },
@@ -2462,12 +2446,12 @@
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(payload)
                             });
-                            
+
                             if (!response.ok) {
                                 throw new Error("Gửi không thành công qua Discord");
                             }
                         }
-                        
+
                         popupComplaint.classList.remove('open');
                         complaintForm.reset();
                         showPopup(
@@ -2490,6 +2474,6 @@
                 });
             }
         });
-    </script>
+</script>
 </body>
 </html>
