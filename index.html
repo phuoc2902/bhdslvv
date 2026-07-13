@@ -1155,6 +1155,10 @@
                             <input type="text" id="customer-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
                         </div>
                         <div class="form-group">
+                            <label class="form-label" for="customer-phone">Số điện thoại *</label>
+                            <input type="tel" id="customer-phone" class="form-control" placeholder="Ví dụ: 0912345678" pattern="[0-9]{10}" title="Vui lòng nhập số điện thoại gồm 10 chữ số" required>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label" for="customer-theater">Số rạp *</label>
                             <select id="customer-theater" class="form-control" required>
                                 <option value="" disabled selected>-- Chọn rạp --</option>
@@ -1430,63 +1434,81 @@
                 name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
                 description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
                 price: 62000,
-                image: "./assets/bap.png"
+                image: "./assets/bap.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 5,
                 name: "Single Combo",
                 description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
                 price: 88000,
-                image: "./assets/singlecombo.png"
+                image: "./assets/singlecombo.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 6,
                 name: "Couple Combo",
                 description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
                 price: 121000,
-                image: "./assets/couplecombo.png"
+                image: "./assets/couplecombo.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 8,
                 name: "Refresh Combo",
                 description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
                 price: 78000,
-                image: "./assets/prefreshcb.png"
+                image: "./assets/prefreshcb.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 9,
                 name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
                 description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
                 price: 38000,
-                image: "./assets/nuocngotly.png"
+                image: "./assets/nuocngotly.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 10,
                 name: "Aquafina (Chai)",
                 description: "Nước suối tinh khiết đóng chai Aquafina mát lạnh tiện lợi.",
                 price: 28000,
-                image: "./assets/aquafina.png"
+                image: "./assets/aquafina.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 11,
                 name: "Nước Đóng Chai Đồng Giá 39K (Twister / Ô Long / Sting / Pepsi lon)",
                 description: "Lựa chọn các dòng Twister, Trà Ô Long TEA+ mát lạnh, nước tăng lực Sting dâu hoặc Pepsi lon.",
                 price: 39000,
-                image: "./assets/nuocngotlon.png"
+                image: "./assets/nuocngotlon.png",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 15,
                 name: "Strawberry Mojito",
                 description: "Sự kết hợp hoàn hảo giữa soda ga nhẹ, dâu tây ngọt thơm và lá bạc hà tươi mát.",
                 price: 48000,
-                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+                hidden: false,
+                hiddenOptions: []
             },
             {
                 id: 16,
                 name: "Blue Ocean Mojito",
                 description: "Mojito đại dương xanh hương vị trái cây nhiệt đới tươi mát mang đậm không khí biển khơi.",
                 price: 48000,
-                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+                hidden: false,
+                hiddenOptions: []
             }
         ];
 
@@ -1572,77 +1594,109 @@
 
         function renderFoodCatalog() {
             const container = document.getElementById('food-grid-container');
-            container.innerHTML = foodCatalog.map(food => {
+            container.innerHTML = foodCatalog.filter(food => !food.hidden).map(food => {
                 let optionsHtml = '';
+                const isHidden = (optVal) => food.hiddenOptions && food.hiddenOptions.includes(optVal);
+
                 if (food.id === 1) {
-                    optionsHtml = `
-                        <div class="food-options" style="margin-bottom: 1rem;">
-                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Hương vị bắp:</label>
-                            <select id="option-popcorn-1" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(1)">
-                                <option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>
-                                <option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>
-                                <option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>
-                            </select>
-                        </div>
-                    `;
+                    let opts = [];
+                    if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
+                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
+                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+                    
+                    if (opts.length > 0) {
+                        optionsHtml = `
+                            <div class="food-options" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Hương vị bắp:</label>
+                                <select id="option-popcorn-1" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(1)">
+                                    ${opts.join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
                 } else if (food.id === 5 || food.id === 6) {
-                    optionsHtml = `
-                        <div class="food-options" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
-                            <div style="flex: 1;">
-                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Vị bắp:</label>
-                                <select id="option-popcorn-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(${food.id})">
-                                    <option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>
-                                    <option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>
-                                    <option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>
-                                </select>
+                    let popOpts = [];
+                    if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
+                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
+                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+
+                    let drinkOpts = [];
+                    if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
+                    if (!isHidden('7Up')) drinkOpts.push('<option value="7Up">7Up</option>');
+                    if (!isHidden('Mirinda Cam')) drinkOpts.push('<option value="Mirinda Cam">Mirinda Cam</option>');
+                    if (!isHidden('Lipton Chanh')) drinkOpts.push('<option value="Lipton Chanh">Lipton Chanh</option>');
+
+                    if (popOpts.length > 0 || drinkOpts.length > 0) {
+                        optionsHtml = `
+                            <div class="food-options" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+                                ${popOpts.length > 0 ? `
+                                <div style="flex: 1;">
+                                    <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Vị bắp:</label>
+                                    <select id="option-popcorn-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(${food.id})">
+                                        ${popOpts.join('')}
+                                    </select>
+                                </div>` : ''}
+                                ${drinkOpts.length > 0 ? `
+                                <div style="flex: 1;">
+                                    <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Nước ngọt:</label>
+                                    <select id="option-drink-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                        ${drinkOpts.join('')}
+                                    </select>
+                                </div>` : ''}
                             </div>
-                            <div style="flex: 1;">
-                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Nước ngọt:</label>
-                                <select id="option-drink-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
-                                    <option value="Pepsi">Pepsi</option>
-                                    <option value="7Up">7Up</option>
-                                    <option value="Mirinda Cam">Mirinda Cam</option>
-                                    <option value="Lipton Chanh">Lipton Chanh</option>
-                                </select>
-                            </div>
-                        </div>
-                    `;
+                        `;
+                    }
                 } else if (food.id === 8) {
-                    optionsHtml = `
-                        <div class="food-options" style="margin-bottom: 1rem;">
-                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Hương vị bắp:</label>
-                            <select id="option-popcorn-8" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(8)">
-                                <option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>
-                                <option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>
-                                <option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>
-                            </select>
-                        </div>
-                    `;
+                    let opts = [];
+                    if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
+                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
+                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+
+                    if (opts.length > 0) {
+                        optionsHtml = `
+                            <div class="food-options" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Hương vị bắp:</label>
+                                <select id="option-popcorn-8" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(8)">
+                                    ${opts.join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
                 } else if (food.id === 9) {
-                    optionsHtml = `
-                        <div class="food-options" style="margin-bottom: 1rem;">
-                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Loại nước ngọt:</label>
-                            <select id="option-drink-9" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
-                                <option value="Pepsi">Pepsi</option>
-                                <option value="7Up">7Up</option>
-                                <option value="Mirinda Cam">Mirinda Cam</option>
-                                <option value="Lipton Chanh">Lipton Chanh</option>
-                            </select>
-                        </div>
-                    `;
+                    let opts = [];
+                    if (!isHidden('Pepsi')) opts.push('<option value="Pepsi">Pepsi</option>');
+                    if (!isHidden('7Up')) opts.push('<option value="7Up">7Up</option>');
+                    if (!isHidden('Mirinda Cam')) opts.push('<option value="Mirinda Cam">Mirinda Cam</option>');
+                    if (!isHidden('Lipton Chanh')) opts.push('<option value="Lipton Chanh">Lipton Chanh</option>');
+
+                    if (opts.length > 0) {
+                        optionsHtml = `
+                            <div class="food-options" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Loại nước ngọt:</label>
+                                <select id="option-drink-9" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                    ${opts.join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
                 } else if (food.id === 11) {
-                    optionsHtml = `
-                        <div class="food-options" style="margin-bottom: 1rem;">
-                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Loại nước:</label>
-                            <select id="option-drink-11" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
-                                <option value="Twister">Twister</option>
-                                <option value="Ô Long">Ô Long</option>
-                                <option value="Sting">Sting</option>
-                                <option value="Pepsi Chanh">Pepsi Chanh</option>
-                                <option value="Pepsi Không Calo">Pepsi Không Calo</option>
-                            </select>
-                        </div>
-                    `;
+                    let opts = [];
+                    if (!isHidden('Twister')) opts.push('<option value="Twister">Twister</option>');
+                    if (!isHidden('Ô Long')) opts.push('<option value="Ô Long">Ô Long</option>');
+                    if (!isHidden('Sting')) opts.push('<option value="Sting">Sting</option>');
+                    if (!isHidden('Pepsi Chanh')) opts.push('<option value="Pepsi Chanh">Pepsi Chanh</option>');
+                    if (!isHidden('Pepsi Không Calo')) opts.push('<option value="Pepsi Không Calo">Pepsi Không Calo</option>');
+
+                    if (opts.length > 0) {
+                        optionsHtml = `
+                            <div class="food-options" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Loại nước:</label>
+                                <select id="option-drink-11" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                    ${opts.join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
                 }
 
                 return `
@@ -1678,9 +1732,11 @@
 
             let extra = 0;
             const selectEl = document.getElementById(`option-popcorn-${foodId}`);
-            if (selectEl) {
+            if (selectEl && selectEl.selectedIndex >= 0) {
                 const selectedOption = selectEl.options[selectEl.selectedIndex];
-                extra = parseInt(selectedOption.getAttribute('data-extra') || '0');
+                if (selectedOption) {
+                    extra = parseInt(selectedOption.getAttribute('data-extra') || '0');
+                }
             }
 
             const priceEl = card.querySelector('.food-price');
@@ -1704,14 +1760,16 @@
             let extraPrice = 0;
 
             const popcornSelect = document.getElementById(`option-popcorn-${foodId}`);
-            if (popcornSelect) {
+            if (popcornSelect && popcornSelect.selectedIndex >= 0) {
                 popcornOption = popcornSelect.value;
                 const optionEl = popcornSelect.options[popcornSelect.selectedIndex];
-                extraPrice = parseInt(optionEl.getAttribute('data-extra') || '0');
+                if (optionEl) {
+                    extraPrice = parseInt(optionEl.getAttribute('data-extra') || '0');
+                }
             }
 
             const drinkSelect = document.getElementById(`option-drink-${foodId}`);
-            if (drinkSelect) {
+            if (drinkSelect && drinkSelect.selectedIndex >= 0) {
                 drinkOption = drinkSelect.value;
             }
 
@@ -1867,7 +1925,7 @@
         }
 
 
-        function buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote) {
+        function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote) {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
             let description = `**🛒 DANH SÁCH MÓN ĐẶT:**\n`;
@@ -1878,6 +1936,7 @@
 
             const fields = [
                 { name: "👤 Khách hàng", value: customerName, inline: true },
+                { name: "📞 Số điện thoại", value: customerPhone, inline: true },
                 { name: "🎬 Số rạp", value: customerTheater, inline: true },
                 { name: "💺 Số ghế", value: customerSeat, inline: true }
             ];
@@ -2119,6 +2178,7 @@
 
         async function confirmAndSendOrder() {
             const customerName = document.getElementById('customer-name').value.trim();
+            const customerPhone = document.getElementById('customer-phone').value.trim();
             const customerTheater = document.getElementById('customer-theater').value;
             const customerSeat = document.getElementById('customer-seat').value.trim();
             const customerNote = document.getElementById('customer-note').value.trim();
@@ -2132,6 +2192,7 @@
             const orderData = {
                 id: 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
                 customerName: customerName,
+                customerPhone: customerPhone,
                 theater: customerTheater,
                 seat: customerSeat,
                 note: customerNote,
@@ -2167,7 +2228,7 @@
             } catch (error) {
                 console.warn(error.message);
                 try {
-                    const discordPayload = buildOrderDiscordPayload(customerName, customerTheater, customerSeat, customerNote);
+                    const discordPayload = buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote);
                     const response = await fetch(activeWebhookUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
