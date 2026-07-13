@@ -1281,6 +1281,12 @@
                 </svg>
                 Thanh Toán Đơn Hàng
             </h3>
+
+            <!-- Tổng Tiền Thanh Toán -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 500;">Tổng tiền thanh toán:</span>
+                <strong style="color: var(--primary); font-size: 1.30rem; font-weight: 700;" id="payment-modal-total">0 ₫</strong>
+            </div>
             
             <!-- Payment Method Tabs -->
             <div style="display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: var(--radius-md); margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
@@ -2163,6 +2169,7 @@
         function openPaymentModal() {
             const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             document.getElementById('cash-payment-total').textContent = formatCurrency(totalPrice);
+            document.getElementById('payment-modal-total').textContent = formatCurrency(totalPrice);
 
 
             selectPaymentMethod('qr');
