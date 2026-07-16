@@ -830,7 +830,7 @@ function openPaymentModal() {
     // Bind Open App button
     const openAppBtn = document.getElementById('btn-open-payment-app');
     if (openAppBtn) {
-        openAppBtn.href = `https://dl.vietqr.co/pay?qr=${encodeURIComponent(dynamicQR)}`;
+        openAppBtn.href = `https://dl.vietqr.io/pay?qr=${encodeURIComponent(dynamicQR)}`;
     }
 
     // Bind Download QR button
