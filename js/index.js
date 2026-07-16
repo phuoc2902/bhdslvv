@@ -827,11 +827,14 @@ function openPaymentModal() {
         qrImgEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(dynamicQR)}`;
     }
     
-    // Bind Open App button
-    const openAppBtn = document.getElementById('btn-open-payment-app');
-    if (openAppBtn) {
-        openAppBtn.href = `https://dl.vietqr.io/pay?app=select&qr=${encodeURIComponent(dynamicQR)}`;
-    }
+    // Bind Banking App buttons
+    const banks = ['vcb', 'mb', 'tcb', 'bidv', 'acb', 'icb'];
+    banks.forEach(bank => {
+        const btn = document.getElementById(`btn-pay-${bank}`);
+        if (btn) {
+            btn.href = `https://dl.vietqr.io/pay?app=${bank}&qr=${encodeURIComponent(dynamicQR)}`;
+        }
+    });
 
     // Bind Download QR button
     const downloadBtn = document.getElementById('btn-payment-download');

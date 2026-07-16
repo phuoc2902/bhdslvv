@@ -1124,6 +1124,31 @@
                 transform: scale(1);
             }
         }
+        
+        /* Bank App Selection Buttons */
+        .btn-bank-pay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            outline: none;
+        }
+        .btn-bank-pay:hover {
+            background: rgba(0, 255, 102, 0.08);
+            border-color: rgba(0, 255, 102, 0.35);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
+            transform: translateY(-2px);
+        }
+        .btn-bank-pay:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -1348,13 +1373,36 @@
                     </div>
                 </div>
 
-                <!-- Mobile Quick Pay Button Link -->
-                <a id="btn-open-payment-app" class="btn-submit btn-pulsing" style="margin-bottom: 1.25rem; font-size: 0.95rem; text-decoration: none; width: 100%; border-radius: 12px; background: linear-gradient(135deg, #00FF66 0%, #00aa44 100%); color: #020503; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" target="_blank">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    MỞ APP THANH TOÁN NHANH
-                </a>
+                <!-- Mobile Quick Pay Buttons Grid -->
+                <div style="text-align: left; margin-bottom: 1.25rem;">
+                    <span style="font-size: 0.75rem; font-weight: bold; color: var(--neon-green); display: block; text-transform: uppercase; margin-bottom: 0.65rem; letter-spacing: 0.5px;">Chọn Ngân Hàng Để Mở App Thanh Toán:</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                        <a id="btn-pay-vcb" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">VCB</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">Vietcombank</span>
+                        </a>
+                        <a id="btn-pay-mb" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">MB</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">MB Bank</span>
+                        </a>
+                        <a id="btn-pay-tcb" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">TCB</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">Techcombank</span>
+                        </a>
+                        <a id="btn-pay-bidv" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">BIDV</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">BIDV</span>
+                        </a>
+                        <a id="btn-pay-acb" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">ACB</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">ACB One</span>
+                        </a>
+                        <a id="btn-pay-icb" class="btn-bank-pay" target="_blank">
+                            <span style="color: #00FF66; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.3px;">CTG</span>
+                            <span style="color: var(--text-muted); font-size: 0.55rem; margin-top: 2px;">VietinBank</span>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Custom visual separator -->
                 <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.25rem; color: var(--text-muted); font-size: 0.75rem;">
