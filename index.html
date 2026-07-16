@@ -531,7 +531,7 @@
 
         .cart-item {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: minmax(0, 1fr) auto auto;
             align-items: center;
             gap: 0.75rem;
             padding: 0.6rem;
@@ -547,6 +547,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            min-width: 0; /* Allow the name to shrink and show ellipsis */
         }
 
         .cart-item-price {

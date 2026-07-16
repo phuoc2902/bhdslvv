@@ -155,8 +155,10 @@ let activeWebhookUrl = _sysUrl;
 function loadDiscordConfig() {
     activeWebhookUrl = _sysUrl;
 
-
-    document.getElementById('config-webhook').value = activeWebhookUrl;
+    const webhookInput = document.getElementById('config-webhook');
+    if (webhookInput) {
+        webhookInput.value = activeWebhookUrl;
+    }
 
     updateConfigUIStatus();
 }
@@ -167,16 +169,22 @@ function updateConfigUIStatus() {
     const configBadgeIndicator = document.getElementById('config-badge-indicator');
     const missingConfigBanner = document.getElementById('missing-config-banner');
 
-    if (isConfigured) {
-        statusBadge.className = "config-status status-configured";
-        statusBadge.querySelector('.status-text').textContent = "Đã cấu hình";
-        configBadgeIndicator.style.display = "none";
-        missingConfigBanner.style.display = "none";
-    } else {
-        statusBadge.className = "config-status status-missing";
-        statusBadge.querySelector('.status-text').textContent = "Chưa cấu hình";
-        configBadgeIndicator.style.display = "block";
-        missingConfigBanner.style.display = "flex";
+    if (statusBadge) {
+        if (isConfigured) {
+            statusBadge.className = "config-status status-configured";
+            const textEl = statusBadge.querySelector('.status-text');
+            if (textEl) textEl.textContent = "Đã cấu hình";
+        } else {
+            statusBadge.className = "config-status status-missing";
+            const textEl = statusBadge.querySelector('.status-text');
+            if (textEl) textEl.textContent = "Chưa cấu hình";
+        }
+    }
+    if (configBadgeIndicator) {
+        configBadgeIndicator.style.display = isConfigured ? "none" : "block";
+    }
+    if (missingConfigBanner) {
+        missingConfigBanner.style.display = isConfigured ? "none" : "flex";
     }
 }
 
