@@ -45,10 +45,45 @@ function obfuscateHtml(filePath) {
     console.log(`=== Hoàn thành làm mờ file: ${filePath} ===\n`);
 }
 
-const files = ['index.html', 'admin.html'];
-files.forEach(file => {
+function obfuscateJsFile(filePath) {
+    console.log(`=== Bắt đầu làm mờ file JS: ${filePath} ===`);
+    let content = fs.readFileSync(filePath, 'utf8');
+    try {
+        console.log(`Tiến hành trộn mã cho ${filePath} (độ dài: ${content.length} ký tự)...`);
+        const obfuscated = JavaScriptObfuscator.obfuscate(content, {
+            compact: true,
+            controlFlowFlattening: true,
+            controlFlowFlatteningThreshold: 0.75,
+            deadCodeInjection: true,
+            deadCodeInjectionThreshold: 0.4,
+            debugProtection: false,
+            stringArray: true,
+            stringArrayRotate: true,
+            stringArrayShuffle: true,
+            stringArrayThreshold: 0.75
+        }).getObfuscatedCode();
+        
+        fs.writeFileSync(filePath, obfuscated, 'utf8');
+        console.log(`=== Hoàn thành làm mờ file JS: ${filePath} ===\n`);
+    } catch (e) {
+        console.error(`❌ Lỗi khi trộn mã trong file JS ${filePath}:`, e);
+    }
+}
+
+const htmlFiles = ['index.html', 'admin.html'];
+htmlFiles.forEach(file => {
     const p = path.join(__dirname, file);
     if (fs.existsSync(p)) {
         obfuscateHtml(p);
+    }
+});
+
+const jsFiles = [
+    path.join(__dirname, 'js', 'index.js'),
+    path.join(__dirname, 'js', 'admin.js')
+];
+jsFiles.forEach(p => {
+    if (fs.existsSync(p)) {
+        obfuscateJsFile(p);
     }
 });
