@@ -58,6 +58,7 @@
             padding: 0;
             scrollbar-width: thin;
             scrollbar-color: var(--neon-green-dim) transparent;
+            touch-action: manipulation; /* Disable double-tap zoom globally */
         }
 
         body {
@@ -1115,13 +1116,6 @@
                 BHDS Lê Văn Việt
             </a>
             <div class="header-actions">
-                <button id="btn-config-toggle" class="icon-btn" aria-label="Cài đặt Telegram" title="Cấu hình Telegram Bot">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span id="config-badge-indicator" style="display: none; position: absolute; top: 0; right: 0; width: 8px; height: 8px; border-radius: 50%; background-color: var(--neon-red); border: 2.5px solid var(--bg-deep-space);"></span>
-                </button>
             </div>
         </div>
     </header>
@@ -1140,15 +1134,7 @@
     <!-- Main App Container -->
     <main class="app-container">
         
-        <!-- Missing Config Banner Warning -->
-        <div id="missing-config-banner" class="info-banner" style="display: none;">
-            <svg class="info-banner-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div class="info-banner-content">
-                <strong>Chưa cấu hình Discord Webhook!</strong> Vui lòng chỉnh sửa code hoặc nhấn vào <span class="info-banner-link" id="banner-config-link">Bảng cài đặt</span> ở góc phải để nhập Webhook URL.
-            </div>
-        </div>
+
 
         <!-- Dynamic Category Selector Switcher -->
         <div class="category-filter-bar">
@@ -1245,40 +1231,7 @@
         </div>
     </main>
 
-    <!-- Configuration Drawer -->
-    <div class="config-drawer-overlay" id="config-overlay"></div>
-    <div class="config-drawer" id="config-drawer">
-        <div class="config-header">
-            <h3>Cài đặt Discord</h3>
-            <button id="btn-config-close" class="icon-btn" aria-label="Đóng cài đặt">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        
-        <div style="font-size: 0.8rem; color: var(--text-body-green); line-height: 1.5; opacity: 0.8;">
-            Nhập Discord Webhook URL của bạn để kiểm tra gửi tin nhắn từ giao diện. Hoặc cấu hình trực tiếp trong file JS.
-        </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 0.5rem;">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="config-webhook">Webhook URL *</label>
-                <input type="password" id="config-webhook" class="form-control" placeholder="Dán liên kết Discord Webhook vào đây...">
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
-                <span>Trạng thái:</span>
-                <span id="config-status-badge" class="config-status status-missing">
-                    <span class="indicator"></span>
-                    <span class="status-text">Chưa cấu hình</span>
-                </span>
-            </div>
-            
-            <button id="btn-save-config" class="btn-submit" style="margin-top: 0.5rem;">Lưu cấu hình</button>
-            <button id="btn-test-bot" class="btn-add" style="justify-content: center; padding: 0.7rem; font-weight: 700; width: 100%;">Kiểm tra Webhook (Gửi tin thử)</button>
-        </div>
-    </div>
 
     <!-- Floating Zalo Button -->
     <a href="https://zalo.me/g/xclnxkmdtrh9mzvn2apl" target="_blank" rel="noopener noreferrer" id="btn-zalo-float" class="btn-zalo-float" aria-label="Liên hệ Zalo">
@@ -1705,6 +1658,24 @@
             // Re-render food catalog using redefined function
             renderFoodCatalog();
         }
+
+        // Lock zoom in and zoom out (pinch and double-tap zoom) completely on mobile devices
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
