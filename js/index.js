@@ -409,8 +409,7 @@ function addToCart(foodId) {
     }
 
     updateCartUI();
-
-
+    showToast(`Đã thêm ${foodItem.name} vào giỏ hàng!`);
     animateCartBadge();
 }
 
@@ -517,11 +516,29 @@ function updateCartUI() {
 
 function animateCartBadge() {
     const btnMobile = document.getElementById('btn-cart-mobile');
-    if (!btnMobile) return;
-    btnMobile.style.transform = 'scale(1.2)';
-    setTimeout(() => {
-        btnMobile.style.transform = '';
-    }, 150);
+    if (btnMobile) {
+        btnMobile.style.transform = 'translateX(-50%) scale(1.2)';
+        btnMobile.style.boxShadow = '0 0 20px var(--neon-green)';
+        btnMobile.style.background = 'var(--neon-green)';
+        btnMobile.style.color = '#020503';
+        setTimeout(() => {
+            btnMobile.style.transform = 'translateX(-50%)';
+            btnMobile.style.boxShadow = '';
+            btnMobile.style.background = '';
+            btnMobile.style.color = '';
+        }, 300);
+    }
+
+    const cartHeader = document.querySelector('.cart-header svg');
+    if (cartHeader) {
+        cartHeader.style.transform = 'scale(1.3)';
+        cartHeader.style.filter = 'drop-shadow(0 0 8px var(--neon-green))';
+        cartHeader.style.transition = 'transform 0.15s ease-out, filter 0.15s ease-out';
+        setTimeout(() => {
+            cartHeader.style.transform = 'none';
+            cartHeader.style.filter = 'none';
+        }, 300);
+    }
 }
 
 
@@ -674,8 +691,26 @@ function selectPaymentMethod(method) {
 function resetCashPayment() {
     selectedCashAmount = 0;
 
+    const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const chips = document.querySelectorAll('.cash-chip');
-    chips.forEach(chip => chip.classList.remove('active'));
+    chips.forEach(chip => {
+        chip.classList.remove('active');
+        const valAttr = chip.getAttribute('data-value');
+        if (valAttr && valAttr !== 'exact') {
+            const valNum = parseInt(valAttr);
+            if (valNum < totalPrice) {
+                chip.disabled = true;
+                chip.style.opacity = '0.3';
+                chip.style.cursor = 'not-allowed';
+                chip.style.pointerEvents = 'none';
+            } else {
+                chip.disabled = false;
+                chip.style.opacity = '1';
+                chip.style.cursor = 'pointer';
+                chip.style.pointerEvents = 'auto';
+            }
+        }
+    });
 
     validateCashPayment();
 }
@@ -1291,3 +1326,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function showToast(message) {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.left = '50%';
+        container.style.transform = 'translateX(-50%)';
+        container.style.zIndex = '100000';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '8px';
+        container.style.width = '90%';
+        container.style.maxWidth = '360px';
+        container.style.pointerEvents = 'none';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.style.background = 'rgba(2, 5, 3, 0.95)';
+    toast.style.border = '1px solid var(--neon-green)';
+    toast.style.color = '#fff';
+    toast.style.padding = '12px 16px';
+    toast.style.borderRadius = '12px';
+    toast.style.fontSize = '0.85rem';
+    toast.style.fontWeight = '700';
+    toast.style.textAlign = 'center';
+    toast.style.boxShadow = '0 10px 25px rgba(0, 255, 102, 0.25), 0 0 10px rgba(0, 255, 102, 0.1)';
+    toast.style.backdropFilter = 'blur(10px)';
+    toast.style.webkitBackdropFilter = 'blur(10px)';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-20px) scale(0.9)';
+    toast.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="3" style="color: var(--neon-green);">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>${message}</span>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0) scale(1)';
+    }, 10);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-15px) scale(0.9)';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 2200);
+}
