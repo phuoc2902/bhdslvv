@@ -820,14 +820,14 @@ function openPaymentModal() {
     const orderIdEl = document.getElementById('payment-modal-order-id');
     if (orderIdEl) orderIdEl.textContent = currentOrderId;
 
-    // Generate dynamic QR and deep link
-    const dynamicQR = generateDynamicEMVCo(totalPrice, currentOrderId);
+    // Show static momo.jpg for 100% reliable scanning
     const qrImgEl = document.getElementById('payment-qr-img');
     if (qrImgEl) {
-        qrImgEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(dynamicQR)}`;
+        qrImgEl.src = './assets/momo.jpg';
     }
     
-    // Bind Banking App buttons
+    // Bind Banking App buttons (keeps dynamic deep links for banks that support autofill)
+    const dynamicQR = generateDynamicEMVCo(totalPrice, currentOrderId);
     const banks = ['vcb', 'mb', 'tcb', 'bidv', 'acb', 'icb'];
     banks.forEach(bank => {
         const btn = document.getElementById(`btn-pay-${bank}`);
@@ -836,11 +836,12 @@ function openPaymentModal() {
         }
     });
 
-    // Bind Download QR button
+    // Bind Download QR button to download static momo.jpg
     const downloadBtn = document.getElementById('btn-payment-download');
     if (downloadBtn) {
-        downloadBtn.href = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(dynamicQR)}`;
-        downloadBtn.setAttribute('target', '_blank');
+        downloadBtn.href = './assets/momo.jpg';
+        downloadBtn.setAttribute('download', 'momo_payment_qr.jpg');
+        downloadBtn.removeAttribute('target');
     }
 
     selectPaymentMethod('qr');

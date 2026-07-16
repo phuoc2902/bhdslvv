@@ -1225,6 +1225,31 @@
                 font-size: 0.8rem !important;
             }
         }
+
+        /* Premium copy button styles */
+        .btn-copy-field {
+            background: rgba(0, 255, 102, 0.08);
+            border: 1px solid rgba(0, 255, 102, 0.25);
+            color: var(--neon-green);
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            outline: none;
+            user-select: none;
+        }
+        .btn-copy-field:hover {
+            background: rgba(0, 255, 102, 0.15);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
+        }
+        .btn-copy-field:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -1428,14 +1453,58 @@
             <div id="payment-qr-container" style="display: block; text-align: center; width: 100%;">
                 
                 <!-- Bill Details Ticket Frame -->
-                <div id="payment-details-card" style="background: rgba(0,255,102,0.03); border: 1px dashed rgba(0,255,102,0.25); padding: 1rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; text-align: left;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
-                        <span style="font-size: 0.8rem; color: var(--text-muted);">Mã đơn hàng:</span>
-                        <strong style="color: var(--text-heading); font-size: 0.95rem; font-family: monospace; letter-spacing: 0.5px;" id="payment-modal-order-id">BHD------</strong>
+                <div id="payment-details-card" style="background: rgba(0,255,102,0.03); border: 1px dashed rgba(0,255,102,0.25); padding: 1rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.65rem; text-align: left;">
+                    <!-- Recipient Bank -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 0.45rem;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Ngân hàng:</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="color: var(--text-heading); font-size: 0.85rem;">BVBank (Bản Việt)</strong>
+                            <button type="button" class="btn-copy-field" onclick="copyPaymentField('BVBank', this)" aria-label="Sao chép tên ngân hàng">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
                     </div>
+                    <!-- Account Number -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 0.45rem;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Số tài khoản:</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="color: var(--text-heading); font-size: 0.85rem; font-family: monospace; letter-spacing: 0.3px;">99MM24166M62095254</strong>
+                            <button type="button" class="btn-copy-field" onclick="copyPaymentField('99MM24166M62095254', this)" aria-label="Sao chép số tài khoản">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Memo / Order ID -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 0.45rem;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Nội dung:</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="color: var(--text-heading); font-size: 0.95rem; font-family: monospace; letter-spacing: 0.5px;" id="payment-modal-order-id">BHD------</strong>
+                            <button type="button" class="btn-copy-field" id="btn-copy-order-id" onclick="copyPaymentField('ORDER_ID', this)" aria-label="Sao chép nội dung">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Total Price -->
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Tổng tiền cần trả:</span>
-                        <strong style="color: var(--neon-green); font-size: 1.35rem; font-weight: 900; text-shadow: 0 0 10px var(--neon-green-glow);" id="payment-modal-total">0 ₫</strong>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="color: var(--neon-green); font-size: 1.35rem; font-weight: 900; text-shadow: 0 0 10px var(--neon-green-glow);" id="payment-modal-total">0 ₫</strong>
+                            <button type="button" class="btn-copy-field" id="btn-copy-total" onclick="copyPaymentField('AMOUNT', this)" aria-label="Sao chép số tiền">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                                <span>Copy</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1443,9 +1512,9 @@
                 <div id="payment-steps-card" style="text-align: left; background: rgba(0,0,0,0.2); padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 1.25rem;">
                     <span style="font-size: 0.75rem; font-weight: bold; color: var(--neon-green); display: block; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Hướng dẫn thanh toán nhanh:</span>
                     <div style="font-size: 0.8rem; color: var(--text-body-green); line-height: 1.45; display: flex; flex-direction: column; gap: 0.4rem;">
-                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">1.</span> <span>Ấn nút <strong>Mở App Thanh Toán</strong> ở dưới (hoặc quét mã QR bên dưới).</span></div>
-                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">2.</span> <span>Chọn Ngân hàng của bạn, hệ thống sẽ tự điền Số tiền & Ghi chú.</span></div>
-                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">3.</span> <span>Thanh toán xong, bấm <strong>Xác nhận & Gửi đơn</strong> để hoàn tất.</span></div>
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">1.</span> <span>Sao chép <strong>Số tài khoản</strong> &amp; <strong>Nội dung</strong> (hoặc nhấn <strong>Tải mã QR về máy</strong>).</span></div>
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">2.</span> <span>Mở ứng dụng Ngân hàng/MoMo của bạn, chọn **Quét QR** (Quét ảnh từ thư viện).</span></div>
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">3.</span> <span>Nhập đúng **Số tiền** &amp; **Nội dung**, thực hiện chuyển khoản rồi bấm **Xác nhận &amp; Gửi đơn**.</span></div>
                     </div>
                 </div>
 
@@ -1594,10 +1663,38 @@
     </footer>
 
     <!-- Logic JS -->
-    <script src="js/index.js?v=1.0.4"></script>
+    <script src="js/index.js?v=1.0.5"></script>
 
     <!-- Overrides & Additions to integrate custom layout elements with index.js -->
     <script>
+        // Premium Clipboard Copy Helper
+        function copyPaymentField(text, btnElement) {
+            if (text === 'ORDER_ID') {
+                text = document.getElementById('payment-modal-order-id').textContent;
+            } else if (text === 'AMOUNT') {
+                text = cart.reduce((total, item) => total + (item.price * item.quantity), 0).toString();
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = `
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="3" style="color: var(--neon-green);">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span style="color: var(--neon-green); font-size: 0.65rem; font-weight: 800;">Copied</span>
+                `;
+                btnElement.style.borderColor = 'rgba(0, 255, 102, 0.4)';
+                btnElement.style.background = 'rgba(0, 255, 102, 0.1)';
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.style.borderColor = '';
+                    btnElement.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Lỗi sao chép:', err);
+            });
+        }
+
         // Store current filter category state
         let currentFilter = 'all';
 
