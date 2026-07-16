@@ -1250,6 +1250,35 @@
         .btn-copy-field:active {
             transform: scale(0.95);
         }
+
+        /* Compact and beautiful empty cart styling */
+        .cart-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0.5rem;
+            text-align: center;
+        }
+        .cart-empty svg {
+            width: 64px;
+            height: 64px;
+            color: var(--neon-green-dim);
+            margin-bottom: 0.75rem;
+            opacity: 0.45;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 102, 0.1));
+        }
+        .cart-empty p {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin: 0 0 0.15rem 0;
+        }
+        .cart-empty span {
+            font-size: 0.75rem !important;
+            color: var(--text-muted) !important;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -1319,11 +1348,6 @@
                         
                         <div id="cart-content">
                             <!-- Cart content -->
-                        </div>
-                        
-                        <div class="ticket-barcode">
-                            <div class="barcode-lines"></div>
-                            <span class="barcode-num">BHD*LVP*2026</span>
                         </div>
                     </div>
                 </div>
