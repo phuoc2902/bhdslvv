@@ -571,7 +571,7 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
         avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
         embeds: [
             {
-                title: "🔔 ĐƠN HÀNG MỚI TỪ BHDS LÊ VĂN VIỆT!",
+                title: `🔔 ĐƠN HÀNG MỚI: #${currentOrderId || 'N/A'}`,
                 color: selectedPaymentMethod === 'qr' ? 2278750 : 16753920,
                 description: description,
                 fields: fields,
@@ -763,6 +763,50 @@ function validateCashPayment() {
 }
 
 
+let currentOrderId = '';
+
+function getCRC16(str) {
+    let crc = 0xFFFF;
+    const polynomial = 0x1021;
+    for (let i = 0; i < str.length; i++) {
+        let b = str.charCodeAt(i);
+        for (let j = 0; j < 8; j++) {
+            let bit = ((b >> (7 - j) & 1) === 1);
+            let c15 = ((crc >> 15 & 1) === 1);
+            crc = (crc << 1) & 0xFFFF;
+            if (c15 ^ bit) {
+                crc ^= polynomial;
+            }
+        }
+    }
+    crc &= 0xFFFF;
+    let crcStr = crc.toString(16).toUpperCase();
+    while (crcStr.length < 4) {
+        crcStr = '0' + crcStr;
+    }
+    return crcStr;
+}
+
+function generateDynamicEMVCo(amount, memo) {
+    const part1 = "00020101021126220007vn.momo0207199069438620010A00000072701320006970454011899MM24166M620952540208QRIBFTTA5303704";
+    const part2 = "5802VN";
+    
+    const amountStr = String(amount);
+    const amountLen = amountStr.length.toString().padStart(2, '0');
+    const tag54 = "54" + amountLen + amountStr;
+    
+    const cleanMemo = memo.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 15);
+    const memoSubLen = cleanMemo.length.toString().padStart(2, '0');
+    const memoSubTag = "08" + memoSubLen + cleanMemo;
+    
+    const tag62Len = memoSubTag.length.toString().padStart(2, '0');
+    const tag62 = "62" + tag62Len + memoSubTag;
+    
+    const combined = part1 + tag54 + part2 + tag62 + "6304";
+    const crc = getCRC16(combined);
+    return combined + crc;
+}
+
 function openPaymentModal() {
     const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const cashTotalEl = document.getElementById('cash-payment-total');
@@ -770,6 +814,31 @@ function openPaymentModal() {
     
     if (cashTotalEl) cashTotalEl.textContent = formatCurrency(totalPrice);
     if (qrTotalEl) qrTotalEl.textContent = formatCurrency(totalPrice);
+
+    // Generate unique short order ID for this checkout session
+    currentOrderId = 'BHD' + String(Date.now()).slice(-5) + Math.floor(Math.random() * 10);
+    const orderIdEl = document.getElementById('payment-modal-order-id');
+    if (orderIdEl) orderIdEl.textContent = currentOrderId;
+
+    // Generate dynamic QR and deep link
+    const dynamicQR = generateDynamicEMVCo(totalPrice, currentOrderId);
+    const qrImgEl = document.getElementById('payment-qr-img');
+    if (qrImgEl) {
+        qrImgEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(dynamicQR)}`;
+    }
+    
+    // Bind Open App button
+    const openAppBtn = document.getElementById('btn-open-payment-app');
+    if (openAppBtn) {
+        openAppBtn.href = `https://dl.vietqr.co/pay?qr=${encodeURIComponent(dynamicQR)}`;
+    }
+
+    // Bind Download QR button
+    const downloadBtn = document.getElementById('btn-payment-download');
+    if (downloadBtn) {
+        downloadBtn.href = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(dynamicQR)}`;
+        downloadBtn.setAttribute('target', '_blank');
+    }
 
     selectPaymentMethod('qr');
 
@@ -781,7 +850,6 @@ function closePaymentModal() {
     const popupPayment = document.getElementById('popup-payment');
     if (popupPayment) popupPayment.classList.remove('open');
 }
-
 
 async function confirmAndSendOrder() {
     const customerName = "Khách hàng";
@@ -798,7 +866,7 @@ async function confirmAndSendOrder() {
     btnConfirm.innerHTML = `<span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> <span>Đang xử lý...</span>`;
 
     const orderData = {
-        id: 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        id: currentOrderId || ('ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
         customerName: customerName,
         customerPhone: customerPhone,
         theater: customerTheater,

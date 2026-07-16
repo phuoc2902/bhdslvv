@@ -1105,6 +1105,25 @@
                 border-radius: 16px;
             }
         }
+
+        /* Pulsing Quick Pay button */
+        .btn-pulsing {
+            animation: pulse-glow 2.5s infinite;
+        }
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+                transform: scale(1.02);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 102, 0);
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1286,44 +1305,75 @@
 
     <!-- Payment QR Modal -->
     <div class="popup-modal" id="popup-payment">
-        <div class="popup-card" style="max-width: 480px; padding: 2.25rem 1.75rem;">
-            <h3 class="popup-title" style="color: var(--neon-green); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-shadow: 0 0 15px var(--neon-green-glow);">
+        <div class="popup-card" style="max-width: 480px; padding: 2rem 1.5rem;">
+            <h3 class="popup-title" style="color: var(--neon-green); margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-shadow: 0 0 15px var(--neon-green-glow); font-size: 1.3rem;">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 Thanh Toán Đơn Hàng
             </h3>
-
-            <!-- Tổng Tiền Thanh Toán -->
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.9rem; color: var(--text-body-green); font-weight: 500;">Tổng tiền thanh toán:</span>
-                <strong style="color: var(--neon-green); font-size: 1.35rem; font-weight: 900; text-shadow: 0 0 10px var(--neon-green-glow);" id="payment-modal-total">0 ₫</strong>
-            </div>
             
             <!-- Payment Method Tabs -->
-            <div style="display: flex; background: rgba(0,0,0,0.35); padding: 4px; border-radius: 10px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; background: rgba(0,0,0,0.35); padding: 4px; border-radius: 10px; margin-bottom: 1.25rem; border: 1px solid rgba(255,255,255,0.05);">
                 <button type="button" id="method-qr" onclick="selectPaymentMethod('qr')" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.25s; background: var(--neon-green); color: #020503; outline: none;">
-                    Chuyển khoản MoMo
+                    Chuyển khoản (App ngân hàng)
                 </button>
                 <button type="button" id="method-cash" onclick="selectPaymentMethod('cash')" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.25s; background: transparent; color: var(--text-body-green); outline: none;">
-                    Tiền mặt tại rạp
+                    Tiền mặt tại quầy
                 </button>
             </div>
 
             <!-- QR Container -->
             <div id="payment-qr-container" style="display: block; text-align: center; width: 100%;">
-                <p class="popup-text" style="font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5;">
-                    Nhập đúng số tiền khi chuyển khoản <strong>MoMo</strong>. Chuyển khoản xong, nhấn <strong>'Xác nhận & Gửi đơn'</strong> để hoàn tất đặt hàng.
-                </p>
-                <div style="background: white; padding: 12px; border-radius: var(--radius-panel); display: inline-block; margin: 0 auto 1.5rem auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); max-width: 260px; border: 1px solid rgba(0,255,102,0.2);">
-                    <img src="./assets/momo.jpg" alt="MoMo QR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: 10px; display: block;">
+                
+                <!-- Bill Details Ticket Frame -->
+                <div style="background: rgba(0,255,102,0.03); border: 1px dashed rgba(0,255,102,0.25); padding: 1rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Mã đơn hàng:</span>
+                        <strong style="color: var(--text-heading); font-size: 0.95rem; font-family: monospace; letter-spacing: 0.5px;" id="payment-modal-order-id">BHD------</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Tổng tiền cần trả:</span>
+                        <strong style="color: var(--neon-green); font-size: 1.35rem; font-weight: 900; text-shadow: 0 0 10px var(--neon-green-glow);" id="payment-modal-total">0 ₫</strong>
+                    </div>
                 </div>
+
+                <!-- Steps visual panel -->
+                <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 1.25rem;">
+                    <span style="font-size: 0.75rem; font-weight: bold; color: var(--neon-green); display: block; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px;">Hướng dẫn thanh toán nhanh:</span>
+                    <div style="font-size: 0.8rem; color: var(--text-body-green); line-height: 1.45; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">1.</span> <span>Ấn nút <strong>Mở App Thanh Toán</strong> ở dưới (hoặc quét mã QR bên dưới).</span></div>
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">2.</span> <span>Chọn Ngân hàng của bạn, hệ thống sẽ tự điền Số tiền & Ghi chú.</span></div>
+                        <div style="display: flex; gap: 0.4rem;"><span style="color: var(--neon-green); font-weight: bold;">3.</span> <span>Thanh toán xong, bấm <strong>Xác nhận & Gửi đơn</strong> để hoàn tất.</span></div>
+                    </div>
+                </div>
+
+                <!-- Mobile Quick Pay Button Link -->
+                <a id="btn-open-payment-app" class="btn-submit btn-pulsing" style="margin-bottom: 1.25rem; font-size: 0.95rem; text-decoration: none; width: 100%; border-radius: 12px; background: linear-gradient(135deg, #00FF66 0%, #00aa44 100%); color: #020503; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" target="_blank">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    MỞ APP THANH TOÁN NHANH
+                </a>
+
+                <!-- Custom visual separator -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.25rem; color: var(--text-muted); font-size: 0.75rem;">
+                    <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.06);"></div>
+                    <span>Hoặc quét mã QR này</span>
+                    <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.06);"></div>
+                </div>
+
+                <!-- QR Code Block -->
+                <div style="background: white; padding: 12px; border-radius: 16px; display: inline-block; margin: 0 auto 1.25rem auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); max-width: 240px; border: 2px dashed rgba(0,255,102,0.35);">
+                    <img src="./assets/momo.jpg" alt="VietQR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: 10px; display: block;">
+                </div>
+                
                 <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
-                    <a href="./assets/momo.jpg" download="BHDS_MOMO_QR.jpg" class="btn-submit btn-payment-download" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-heading); text-decoration: none; padding: 0.65rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-pill); cursor: pointer; transition: var(--transition-swift);">
+                    <a id="btn-payment-download" class="btn-submit" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-heading); text-decoration: none; padding: 0.55rem 1.25rem; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; border-radius: var(--radius-pill); cursor: pointer; transition: var(--transition-swift); box-shadow: none;">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Tải mã QR về
+                        Tải mã QR về máy
                     </a>
                 </div>
             </div>
