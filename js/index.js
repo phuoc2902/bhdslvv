@@ -151,6 +151,50 @@ let cart = [];
 
 let activeWebhookUrl = _sysUrl;
 
+// ── Category management (read from Firebase, sync with admin) ──
+const DEFAULT_CATEGORIES_INDEX = [
+    { id: 'combo',   label: 'Combo Tiết Kiệm' },
+    { id: 'popcorn', label: 'Bắp Rang Giòn' },
+    { id: 'drink',   label: 'Nước Giải Khát' }
+];
+let indexCategories = [...DEFAULT_CATEGORIES_INDEX];
+let activeCategoryFilter = 'all';
+
+function loadIndexCategories() {
+    if (database) {
+        database.ref('categories').on('value', snapshot => {
+            const data = snapshot.val();
+            indexCategories = (data && Array.isArray(data) && data.length > 0)
+                ? data : [...DEFAULT_CATEGORIES_INDEX];
+            renderCategoryFilterBar();
+        }, () => { renderCategoryFilterBar(); });
+    } else {
+        try {
+            const saved = localStorage.getItem('bhds_categories');
+            indexCategories = saved ? JSON.parse(saved) : [...DEFAULT_CATEGORIES_INDEX];
+        } catch(e) { indexCategories = [...DEFAULT_CATEGORIES_INDEX]; }
+        renderCategoryFilterBar();
+    }
+}
+
+function renderCategoryFilterBar() {
+    const bar = document.getElementById('category-filter-bar');
+    if (!bar) return;
+    bar.innerHTML = `
+        <button type="button" class="filter-chip ${activeCategoryFilter === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all')">Tất cả thực đơn</button>
+        ${indexCategories.map(cat =>
+            `<button type="button" class="filter-chip ${activeCategoryFilter === cat.id ? 'active' : ''}" onclick="setCategoryFilter('${cat.id}')">${cat.label}</button>`
+        ).join('')}
+    `;
+}
+
+function setCategoryFilter(filter) {
+    activeCategoryFilter = filter;
+    renderCategoryFilterBar();
+    renderFoodCatalog();
+}
+// ─────────────────────────────────────────────────────────────
+
 
 function loadDiscordConfig() {
     activeWebhookUrl = _sysUrl;
@@ -192,8 +236,12 @@ function updateConfigUIStatus() {
 function renderFoodCatalog() {
     const container = document.getElementById('food-grid-container');
     if (!container) return;
-    
-    container.innerHTML = foodCatalog.filter(food => !food.hidden).map(food => {
+
+    const filtered = activeCategoryFilter === 'all'
+        ? foodCatalog.filter(f => !f.hidden)
+        : foodCatalog.filter(f => !f.hidden && f.category === activeCategoryFilter);
+
+    container.innerHTML = filtered.map(food => {
         let optionsHtml = '';
         const isHidden = (optVal) => food.hiddenOptions && food.hiddenOptions.includes(optVal);
 
@@ -1165,8 +1213,7 @@ function initSecretAdmin() {
 document.addEventListener('DOMContentLoaded', () => {
 
     initSecretAdmin();
-
-
+    loadIndexCategories();
     loadFoodCatalog();
 
 

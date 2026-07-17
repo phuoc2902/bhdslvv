@@ -1348,12 +1348,9 @@
         
 
 
-        <!-- Dynamic Category Selector Switcher -->
-        <div class="category-filter-bar">
-            <button type="button" class="filter-chip active" onclick="setCategoryFilter('all')">Tất cả thực đơn</button>
-            <button type="button" class="filter-chip" onclick="setCategoryFilter('combo')">Combo Tiết Kiệm</button>
-            <button type="button" class="filter-chip" onclick="setCategoryFilter('popcorn')">Bắp Rang Giòn</button>
-            <button type="button" class="filter-chip" onclick="setCategoryFilter('drink')">Nước Giải Khát</button>
+        <!-- Dynamic Category Selector Switcher (rendered by JS from Firebase) -->
+        <div class="category-filter-bar" id="category-filter-bar">
+            <!-- chips rendered by renderCategoryFilterBar() -->
         </div>
 
         <!-- Grid Workspace -->

@@ -76,6 +76,11 @@
                 </button>
             </section>
 
+            <!-- Category Filter Bar (rendered by JS) -->
+            <div class="catalog-filter-bar" id="catalog-filter-bar">
+                <!-- chips rendered by renderCatalogFilterBar() -->
+            </div>
+
             <!-- Workspace Layout -->
             <div class="workspace">
                 
@@ -130,6 +135,15 @@
                         <div class="form-group">
                             <label class="form-label" for="food-desc">Mô tả chi tiết *</label>
                             <textarea id="food-desc" class="form-control" placeholder="Nguyên liệu chi tiết, nước sốt đi kèm..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="food-category">Danh mục *</label>
+                            <select id="food-category" class="form-control" required>
+                                <option value="combo">Combo Tiết Kiệm</option>
+                                <option value="popcorn">Bắp Rang Giòn</option>
+                                <option value="drink">Nước Giải Khát</option>
+                            </select>
                         </div>
                         
                         <div class="form-group" id="options-hide-group" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">

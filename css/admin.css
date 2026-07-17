@@ -873,6 +873,91 @@ textarea.form-control {
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
+/* Catalog Category Filter Bar */
+.catalog-filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.catalog-filter-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.catalog-filter-chip {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.catalog-filter-chip:hover {
+    border-color: rgba(34, 197, 94, 0.35);
+    color: var(--primary);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.catalog-filter-chip.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #050b07;
+    box-shadow: 0 0 14px var(--primary-glow);
+}
+
+/* Chip group: chip + pencil edit button side by side */
+.catalog-chip-group {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.catalog-chip-group:hover {
+    border-color: rgba(34, 197, 94, 0.35);
+}
+
+.catalog-chip-group .catalog-filter-chip {
+    border: none;
+    border-radius: 0;
+}
+
+.catalog-chip-group .catalog-filter-chip.active {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.btn-edit-category {
+    background: rgba(255, 255, 255, 0.03);
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.btn-edit-category:hover {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--primary);
+}
+
 /* Footer */
 footer {
     text-align: center;

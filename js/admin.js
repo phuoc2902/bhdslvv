@@ -14,9 +14,76 @@ try {
 } catch (e) {}
 
 let activeTab = 'catalog';
+let activeCatalogFilter = 'all';
 let orders = {};
 let discordQueue = [];
 let isProcessingDiscordQueue = false;
+
+// ── Category management ──────────────────────────────────────
+const DEFAULT_CATEGORIES = [
+    { id: 'combo',   label: 'Combo Tiết Kiệm' },
+    { id: 'popcorn', label: 'Bắp Rang Giòn' },
+    { id: 'drink',   label: 'Nước Giải Khát' }
+];
+let categories = [...DEFAULT_CATEGORIES];
+
+function loadCategories() {
+    const render = () => renderCatalogFilterBar();
+    if (database) {
+        database.ref('categories').once('value', snapshot => {
+            const data = snapshot.val();
+            if (data && Array.isArray(data) && data.length > 0) {
+                categories = data;
+            } else {
+                categories = [...DEFAULT_CATEGORIES];
+                database.ref('categories').set(categories);
+            }
+            render();
+        }, () => { categories = [...DEFAULT_CATEGORIES]; render(); });
+    } else {
+        try {
+            const saved = localStorage.getItem('bhds_categories');
+            categories = saved ? JSON.parse(saved) : [...DEFAULT_CATEGORIES];
+        } catch(e) { categories = [...DEFAULT_CATEGORIES]; }
+        render();
+    }
+}
+
+function saveCategories() {
+    localStorage.setItem('bhds_categories', JSON.stringify(categories));
+    if (database) database.ref('categories').set(categories);
+}
+
+function renderCatalogFilterBar() {
+    const bar = document.getElementById('catalog-filter-bar');
+    if (!bar) return;
+    bar.innerHTML = `
+        <button type="button" class="catalog-filter-chip ${activeCatalogFilter === 'all' ? 'active' : ''}" data-filter="all" onclick="setCatalogFilter('all')">Tất cả thực đơn</button>
+        ${categories.map(cat => `
+            <span class="catalog-chip-group">
+                <button type="button" class="catalog-filter-chip ${activeCatalogFilter === cat.id ? 'active' : ''}" data-filter="${cat.id}" onclick="setCatalogFilter('${cat.id}')">${cat.label}</button>
+                <button type="button" class="btn-edit-category" onclick="editCategoryLabel('${cat.id}')" title="Đổi tên danh mục">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </button>
+            </span>
+        `).join('')}
+    `;
+}
+
+function editCategoryLabel(id) {
+    const cat = categories.find(c => c.id === id);
+    if (!cat) return;
+    const newLabel = prompt(`Đổi tên danh mục "${cat.label}" thành:`, cat.label);
+    if (!newLabel || newLabel.trim() === '' || newLabel.trim() === cat.label) return;
+    cat.label = newLabel.trim();
+    saveCategories();
+    renderCatalogFilterBar();
+    renderFoodList();
+    showPopup('Cập nhật thành công!', `Danh mục đã được đổi tên thành "${cat.label}".`, true);
+}
+// ─────────────────────────────────────────────────────────────
 
 const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
 
@@ -32,6 +99,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
         price: 62000,
         image: "./assets/bap.png",
+        category: "popcorn",
         hidden: false,
         hiddenOptions: []
     },
@@ -41,6 +109,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
         price: 88000,
         image: "./assets/singlecombo.png",
+        category: "combo",
         hidden: false,
         hiddenOptions: []
     },
@@ -50,6 +119,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
         price: 121000,
         image: "./assets/couplecombo.png",
+        category: "combo",
         hidden: false,
         hiddenOptions: []
     },
@@ -59,6 +129,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
         price: 78000,
         image: "./assets/prefreshcb.png",
+        category: "combo",
         hidden: false,
         hiddenOptions: []
     },
@@ -68,6 +139,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
         price: 38000,
         image: "./assets/nuocngotly.png",
+        category: "drink",
         hidden: false,
         hiddenOptions: []
     },
@@ -77,6 +149,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Nước suối tinh khiết đóng chai Aquafina mát lạnh tiện lợi.",
         price: 28000,
         image: "./assets/aquafina.png",
+        category: "drink",
         hidden: false,
         hiddenOptions: []
     },
@@ -86,6 +159,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Lựa chọn các dòng Twister, Trà Ô Long TEA+ mát lạnh, nước tăng lực Sting dâu hoặc Pepsi lon.",
         price: 39000,
         image: "./assets/nuocngotlon.png",
+        category: "drink",
         hidden: false,
         hiddenOptions: []
     },
@@ -95,6 +169,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Sự kết hợp hoàn hảo giữa soda ga nhẹ, dâu tây ngọt thơm và lá bạc hà tươi mát.",
         price: 48000,
         image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+        category: "drink",
         hidden: false,
         hiddenOptions: []
     },
@@ -104,6 +179,7 @@ const DEFAULT_FOOD_CATALOG = [
         description: "Mojito đại dương xanh hương vị trái cây nhiệt đới tươi mát mang đậm không khí biển khơi.",
         price: 48000,
         image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+        category: "drink",
         hidden: false,
         hiddenOptions: []
     }
@@ -185,23 +261,38 @@ function saveCatalogToStorage() {
     document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
 }
 
+function setCatalogFilter(filter) {
+    activeCatalogFilter = filter;
+    document.querySelectorAll('.catalog-filter-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === filter);
+    });
+    renderFoodList();
+}
+
 function renderFoodList() {
     const container = document.getElementById('food-list-container');
 
-    if (foodCatalog.length === 0) {
+    const filtered = activeCatalogFilter === 'all'
+        ? foodCatalog
+        : foodCatalog.filter(f => f.category === activeCatalogFilter);
+
+    const countEl = document.getElementById('catalog-count');
+    if (countEl) countEl.textContent = `${filtered.length} món`;
+
+    if (filtered.length === 0) {
         container.innerHTML = `
             <div class="empty-catalog-state">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <p>Chưa có món ăn nào trong thực đơn của bạn.</p>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Hãy điền form bên phải để thêm món ăn mới!</p>
+                <p>Không có món ăn nào trong danh mục này.</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Hãy chọn danh mục khác hoặc thêm món mới!</p>
             </div>
         `;
         return;
     }
 
-    container.innerHTML = foodCatalog.map(food => `
+    container.innerHTML = filtered.map(food => `
         <div class="food-item-row ${food.hidden ? 'item-hidden' : ''}" id="food-row-${food.id}">
             <img src="${food.image}" alt="${food.name}" class="food-item-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&auto=format&fit=crop&q=80';">
             <div class="food-item-details">
@@ -238,8 +329,6 @@ function renderFoodList() {
             </div>
         </div>
     `).join('');
-
-    document.getElementById('catalog-count').textContent = `${foodCatalog.length} món`;
 }
 
 function toggleFoodVisibility(id) {
@@ -310,6 +399,8 @@ function initiateEdit(id) {
     document.getElementById('food-price').value = food.price;
     document.getElementById('food-image').value = food.image;
     document.getElementById('food-desc').value = food.description;
+    const catSelect = document.getElementById('food-category');
+    if (catSelect && food.category) catSelect.value = food.category;
     renderOptionsCheckboxes(food);
 
     document.getElementById('form-panel-title').innerHTML = `
@@ -374,6 +465,7 @@ function handleFormSubmit(e) {
                 price, 
                 image, 
                 description,
+                category: foodCatalog[index].category || 'all',
                 hidden: isHidden,
                 hiddenOptions: hiddenOptions
             };
@@ -385,13 +477,14 @@ function handleFormSubmit(e) {
             showPopup("Lỗi!", "Không tìm thấy món ăn cần cập nhật.", false);
         }
     } else {
-        const maxId = foodCatalog.reduce((max, item) => item.id > max ? item.id : max, 0);
+        const categorySelect = document.getElementById('food-category');
         const newFood = {
-            id: maxId + 1,
+            id: foodCatalog.reduce((max, item) => item.id > max ? item.id : max, 0) + 1,
             name,
             price,
             image,
             description,
+            category: categorySelect ? categorySelect.value : 'all',
             hidden: false,
             hiddenOptions: []
         };
@@ -796,6 +889,7 @@ function buildAdminOrderDiscordPayload(order) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadCategories();
     loadCatalog();
     initOrdersListener();
 
