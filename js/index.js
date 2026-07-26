@@ -1101,23 +1101,9 @@ async function confirmAndSendOrder() {
     };
 
     try {
-        if (database) {
-            await database.ref('orders').push(orderData);
-            cart = [];
-            updateCartUI();
-            const form = document.getElementById('checkout-form');
-            if (form) form.reset();
-            closePaymentModal();
-            showPopup(
-                "Đặt hàng thành công!",
-                "Cảm ơn bạn đã đặt món! Đơn hàng đã được ghi nhận trên hệ thống và chuyển đến bếp.",
-                true
-            );
-        } else {
-            throw new Error("Không thể kết nối máy chủ Firebase. Chuyển sang dự phòng gửi trực tiếp.");
-        }
-    } catch (error) {
-        console.warn(error.message);
+        let isDiscordSent = false;
+        
+        // 1. Luôn thử gửi sang Discord trước từ phía client
         try {
             const discordPayload = buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote);
             const response = await fetch(activeWebhookUrl, {
@@ -1125,30 +1111,51 @@ async function confirmAndSendOrder() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(discordPayload)
             });
-
             if (response.ok) {
-                cart = [];
-                updateCartUI();
-                const form = document.getElementById('checkout-form');
-                if (form) form.reset();
-                closePaymentModal();
-                showPopup(
-                    "Đặt hàng thành công!",
-                    "Cảm ơn bạn đã đặt món! Đơn hàng của bạn đã được gửi trực tiếp đến hệ thống bếp.",
-                    true
-                );
+                isDiscordSent = true;
             } else {
-                const errText = await response.text();
-                throw new Error(`Mã lỗi: ${response.status} - ${errText}`);
+                console.warn("Client gửi Discord thất bại, mã lỗi:", response.status);
             }
-        } catch (fallbackError) {
-            closePaymentModal();
+        } catch (discordErr) {
+            console.warn("Lỗi mạng khi gửi Discord từ client:", discordErr.message);
+        }
+
+        // Cập nhật trạng thái sentToDiscord
+        orderData.sentToDiscord = isDiscordSent;
+
+        // 2. Ghi nhận vào Firebase
+        if (database) {
+            await database.ref('orders').push(orderData);
+        }
+
+        // 3. Hoàn tất thành công
+        cart = [];
+        updateCartUI();
+        const form = document.getElementById('checkout-form');
+        if (form) form.reset();
+        closePaymentModal();
+        
+        if (isDiscordSent) {
             showPopup(
-                "Đã xảy ra lỗi!",
-                `Không thể gửi đơn hàng đến bếp. Chi tiết lỗi: ${fallbackError.message}`,
-                false
+                "Đặt hàng thành công!",
+                "Cảm ơn bạn đã đặt món! Đơn hàng của bạn đã được gửi trực tiếp đến hệ thống bếp.",
+                true
+            );
+        } else {
+            showPopup(
+                "Ghi nhận thành công!",
+                "Đơn hàng đã lưu vào hệ thống, nhưng hiện không gửi được thông báo Discord. Bếp sẽ kiểm tra hệ thống sau.",
+                true
             );
         }
+    } catch (error) {
+        console.error("Lỗi đặt hàng:", error);
+        closePaymentModal();
+        showPopup(
+            "Đã xảy ra lỗi!",
+            `Không thể ghi nhận đơn hàng. Chi tiết: ${error.message}`,
+            false
+        );
     } finally {
         btnConfirm.disabled = false;
         btnConfirm.innerHTML = originalBtnConfirmHTML;
