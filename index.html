@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Noto+Serif+JP:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -24,31 +24,31 @@
     <style>
         /* Design Tokens & Theme Variables */
         :root {
-            --bg-deep-space: #020503;
-            --bg-glass-card: rgba(6, 15, 9, 0.65);
-            --bg-glass-card-hover: rgba(12, 31, 18, 0.85);
+            --bg-deep-space: #0f0d0b;
+            --bg-glass-card: rgba(30, 26, 22, 0.85);
+            --bg-glass-card-hover: rgba(45, 38, 30, 0.95);
             
-            --neon-green: #00FF66;
-            --neon-green-dim: rgba(0, 255, 102, 0.35);
-            --neon-green-glow: rgba(0, 255, 102, 0.15);
-            --neon-red: #ff3366;
-            --neon-red-glow: rgba(255, 51, 102, 0.3);
+            --neon-green: #d4af37;
+            --neon-green-dim: #b89146;
+            --neon-green-glow: rgba(184, 145, 70, 0.4);
+            --neon-red: #8a151b;
+            --neon-red-glow: rgba(138, 21, 27, 0.4);
             
-            --border-neon: rgba(0, 255, 102, 0.15);
-            --border-neon-hover: rgba(0, 255, 102, 0.5);
+            --border-neon: rgba(184, 145, 70, 0.3);
+            --border-neon-hover: #b89146;
             
-            --text-neon: #00FF66;
-            --text-heading: #ffffff;
-            --text-body-green: #a3cbb5;
-            --text-muted: #4e6d5a;
+            --text-neon: #d4af37;
+            --text-heading: #f2e8d5;
+            --text-body-green: #c4bcae;
+            --text-muted: #8c8375;
             
-            --font-display: 'Outfit', sans-serif;
-            --font-mono: 'Space Grotesk', sans-serif;
+            --font-display: 'Cinzel', serif;
+            --font-mono: 'Inter', sans-serif;
             --transition-swift: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             
-            --radius-pill: 8px;
-            --radius-panel: 20px;
-            --radius-card: 24px;
+            --radius-pill: 4px;
+            --radius-panel: 4px;
+            --radius-card: 2px;
         }
 
         /* Base Resets */
@@ -69,93 +69,91 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 50% -10%, rgba(0, 255, 102, 0.15) 0%, transparent 60%),
-                radial-gradient(circle at 10% 80%, rgba(0, 255, 102, 0.04) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 50% 0%, rgba(30,26,22,1) 0%, rgba(15,13,11,1) 80%);
             background-attachment: fixed;
+            background-size: cover;
         }
 
-        /* Screen Glow & Projection Concept */
+        /* Hero Banner Hộ Linh Tráng Sĩ */
         .cinema-projection-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 3.5rem;
-            perspective: 1000px;
-        }
-
-        .cinema-curved-screen {
-            width: 85%;
-            max-width: 900px;
-            height: 24px;
-            background: linear-gradient(180deg, rgba(0, 255, 102, 0.7) 0%, rgba(0, 255, 102, 0.1) 80%, transparent 100%);
-            border-top: 3px solid var(--neon-green);
-            border-radius: 50% / 0 0 100% 100%;
-            box-shadow: 0 -10px 30px rgba(0, 255, 102, 0.3), 0 5px 25px rgba(0, 255, 102, 0.15);
             position: relative;
-            transform: rotateX(-15deg);
-        }
-
-        .projector-beam {
-            width: 80%;
-            max-width: 800px;
-            height: 140px;
-            background: linear-gradient(to bottom, rgba(0, 255, 102, 0.18) 0%, rgba(0, 255, 102, 0.01) 80%, transparent 100%);
-            clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
-            pointer-events: none;
-            opacity: 0.85;
-            animation: beam-flicker 5s infinite alternate;
-        }
-
-        @keyframes beam-flicker {
-            0%, 100% { opacity: 0.75; transform: scaleX(1); }
-            50% { opacity: 0.95; transform: scaleX(1.02); }
-        }
-
-        /* Immersive Curved Typography */
-        .immersive-title-card {
+            height: 60vh;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-top: -80px;
+            overflow: hidden;
+            border-bottom: 2px solid var(--border-neon-hover);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            margin-bottom: 3.5rem;
+            width: 100%;
+        }
+
+        .cinema-projection-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('assets/holinh_hero_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.6;
+            z-index: -2;
+            filter: grayscale(15%) contrast(115%) sepia(10%);
+        }
+
+        .cinema-projection-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(15, 13, 11, 0.1) 0%, rgba(15, 13, 11, 0.95) 100%);
+            z-index: -1;
+        }
+
+        .immersive-title-card {
+            padding: 0 20px;
             z-index: 10;
+            margin-top: 0;
         }
 
         .immersive-title-card h1 {
             font-family: var(--font-display);
-            font-size: 2.85rem;
-            font-weight: 900;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: var(--text-neon);
             text-transform: uppercase;
-            letter-spacing: -0.01em;
-            color: #ffffff;
-            text-shadow:
-                0 0 30px rgba(0, 255, 102, 0.35),
-                0 0 60px rgba(0, 255, 102, 0.15),
-                0 2px 8px rgba(0, 0, 0, 0.6);
-            margin-bottom: 0.75rem;
-            line-height: 1.1;
-        }
-
-        .title-brand-label {
-            display: block;
-            font-family: var(--font-display);
-            font-size: 0.78rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            color: var(--neon-green);
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-            text-shadow: 0 0 12px rgba(0, 255, 102, 0.5);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(184, 145, 70, 0.4);
         }
 
         .immersive-title-card p {
-            font-size: 1rem;
-            color: var(--text-body-green);
-            max-width: 600px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.2rem;
+            color: var(--text-heading);
+            max-width: 700px;
             margin: 0 auto;
-            opacity: 0.85;
-            line-height: 1.5;
+            line-height: 1.6;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+            font-style: italic;
         }
+
+        .title-brand-label {
+            display: inline-block;
+            background-color: var(--neon-red);
+            color: #fff;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border: 1px solid #ff4d4d;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px var(--neon-red-glow);
+        }
+        
+        .cinema-curved-screen, .projector-beam { display: none; }
 
         /* Sticky Glassmorphic Header */
         header {
@@ -308,12 +306,21 @@
             position: relative;
         }
 
-        .food-card::before {
+        .food-card::before, .food-card::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(to right, transparent, rgba(0, 255, 102, 0.4), transparent);
-            opacity: 0.5;
+            width: 20px; height: 20px;
+            border: 1px solid var(--neon-green-dim);
+            opacity: 0.3;
+            transition: opacity 0.4s ease, width 0.4s, height 0.4s;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .food-card::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+        .food-card::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+        .food-card:hover::before, .food-card:hover::after {
+            opacity: 1;
+            width: 30px; height: 30px;
         }
 
         .food-card:hover {
@@ -325,10 +332,11 @@
 
         .food-img-container {
             width: 100%;
-            height: 175px;
+            height: 220px;
             overflow: hidden;
             position: relative;
             background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #5c0b10;
         }
 
         .food-img {
@@ -336,10 +344,12 @@
             height: 100%;
             object-fit: cover;
             transition: var(--transition-swift);
+            filter: sepia(30%) contrast(120%) brightness(80%);
         }
 
         .food-card:hover .food-img {
-            transform: scale(1.06);
+            transform: scale(1.05);
+            filter: sepia(10%) contrast(120%) brightness(100%);
         }
 
         /* Custom Floating Badge on Card */
@@ -450,11 +460,14 @@
 
         /* Action Buttons */
         .btn-add {
-            background: rgba(0, 255, 102, 0.06);
-            border: 1px solid rgba(0, 255, 102, 0.25);
-            color: var(--neon-green);
+            background: rgba(138, 21, 27, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--text-heading);
             padding: 0.55rem 1.1rem;
             font-size: 0.85rem;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             font-weight: 700;
             border-radius: var(--radius-pill);
             cursor: pointer;
@@ -465,10 +478,10 @@
         }
 
         .btn-add:hover {
-            background-color: var(--neon-green);
-            border-color: var(--neon-green);
-            color: #020503;
-            box-shadow: 0 0 15px var(--neon-green-glow);
+            background-color: var(--neon-red);
+            border-color: #ff3333;
+            color: #ffffff;
+            box-shadow: 0 0 20px var(--neon-red-glow);
         }
 
         /* Sidebar Panels */
@@ -483,7 +496,7 @@
         /* Digital Movie Ticket Theme for Shopping Cart */
         .ticket-panel {
             background: #09120c;
-            border: 2px solid var(--neon-green-dim);
+            border: 2px solid var(--border-neon);
             border-radius: var(--radius-panel);
             position: relative;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
@@ -501,11 +514,11 @@
         }
         .ticket-panel::before {
             top: -2px;
-            background-image: radial-gradient(circle, transparent 7px, #020503 8px);
+            background-image: radial-gradient(circle, transparent 7px, #0f0d0b 8px);
         }
         .ticket-panel::after {
             bottom: -2px;
-            background-image: radial-gradient(circle, transparent 7px, #020503 8px);
+            background-image: radial-gradient(circle, transparent 7px, #0f0d0b 8px);
             transform: rotate(180deg);
         }
 
@@ -516,7 +529,7 @@
         /* Perforated separator line */
         .ticket-divider {
             border: none;
-            border-top: 2px dashed rgba(0, 255, 102, 0.25);
+            border-top: 2px dashed rgba(184, 145, 70, 0.25);
             margin: 1.5rem 0;
             position: relative;
         }
@@ -729,12 +742,12 @@
         /* Order button styling */
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, var(--neon-green) 0%, #00cc52 100%);
-            border: none;
-            color: #020503;
+            background: linear-gradient(135deg, var(--neon-red) 0%, #a61c24 100%);
+            border: 1px solid #ff3333;
+            color: #ffffff;
             font-weight: 800;
             padding: 0.95rem 1.5rem;
-            border-radius: 12px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -745,12 +758,12 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             transition: var(--transition-swift);
-            box-shadow: 0 5px 20px var(--neon-green-glow);
+            box-shadow: 0 5px 20px var(--neon-red-glow);
         }
 
         .btn-submit:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0, 255, 102, 0.35);
+            box-shadow: 0 8px 22px rgba(255, 51, 102, 0.35);
         }
 
         .btn-submit:disabled {
@@ -1357,9 +1370,9 @@
         <div class="projector-beam"></div>
         
         <div class="immersive-title-card">
-            <span class="title-brand-label">🍿 <span id="client-cinema-title-text">BHDS Thảo Điền</span></span>
-            <h1>Đặt Món — Giao Tận Ghế</h1>
-            <p>Bắp nóng giòn thơm ngọt, nước mát lạnh giao tận ghế phòng chiếu. Đặt món siêu nhanh, giữ trọn từng giây phút phim kịch tính!</p>
+            <span class="title-brand-label">Dự Án Điện Ảnh 2026 - <span id="client-cinema-title-text">BHDS Thảo Điền</span></span>
+            <h1>Hộ Linh Tráng Sĩ</h1>
+            <p>"Thưởng thức tinh hoa ẩm thực trong không gian huyền bí, oai hùng của lịch sử Đại Cồ Việt xưa."</p>
         </div>
     </div>
 
@@ -1413,35 +1426,35 @@
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="2.5" style="color: var(--neon-green);">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Thông tin nhận hàng
+                            Thông tin Lữ Khách
                         </h3>
                     </div>
                     
                     <form id="checkout-form">
                         <div class="form-group">
-                            <label class="form-label" for="customer-name">Tên khách hàng *</label>
-                            <input type="text" id="customer-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+                            <label class="form-label" for="customer-name">Danh tính Lữ Khách *</label>
+                            <input type="text" id="customer-name" class="form-control" placeholder="Ví dụ: Nguyên Phong" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="customer-theater">Số rạp *</label>
+                            <label class="form-label" for="customer-theater">Tọa độ gian phòng *</label>
                             <select id="customer-theater" class="form-control" required>
-                                <option value="" disabled selected>-- Chọn rạp --</option>
+                                <option value="" disabled selected>-- Chọn phòng chiếu --</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="customer-seat">Số ghế *</label>
+                            <label class="form-label" for="customer-seat">Vị trí ghế *</label>
                             <input type="text" id="customer-seat" class="form-control" placeholder="Ví dụ: H12, G15..." required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="customer-note">Ghi chú (không bắt buộc)</label>
-                            <textarea id="customer-note" class="form-control" placeholder="Ví dụ: Lấy nhiều tương ớt, tương cà, ly nước ít đá..."></textarea>
+                            <label class="form-label" for="customer-note">Lời nhắn nhủ (Không bắt buộc)</label>
+                            <textarea id="customer-note" class="form-control" placeholder="Ví dụ: Mang nhiều tương ớt, lấy mỹ tửu ít đá..."></textarea>
                         </div>
                         
                         <button type="submit" id="btn-submit-order" class="btn-submit">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span>Đặt hàng ngay</span>
+                            <span>Truyền Lệnh Lên Món</span>
                         </button>
                     </form>
                 </div>
@@ -1707,9 +1720,21 @@
                 const isHidden = (optVal) => food.hiddenOptions && food.hiddenOptions.includes(optVal);
 
                 // Map category label for badge
-                let categoryLabel = 'Nước Uống';
-                if (food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20) categoryLabel = 'Combo';
-                else if (food.id === 1) categoryLabel = 'Bắp Rang';
+                let categoryLabel = 'Mỹ Tửu';
+                if (food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20) categoryLabel = 'Yến Tiệc';
+                else if (food.id === 1) categoryLabel = 'Lương Thảo';
+
+                // Force override names to Hộ Linh Tráng Sĩ theme ignoring Firebase data
+                if (food.id === 1) { food.name = "Kim Ngọc Hạt (Bắp Rang)"; food.description = "Lương thảo giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Hoàng Kim hoặc Hổ Phách."; }
+                else if (food.id === 5) { food.name = "Hành Trang Tráng Sĩ (Single)"; food.description = "Phù hợp cho một lữ khách mang tinh thần độc hành: 1 phần Kim Ngọc Hạt lớn + 1 ly Mỹ Tửu."; }
+                else if (food.id === 6) { food.name = "Song Hành Kỳ Duyên (Couple)"; food.description = "Dành cho các hiệp khách đi chung: 1 phần Kim Ngọc Hạt lớn + 2 ly Mỹ Tửu."; }
+                else if (food.id === 8) { food.name = "Thanh Tâm Tĩnh Khí (Refresh)"; food.description = "Cảm giác thanh mát, giải tỏa: 1 phần Kim Ngọc Hạt lớn + 1 chai Tịnh Thủy Thiên Cực."; }
+                else if (food.id === 9) { food.name = "Mỹ Tửu Trân Các (Ly)"; food.description = "Mỹ tửu mát lạnh sảng khoái đánh tan cơn khát trên bước đường hành hiệp."; }
+                else if (food.id === 10) { food.name = "Tịnh Thủy Thiên Cực"; food.description = "Nước suối tinh khiết mát lạnh giúp phục hồi công lực tiện lợi."; }
+                else if (food.id === 11) { food.name = "Đồng Giá Trân Các 39K"; food.description = "Lựa chọn các loại thảo mộc, trà giải độc và mỹ tửu bổ sung công lực đóng chai."; }
+                else if (food.id === 15) { food.name = "Huyết Kiếm Lộ (Mojito Dâu)"; food.description = "Sự kết hợp hoàn hảo giữa hương dâu tây và lá bạc hà tươi mát."; }
+                else if (food.id === 16) { food.name = "Bích Hải Thanh Lưu (Mojito Đại dương)"; food.description = "Hương vị đại dương xanh tươi mát mang đậm không khí bi tráng."; }
+                else if (food.id === 20) { food.name = "Đại Yến Hoàng Cung (Food)"; food.description = "Khao quân đại tiệc gồm: 1 Kim Ngọc Hạt lớn + 1 Mỹ Tửu + 1 Lương thực nóng tuỳ chọn."; }
 
                 // Build hidden select element to stay 100% compatible with index.js, synchronized with interactive pills
                 if (food.id === 1) {
@@ -1729,9 +1754,9 @@
                             <div class="option-group-wrapper">
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container">
-                                    ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 1, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 1, 'popcorn', 'Ngọt')">Hương Mật</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Phô mai')">Hoàng Kim (+9K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Caramel')">Hổ Phách (+9K)</button>` : ''}
                                 </div>
                             </div>
                         `;
@@ -1757,18 +1782,18 @@
                             ${popOpts.length > 0 ? `
                             <span class="option-label">Chọn vị bắp:</span>
                             <div class="pill-container" style="margin-bottom: 0.5rem;">
-                                ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Hương Mật</button>` : ''}
+                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Hoàng Kim (+9K)</button>` : ''}
+                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Hổ Phách (+9K)</button>` : ''}
                             </div>` : ''}
                             
                             ${drinkOpts.length > 0 ? `
                             <span class="option-label">Chọn loại nước:</span>
                             <div class="pill-container">
-                                ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'drink', 'Pepsi')">Pepsi</button>` : ''}
-                                ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">7Up</button>` : ''}
-                                ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Mirinda</button>` : ''}
-                                ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Lipton</button>` : ''}
+                                ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'drink', 'Pepsi')">Hắc Phong Tửu (Pepsi)</button>` : ''}
+                                ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">Thanh Lộ Trà (7Up)</button>` : ''}
+                                ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Hồng Cẩm Tửu (Mirinda)</button>` : ''}
+                                ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Trà Băng (Lipton)</button>` : ''}
                             </div>` : ''}
                         </div>
                     `;
@@ -1799,18 +1824,18 @@
                             ${popOpts.length > 0 ? `
                             <span class="option-label">Chọn vị bắp:</span>
                             <div class="pill-container" style="margin-bottom: 0.5rem;">
-                                ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Hương Mật</button>` : ''}
+                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Hoàng Kim (+9K)</button>` : ''}
+                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Hổ Phách (+9K)</button>` : ''}
                             </div>` : ''}
                             
                             ${drinkOpts.length > 0 ? `
                             <span class="option-label">Chọn loại nước:</span>
                             <div class="pill-container" style="margin-bottom: 0.5rem;">
-                                ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'drink', 'Pepsi')">Pepsi</button>` : ''}
-                                ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">7Up</button>` : ''}
-                                ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Mirinda</button>` : ''}
-                                ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Lipton</button>` : ''}
+                                ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'drink', 'Pepsi')">Hắc Phong Tửu (Pepsi)</button>` : ''}
+                                ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">Thanh Lộ Trà (7Up)</button>` : ''}
+                                ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Hồng Cẩm Tửu (Mirinda)</button>` : ''}
+                                ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Trà Băng (Lipton)</button>` : ''}
                             </div>` : ''}
 
                             ${hotFoodOpts.length > 0 ? `
@@ -1837,9 +1862,9 @@
                             <div class="option-group-wrapper">
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container">
-                                    ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 8, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 8, 'popcorn', 'Ngọt')">Hương Mật</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Phô mai')">Hoàng Kim (+9K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Caramel')">Hổ Phách (+9K)</button>` : ''}
                                 </div>
                             </div>
                         `;
@@ -1860,10 +1885,10 @@
                             <div class="option-group-wrapper">
                                 <span class="option-label">Chọn loại nước:</span>
                                 <div class="pill-container">
-                                    ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 9, 'drink', 'Pepsi')">Pepsi</button>` : ''}
-                                    ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', '7Up')">7Up</button>` : ''}
-                                    ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', 'Mirinda Cam')">Mirinda</button>` : ''}
-                                    ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', 'Lipton Chanh')">Lipton</button>` : ''}
+                                    ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 9, 'drink', 'Pepsi')">Hắc Phong Tửu (Pepsi)</button>` : ''}
+                                    ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', '7Up')">Thanh Lộ Trà (7Up)</button>` : ''}
+                                    ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', 'Mirinda Cam')">Hồng Cẩm Tửu (Mirinda)</button>` : ''}
+                                    ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 9, 'drink', 'Lipton Chanh')">Trà Băng (Lipton)</button>` : ''}
                                 </div>
                             </div>
                         `;

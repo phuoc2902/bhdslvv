@@ -21,7 +21,9 @@ let isProcessingDiscordQueue = false;
 
 // ── Category management ──────────────────────────────────────
 const DEFAULT_CATEGORIES = [
-    { id: 'combo',   label: 'Combo Tiết Kiệm' }
+    { id: 'combo',   label: 'Yến Tiệc (Combo)' },
+    { id: 'popcorn', label: 'Lương Thảo (Bắp)' },
+    { id: 'drink',   label: 'Mỹ Tửu (Nước)' }
 ];
 let categories = [...DEFAULT_CATEGORIES];
 
@@ -93,8 +95,8 @@ if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
 const DEFAULT_FOOD_CATALOG = [
     {
         id: 1,
-        name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
-        description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
+        name: "Kim Ngọc Hạt (Bắp Rang)",
+        description: "Lương thảo giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Hoàng Kim hoặc Hổ Phách.",
         price: 62000,
         image: "./assets/bap.png",
         category: "popcorn",
@@ -103,8 +105,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 5,
-        name: "Single Combo",
-        description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
+        name: "Hành Trang Tráng Sĩ (Single)",
+        description: "Phù hợp cho một lữ khách mang tinh thần độc hành: 1 phần Kim Ngọc Hạt lớn + 1 ly Mỹ Tửu.",
         price: 88000,
         image: "./assets/singlecombo.png",
         category: "combo",
@@ -113,8 +115,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 6,
-        name: "Couple Combo",
-        description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
+        name: "Song Hành Kỳ Duyên (Couple)",
+        description: "Dành cho các hiệp khách đi chung: 1 phần Kim Ngọc Hạt lớn + 2 ly Mỹ Tửu.",
         price: 121000,
         image: "./assets/couplecombo.png",
         category: "combo",
@@ -123,8 +125,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 8,
-        name: "Refresh Combo",
-        description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
+        name: "Thanh Tâm Tĩnh Khí (Refresh)",
+        description: "Cảm giác thanh mát, giải tỏa: 1 phần Kim Ngọc Hạt lớn + 1 chai Tịnh Thủy Thiên Cực.",
         price: 78000,
         image: "./assets/prefreshcb.png",
         category: "combo",
@@ -133,8 +135,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 9,
-        name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
-        description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
+        name: "Mỹ Tửu Trân Các (Ly)",
+        description: "Mỹ tửu mát lạnh sảng khoái đánh tan cơn khát trên bước đường hành hiệp.",
         price: 38000,
         image: "./assets/nuocngotly.png",
         category: "drink",
@@ -143,8 +145,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 10,
-        name: "Aquafina (Chai)",
-        description: "Nước suối tinh khiết đóng chai Aquafina mát lạnh tiện lợi.",
+        name: "Tịnh Thủy Thiên Cực",
+        description: "Nước suối tinh khiết mát lạnh giúp phục hồi công lực tiện lợi.",
         price: 28000,
         image: "./assets/aquafina.png",
         category: "drink",
@@ -153,8 +155,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 11,
-        name: "Nước Đóng Chai Đồng Giá 39K (Twister / Ô Long / Sting / Pepsi lon)",
-        description: "Lựa chọn các dòng Twister, Trà Ô Long TEA+ mát lạnh, nước tăng lực Sting dâu hoặc Pepsi lon.",
+        name: "Đồng Giá Trân Các 39K",
+        description: "Lựa chọn các loại thảo mộc, trà giải độc và mỹ tửu bổ sung công lực đóng chai.",
         price: 39000,
         image: "./assets/nuocngotlon.png",
         category: "drink",
@@ -163,8 +165,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 15,
-        name: "Strawberry Mojito",
-        description: "Sự kết hợp hoàn hảo giữa soda ga nhẹ, dâu tây ngọt thơm và lá bạc hà tươi mát.",
+        name: "Huyết Kiếm Lộ (Mojito Dâu)",
+        description: "Sự kết hợp hoàn hảo giữa hương dâu tây và lá bạc hà tươi mát.",
         price: 48000,
         image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
         category: "drink",
@@ -173,8 +175,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 16,
-        name: "Blue Ocean Mojito",
-        description: "Mojito đại dương xanh hương vị trái cây nhiệt đới tươi mát mang đậm không khí biển khơi.",
+        name: "Bích Hải Thanh Lưu (Mojito Đại dương)",
+        description: "Hương vị đại dương xanh tươi mát mang đậm không khí bi tráng.",
         price: 48000,
         image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
         category: "drink",
@@ -183,8 +185,8 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 20,
-        name: "Combo Food",
-        description: "Combo đặc biệt gồm: 1 bắp rang lớn + 1 ly nước ngọt lạnh + 1 thức ăn nóng tuỳ chọn.",
+        name: "Đại Yến Hoàng Cung (Food)",
+        description: "Khao quân đại tiệc gồm: 1 Kim Ngọc Hạt lớn + 1 Mỹ Tửu + 1 Lương thực nóng tuỳ chọn.",
         price: 121000,
         category: "combo",
         image: "./assets/combofood.png",
