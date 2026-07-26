@@ -727,11 +727,8 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
     });
 
     const fields = [];
-    if (customerName && customerName !== "Khách hàng") {
-        fields.push({ name: "👤 Khách hàng", value: customerName, inline: true });
-    }
     fields.push(
-        { name: "📞 Số điện thoại", value: customerPhone, inline: true },
+        { name: "👤 Khách hàng", value: customerName || "Khách vô danh", inline: true },
         { name: "🎬 Số rạp", value: customerTheater, inline: true },
         { name: "💺 Số ghế", value: customerSeat, inline: true }
     );
@@ -1066,8 +1063,8 @@ function closePaymentModal() {
 }
 
 async function confirmAndSendOrder() {
-    const customerName = "Khách hàng";
-    const customerPhone = document.getElementById('customer-phone').value.trim();
+    const customerName = document.getElementById('customer-name').value.trim() || "Khách vô danh";
+    const customerPhone = "";
     const customerTheater = document.getElementById('customer-theater').value;
     const customerSeat = document.getElementById('customer-seat').value.trim();
     const customerNote = document.getElementById('customer-note').value.trim();
