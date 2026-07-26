@@ -732,7 +732,7 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
     }
 
     return {
-        username: "BHDS Thảo Điền Delivery",
+        username: `${currentCinemaName} Delivery`,
         avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
         embeds: [
             {
@@ -767,13 +767,13 @@ async function testDiscordConnection() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: "BHDS Thảo Điền Delivery",
+                username: `${currentCinemaName} Delivery`,
                 avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
                 embeds: [
                     {
                         title: "👋 Xin chào!",
                         color: 65280,
-                        description: "Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **BHDS Thảo Điền**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉",
+                        description: `Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **${currentCinemaName}**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉`,
                         footer: {
                             text: `Thời gian: ${new Date().toLocaleString('vi-VN')}`
                         }
@@ -1328,6 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadIndexCategories();
     loadFoodCatalog();
     loadTheaters();
+    loadCinemaName();
     loadZaloLink();
 
 
@@ -1434,11 +1435,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const webhookUrl = _sysFbUrl;
 
             const payload = {
-                username: "BHDS Thảo Điền - Khiếu Nại",
+                username: `${currentCinemaName} - Khiếu Nại`,
                 avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
                 embeds: [
                     {
-                        title: "🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ RẠP Thảo Điền!",
+                        title: `🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ ${currentCinemaName}!`,
                         color: 16738304,
                         fields: [
                             { name: "👤 Khách hàng", value: name, inline: true },

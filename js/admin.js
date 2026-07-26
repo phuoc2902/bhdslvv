@@ -942,7 +942,7 @@ function buildAdminOrderDiscordPayload(order) {
     const paymentText = order.paymentMethod === 'cash' ? '💵 Tiền mặt' : '💳 Chuyển khoản / QR MoMo';
     
     return {
-        username: "BHDS Thảo Điền - Đơn Mới",
+        username: `${currentCinemaName} - Đơn Mới`,
         avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
         embeds: [
             {
@@ -982,6 +982,9 @@ function loadTheaters() {
                 hiddenTheaters = [];
             }
             renderTheatersList();
+        }, error => {
+            console.error("Lỗi lấy dữ liệu rạp từ Firebase:", error);
+            renderTheatersList();
         });
     } else {
         renderTheatersList();
@@ -1019,17 +1022,113 @@ function toggleTheater(theater) {
     }
     
     if (database) {
-        database.ref('hiddenTheaters').set(hiddenTheaters)
+        let adminPin = sessionStorage.getItem('bhds_admin_pin');
+        if (!adminPin) {
+            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật trạng thái rạp:");
+            if (adminPin) {
+                sessionStorage.setItem('bhds_admin_pin', adminPin);
+            } else {
+                showPopup("Thất bại", "Cần có mã PIN để lưu thay đổi.", false);
+                // Revert local state
+                if (hiddenTheaters.includes(theater)) {
+                    hiddenTheaters = hiddenTheaters.filter(t => t !== theater);
+                } else {
+                    hiddenTheaters.push(theater);
+                }
+                renderTheatersList();
+                return;
+            }
+        }
+        
+        const updates = {};
+        updates['/hiddenTheaters'] = hiddenTheaters;
+        updates['/auth_pin'] = adminPin;
+
+        database.ref().update(updates)
             .then(() => {
                 showPopup("Thành công!", `Đã ${hiddenTheaters.includes(theater) ? 'đóng' : 'mở'} ${theater}.`, true);
             })
             .catch(error => {
                 console.error("Error updating theater status:", error);
-                showPopup("Lỗi!", "Không thể lưu trạng thái rạp lên máy chủ.", false);
+                // Revert local state
+                if (hiddenTheaters.includes(theater)) {
+                    hiddenTheaters = hiddenTheaters.filter(t => t !== theater);
+                } else {
+                    hiddenTheaters.push(theater);
+                }
+                renderTheatersList();
+                showPopup("Lỗi!", "Mã PIN không đúng hoặc không thể lưu trạng thái rạp lên máy chủ.", false);
             });
     } else {
         renderTheatersList();
         showPopup("Chế độ Offline", `Đã cập nhật trạng thái tạm thời cho ${theater}.`, true);
+    }
+}
+
+// ── Cinema Branding Management ──────────────────────────────────
+
+let currentCinemaName = 'BHDS Thảo Điền';
+
+function loadCinemaName() {
+    if (database) {
+        database.ref('config/cinemaName').on('value', snapshot => {
+            currentCinemaName = snapshot.val() || 'BHDS Thảo Điền';
+            
+            const input = document.getElementById('config-cinema-name');
+            if (input) input.value = currentCinemaName;
+            
+            const logoText = document.getElementById('admin-cinema-logo-text');
+            if (logoText) logoText.textContent = currentCinemaName;
+            
+            const footerText = document.getElementById('admin-cinema-footer-text');
+            if (footerText) footerText.textContent = currentCinemaName;
+            
+            document.title = `${currentCinemaName} Admin - Quản Lý Thực Đơn`;
+        });
+    } else {
+        const logoText = document.getElementById('admin-cinema-logo-text');
+        if (logoText) logoText.textContent = currentCinemaName;
+        const footerText = document.getElementById('admin-cinema-footer-text');
+        if (footerText) footerText.textContent = currentCinemaName;
+        document.title = `${currentCinemaName} Admin - Quản Lý Thực Đơn`;
+    }
+}
+
+function saveCinemaName() {
+    const input = document.getElementById('config-cinema-name');
+    if (!input) return;
+    const newName = input.value.trim();
+    if (!newName) {
+        showPopup("Lỗi!", "Vui lòng nhập tên rạp.", false);
+        return;
+    }
+    
+    if (database) {
+        let adminPin = sessionStorage.getItem('bhds_admin_pin');
+        if (!adminPin) {
+            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật tên rạp:");
+            if (adminPin) {
+                sessionStorage.setItem('bhds_admin_pin', adminPin);
+            } else {
+                showPopup("Thất bại", "Cần có mã PIN để lưu thay đổi.", false);
+                return;
+            }
+        }
+        
+        const updates = {};
+        updates['/config/cinemaName'] = newName;
+        updates['/auth_pin'] = adminPin;
+
+        database.ref().update(updates)
+            .then(() => showPopup("Thành công!", "Đã lưu tên rạp.", true))
+            .catch(e => {
+                console.error("Error updating cinema name:", e);
+                showPopup("Lỗi!", "Mã PIN không đúng hoặc không thể lưu: " + e.message, false);
+            });
+    } else {
+        currentCinemaName = newName;
+        loadCinemaName(); // update UI locally
+        showPopup("Chế độ Offline", "Đã cập nhật tên rạp tạm thời.", true);
     }
 }
 
@@ -1041,6 +1140,10 @@ function loadZaloLink() {
     if (database) {
         database.ref('config/zaloLink').on('value', snapshot => {
             currentZaloLink = snapshot.val() || 'https://zalo.me/g/xclnxkmdtrh9mzvn2apl';
+            const input = document.getElementById('config-zalo-link');
+            if (input) input.value = currentZaloLink;
+        }, error => {
+            console.error("Lỗi lấy cấu hình Zalo từ Firebase:", error);
             const input = document.getElementById('config-zalo-link');
             if (input) input.value = currentZaloLink;
         });
@@ -1057,9 +1160,27 @@ function saveZaloLink() {
     }
     
     if (database) {
-        database.ref('config/zaloLink').set(newLink)
+        let adminPin = sessionStorage.getItem('bhds_admin_pin');
+        if (!adminPin) {
+            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật link Zalo:");
+            if (adminPin) {
+                sessionStorage.setItem('bhds_admin_pin', adminPin);
+            } else {
+                showPopup("Thất bại", "Cần có mã PIN để lưu thay đổi.", false);
+                return;
+            }
+        }
+        
+        const updates = {};
+        updates['/config/zaloLink'] = newLink;
+        updates['/auth_pin'] = adminPin;
+
+        database.ref().update(updates)
             .then(() => showPopup("Thành công!", "Đã lưu đường dẫn Zalo.", true))
-            .catch(e => showPopup("Lỗi!", "Không thể lưu: " + e.message, false));
+            .catch(e => {
+                console.error("Error updating Zalo link:", e);
+                showPopup("Lỗi!", "Mã PIN không đúng hoặc không thể lưu: " + e.message, false);
+            });
     } else {
         showPopup("Chế độ Offline", "Đã lưu đường dẫn Zalo (ảo).", true);
     }
@@ -1070,6 +1191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCatalog();
     initOrdersListener();
     loadTheaters();
+    loadCinemaName();
     loadZaloLink();
 
     document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
