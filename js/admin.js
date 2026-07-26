@@ -968,7 +968,7 @@ function buildAdminOrderDiscordPayload(order) {
 // ── Theater Management ────────────────────────────────────────
 
 let hiddenTheaters = [];
-const ALL_THEATERS = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4 (VIP)', 'Rạp 5', 'Rạp 6 (First Class)'];
+const ALL_THEATERS = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'VIP', 'Rạp 5', 'First Class'];
 
 function loadTheaters() {
     if (database) {
