@@ -253,7 +253,7 @@ function updateTheaterSelect() {
     const select = document.getElementById('customer-theater');
     if (!select) return;
     
-    const allRooms = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4', 'Rạp 5', 'Rạp 6'];
+    const allRooms = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4 (VIP)', 'Rạp 5', 'Rạp 6 (First Class)'];
     const availableRooms = allRooms.filter(room => !hiddenTheaters.includes(room));
     
     // Remember the currently selected value if any
