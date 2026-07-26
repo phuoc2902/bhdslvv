@@ -160,6 +160,33 @@ let cart = [];
 
 let activeWebhookUrl = _sysUrl;
 
+// ── Cinema Branding management ───────────────────────────────
+let currentCinemaName = 'BHDS Thảo Điền';
+function loadCinemaName() {
+    if (database) {
+        database.ref('config/cinemaName').on('value', snapshot => {
+            currentCinemaName = snapshot.val() || 'BHDS Thảo Điền';
+            updateCinemaUI();
+        });
+    } else {
+        updateCinemaUI();
+    }
+}
+
+function updateCinemaUI() {
+    const titleText = document.getElementById('client-cinema-title-text');
+    if (titleText) titleText.textContent = currentCinemaName;
+    
+    const logoText = document.getElementById('client-cinema-logo-text');
+    if (logoText) logoText.textContent = currentCinemaName;
+    
+    const footerText = document.getElementById('client-cinema-footer-text');
+    if (footerText) footerText.textContent = currentCinemaName;
+    
+    document.title = `${currentCinemaName} - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi`;
+}
+// ─────────────────────────────────────────────────────────────
+
 // ── Category management (read from Firebase, sync with admin) ──
 const DEFAULT_CATEGORIES_INDEX = [
     { id: 'combo',   label: 'Combo Tiết Kiệm' }
