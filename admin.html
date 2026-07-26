@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BHDS Lê Văn Việt Admin - Quản Lý Thực Đơn</title>
+    <title>BHDS Thảo Điền Admin - Quản Lý Thực Đơn</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/logo.png">
@@ -25,9 +25,9 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo" aria-label="BHDS Lê Văn Việt Home">
+            <a href="index.html" class="logo" aria-label="BHDS Thảo Điền Home">
                 <img src="./assets/logo.png" alt="BHDS Logo">
-                BHDS Lê Văn Việt Admin
+                BHDS Thảo Điền Admin
             </a>
             <div class="header-actions">
                 <a href="index.html" class="btn-action btn-back">
@@ -57,6 +57,13 @@
                 </svg>
                 Quản lý Đơn hàng
                 <span class="tab-badge" id="pending-orders-badge">0</span>
+            </button>
+            <button class="tab-btn" id="tab-btn-theaters" onclick="switchTab('theaters')">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Cấu hình Chung
             </button>
         </nav>
 
@@ -218,6 +225,55 @@
             </div>
         </div>
 
+        <!-- Tab Content: Theaters -->
+        <div id="tab-content-theaters" class="tab-content" style="display: none;">
+            <section class="hero">
+                <div class="hero-text">
+                    <h1>Cấu hình Chung</h1>
+                    <p>Cấu hình các thiết lập của hệ thống: Đóng/Mở rạp chiếu và cập nhật các liên kết mạng xã hội.</p>
+                </div>
+            </section>
+            
+            <div class="workspace" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Zalo Config Panel -->
+                <section class="card-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            Cấu hình Liên kết Zalo
+                        </h2>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <label class="form-label" for="config-zalo-link">Đường dẫn nhóm Zalo hỗ trợ khách hàng</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="url" id="config-zalo-link" class="form-control" placeholder="https://zalo.me/g/..." style="flex: 1;">
+                            <button id="btn-save-zalo" class="btn-submit" style="width: auto; padding: 0 1.5rem; margin: 0;" onclick="saveZaloLink()">Lưu</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Theater Config Panel -->
+                <section class="card-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            Danh sách Rạp chiếu
+                        </h2>
+                    </div>
+                    
+                    <div id="theater-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <!-- Theaters rendered by JS -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
     </main>
 
     <!-- Pop-up Alert Modal (Success/Failure) -->
@@ -234,10 +290,10 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 BHDS Lê Văn Việt Admin Panel. Bản quyền thuộc về thiết kế HTML/JS tĩnh.</p>
+        <p>&copy; 2026 BHDS Thảo Điền Admin Panel. Bản quyền thuộc về thiết kế HTML/JS tĩnh.</p>
     </footer>
 
     <!-- JS Logic -->
-    <script src="js/admin.js"></script>
+    <script src="js/admin.js?v=2.0.1"></script>
 </body>
 </html>

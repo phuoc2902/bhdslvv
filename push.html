@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+        setTimeout(() => {
+            if (database) {
+                database.ref('foodCatalog').set(DEFAULT_FOOD_CATALOG).then(() => {
+                    document.body.innerHTML = '<h1 id="status">Success! Data pushed to Firebase.</h1>';
+                }).catch(e => {
+                    document.body.innerHTML = '<h1 id="status">Error: ' + e.message + '</h1>';
+                });
+            } else {
+                document.body.innerHTML = '<h1 id="status">Database not initialized.</h1>';
+            }
+        }, 1000);
+    </script>
+</head>
+<body>
+    <h1 id="status">Pushing data to Firebase...</h1>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+        setTimeout(() => {
+            if (database) {
+                database.ref('categories').set(DEFAULT_CATEGORIES_INDEX).then(() => {
+                    document.body.innerHTML = '<h1 id="status">Success! Categories updated on Firebase.</h1>';
+                }).catch(e => {
+                    document.body.innerHTML = '<h1 id="status">Error: ' + e.message + '</h1>';
+                });
+            } else {
+                document.body.innerHTML = '<h1 id="status">Database not initialized.</h1>';
+            }
+        }, 1000);
+    </script>
+</head>
+<body>
+    <h1 id="status">Updating categories on Firebase...</h1>
+</body>
+</html>

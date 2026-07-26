@@ -21,9 +21,7 @@ let isProcessingDiscordQueue = false;
 
 // ── Category management ──────────────────────────────────────
 const DEFAULT_CATEGORIES = [
-    { id: 'combo',   label: 'Combo Tiết Kiệm' },
-    { id: 'popcorn', label: 'Bắp Rang Giòn' },
-    { id: 'drink',   label: 'Nước Giải Khát' }
+    { id: 'combo',   label: 'Combo Tiết Kiệm' }
 ];
 let categories = [...DEFAULT_CATEGORIES];
 
@@ -182,6 +180,16 @@ const DEFAULT_FOOD_CATALOG = [
         category: "drink",
         hidden: false,
         hiddenOptions: []
+    },
+    {
+        id: 20,
+        name: "Combo Food",
+        description: "Combo đặc biệt gồm: 1 bắp rang lớn + 1 ly nước ngọt lạnh + 1 thức ăn nóng tuỳ chọn.",
+        price: 121000,
+        category: "combo",
+        image: "./assets/combofood.png",
+        hidden: false,
+        hiddenOptions: []
     }
 ];
 
@@ -304,6 +312,16 @@ function renderFoodList() {
                 <div class="food-item-price">${formatCurrency(food.price)}</div>
             </div>
             <div class="food-item-actions">
+                <button class="btn-icon-action" style="color: var(--text-secondary);" onclick="moveFoodUp(${food.id})" title="Chuyển lên">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+                <button class="btn-icon-action" style="color: var(--text-secondary);" onclick="moveFoodDown(${food.id})" title="Chuyển xuống">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
                 <button class="btn-icon-action btn-visibility" onclick="toggleFoodVisibility(${food.id})" title="${food.hidden ? 'Hiện món' : 'Ẩn món'}">
                     ${food.hidden ? `
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -339,6 +357,59 @@ function toggleFoodVisibility(id) {
     renderFoodList();
 }
 
+function moveFoodUp(id) {
+    const currentIndex = foodCatalog.findIndex(item => item.id === id);
+    if (currentIndex <= 0) return;
+
+    if (activeCatalogFilter === 'all') {
+        const temp = foodCatalog[currentIndex];
+        foodCatalog[currentIndex] = foodCatalog[currentIndex - 1];
+        foodCatalog[currentIndex - 1] = temp;
+    } else {
+        let prevIndex = -1;
+        for (let i = currentIndex - 1; i >= 0; i--) {
+            if (foodCatalog[i].category === activeCatalogFilter) {
+                prevIndex = i;
+                break;
+            }
+        }
+        if (prevIndex !== -1) {
+            const temp = foodCatalog[currentIndex];
+            foodCatalog[currentIndex] = foodCatalog[prevIndex];
+            foodCatalog[prevIndex] = temp;
+        }
+    }
+    saveCatalogToStorage();
+    renderFoodList();
+}
+
+function moveFoodDown(id) {
+    const currentIndex = foodCatalog.findIndex(item => item.id === id);
+    if (currentIndex === -1 || currentIndex >= foodCatalog.length - 1) return;
+
+    if (activeCatalogFilter === 'all') {
+        const temp = foodCatalog[currentIndex];
+        foodCatalog[currentIndex] = foodCatalog[currentIndex + 1];
+        foodCatalog[currentIndex + 1] = temp;
+    } else {
+        let nextIndex = -1;
+        for (let i = currentIndex + 1; i < foodCatalog.length; i++) {
+            if (foodCatalog[i].category === activeCatalogFilter) {
+                nextIndex = i;
+                break;
+            }
+        }
+        if (nextIndex !== -1) {
+            const temp = foodCatalog[currentIndex];
+            foodCatalog[currentIndex] = foodCatalog[nextIndex];
+            foodCatalog[nextIndex] = temp;
+        }
+    }
+    saveCatalogToStorage();
+    renderFoodList();
+}
+
+
 function renderOptionsCheckboxes(food) {
     const container = document.getElementById('options-hide-checkboxes');
     const group = document.getElementById('options-hide-group');
@@ -347,14 +418,14 @@ function renderOptionsCheckboxes(food) {
     container.innerHTML = '';
     
     let options = [];
-    if (food.id === 1 || food.id === 5 || food.id === 6 || food.id === 8) {
+    if (food.id === 1 || food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20) {
         // Popcorn flavors
         options.push({ type: 'Bắp', val: 'Ngọt' });
         options.push({ type: 'Bắp', val: 'Phô mai' });
         options.push({ type: 'Bắp', val: 'Caramel' });
     }
     
-    if (food.id === 5 || food.id === 6 || food.id === 9) {
+    if (food.id === 5 || food.id === 6 || food.id === 9 || food.id === 20) {
         // Soda cup drinks
         options.push({ type: 'Nước', val: 'Pepsi' });
         options.push({ type: 'Nước', val: '7Up' });
@@ -369,6 +440,12 @@ function renderOptionsCheckboxes(food) {
         options.push({ type: 'Nước', val: 'Sting' });
         options.push({ type: 'Nước', val: 'Pepsi Chanh' });
         options.push({ type: 'Nước', val: 'Pepsi Không Calo' });
+    }
+
+    if (food.id === 20) {
+        options.push({ type: 'Đồ ăn', val: 'Gà vòng' });
+        options.push({ type: 'Đồ ăn', val: 'Xúc xích' });
+        options.push({ type: 'Đồ ăn', val: 'Khoai tây chiên' });
     }
 
     if (options.length > 0) {
@@ -515,7 +592,7 @@ function deleteFood(id) {
 }
 
 function resetToDefault() {
-    if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Lê Văn Việt. Bạn vẫn muốn tiếp tục?")) {
+    if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Thảo Điền. Bạn vẫn muốn tiếp tục?")) {
         cancelEdit();
         foodCatalog = [...DEFAULT_FOOD_CATALOG];
         saveCatalogToStorage();
@@ -865,7 +942,7 @@ function buildAdminOrderDiscordPayload(order) {
     const paymentText = order.paymentMethod === 'cash' ? '💵 Tiền mặt' : '💳 Chuyển khoản / QR MoMo';
     
     return {
-        username: "BHDS Lê Văn Việt - Đơn Mới",
+        username: "BHDS Thảo Điền - Đơn Mới",
         avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
         embeds: [
             {
@@ -888,10 +965,112 @@ function buildAdminOrderDiscordPayload(order) {
     };
 }
 
+// ── Theater Management ────────────────────────────────────────
+
+let hiddenTheaters = [];
+const ALL_THEATERS = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4', 'Rạp 5', 'Rạp 6'];
+
+function loadTheaters() {
+    if (database) {
+        database.ref('hiddenTheaters').on('value', snapshot => {
+            const val = snapshot.val();
+            if (Array.isArray(val)) {
+                hiddenTheaters = val;
+            } else if (val && typeof val === 'object') {
+                hiddenTheaters = Object.values(val);
+            } else {
+                hiddenTheaters = [];
+            }
+            renderTheatersList();
+        });
+    } else {
+        renderTheatersList();
+    }
+}
+
+
+function renderTheatersList() {
+    const container = document.getElementById('theater-list-container');
+    if (!container) return;
+    
+    container.innerHTML = ALL_THEATERS.map(theater => {
+        const isHidden = hiddenTheaters.includes(theater);
+        return `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: ${isHidden ? 'var(--text-muted)' : 'var(--text-heading)'}; text-decoration: ${isHidden ? 'line-through' : 'none'};">
+                    ${theater}
+                </div>
+                <div style="font-size: 0.85rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; background: ${isHidden ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)'}; color: ${isHidden ? '#ef4444' : '#22c55e'};">
+                    ${isHidden ? 'Đang Đóng' : 'Mở Cửa'}
+                </div>
+                <button onclick="toggleTheater('${theater}')" style="margin-top: 0.5rem; padding: 0.5rem 1rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; background: ${isHidden ? '#22c55e' : '#ef4444'}; color: white; width: 100%;">
+                    ${isHidden ? 'Mở rạp này' : 'Đóng rạp này'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleTheater(theater) {
+    if (hiddenTheaters.includes(theater)) {
+        hiddenTheaters = hiddenTheaters.filter(t => t !== theater);
+    } else {
+        hiddenTheaters.push(theater);
+    }
+    
+    if (database) {
+        database.ref('hiddenTheaters').set(hiddenTheaters)
+            .then(() => {
+                showPopup("Thành công!", `Đã ${hiddenTheaters.includes(theater) ? 'đóng' : 'mở'} ${theater}.`, true);
+            })
+            .catch(error => {
+                console.error("Error updating theater status:", error);
+                showPopup("Lỗi!", "Không thể lưu trạng thái rạp lên máy chủ.", false);
+            });
+    } else {
+        renderTheatersList();
+        showPopup("Chế độ Offline", `Đã cập nhật trạng thái tạm thời cho ${theater}.`, true);
+    }
+}
+
+// ── Zalo Config Management ──────────────────────────────────────
+
+let currentZaloLink = 'https://zalo.me/g/xclnxkmdtrh9mzvn2apl';
+
+function loadZaloLink() {
+    if (database) {
+        database.ref('config/zaloLink').on('value', snapshot => {
+            currentZaloLink = snapshot.val() || 'https://zalo.me/g/xclnxkmdtrh9mzvn2apl';
+            const input = document.getElementById('config-zalo-link');
+            if (input) input.value = currentZaloLink;
+        });
+    }
+}
+
+function saveZaloLink() {
+    const input = document.getElementById('config-zalo-link');
+    if (!input) return;
+    const newLink = input.value.trim();
+    if (!newLink) {
+        showPopup("Lỗi!", "Vui lòng nhập đường dẫn Zalo.", false);
+        return;
+    }
+    
+    if (database) {
+        database.ref('config/zaloLink').set(newLink)
+            .then(() => showPopup("Thành công!", "Đã lưu đường dẫn Zalo.", true))
+            .catch(e => showPopup("Lỗi!", "Không thể lưu: " + e.message, false));
+    } else {
+        showPopup("Chế độ Offline", "Đã lưu đường dẫn Zalo (ảo).", true);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadCategories();
     loadCatalog();
     initOrdersListener();
+    loadTheaters();
+    loadZaloLink();
 
     document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
 
@@ -904,3 +1083,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.id === 'popup-result') closePopup();
     });
 });
+

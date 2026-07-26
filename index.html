@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BHDS Lê Văn Việt - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi (Immersive Version)</title>
+    <title>BHDS Thảo Điền - Đặt Món Nhanh Chóng, Giao Hàng Tận Nơi (Immersive Version)</title>
     <meta name="description" content="Trang đặt món ăn trực tuyến nhanh chóng với thực đơn phong phú, giao hàng siêu tốc và phục vụ tận nơi tại rạp.">
     
     <!-- Favicon -->
@@ -1342,9 +1342,9 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <a href="#" class="logo" aria-label="BHDS Lê Văn Việt Home">
+            <a href="#" class="logo" aria-label="BHDS Thảo Điền Home">
                 <img src="./assets/logo.png" alt="BHDS Logo">
-                BHDS Lê Văn Việt
+                BHDS Thảo Điền
             </a>
             <div class="header-actions">
             </div>
@@ -1357,7 +1357,7 @@
         <div class="projector-beam"></div>
         
         <div class="immersive-title-card">
-            <span class="title-brand-label">🍿 BHDS Lê Văn Việt</span>
+            <span class="title-brand-label">🍿 BHDS Thảo Điền</span>
             <h1>Đặt Món — Giao Tận Ghế</h1>
             <p>Bắp nóng giòn thơm ngọt, nước mát lạnh giao tận ghế phòng chiếu. Đặt món siêu nhanh, giữ trọn từng giây phút phim kịch tính!</p>
         </div>
@@ -1426,12 +1426,6 @@
                             <label class="form-label" for="customer-theater">Số rạp *</label>
                             <select id="customer-theater" class="form-control" required>
                                 <option value="" disabled selected>-- Chọn rạp --</option>
-                                <option value="Rạp 1">Rạp 1</option>
-                                <option value="Rạp 2">Rạp 2</option>
-                                <option value="Rạp 3">Rạp 3</option>
-                                <option value="Rạp 4">Rạp 4</option>
-                                <option value="Rạp 5">Rạp 5</option>
-                                <option value="Rạp 6">Rạp 6</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1655,11 +1649,11 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 BHDS. Độc quyền tại BHDS Lê Văn Việt.</p>
+        <p>&copy; 2026 BHDS. Độc quyền tại BHDS Thảo Điền.</p>
     </footer>
 
     <!-- Logic JS -->
-    <script src="js/index.js?v=1.0.7"></script>
+    <script src="js/index.js?v=1.0.8"></script>
 
     <!-- Overrides & Additions to integrate custom layout elements with index.js -->
     <script>
@@ -1704,7 +1698,7 @@
                 // Filter status
                 if (food.hidden) return false;
                 if (currentFilter === 'all') return true;
-                if (currentFilter === 'combo' && (food.id === 5 || food.id === 6 || food.id === 8)) return true;
+                if (currentFilter === 'combo' && (food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20)) return true;
                 if (currentFilter === 'popcorn' && (food.id === 1 || food.id === 8)) return true;
                 if (currentFilter === 'drink' && (food.id === 9 || food.id === 10 || food.id === 11 || food.id === 15 || food.id === 16)) return true;
                 return false;
@@ -1714,7 +1708,7 @@
 
                 // Map category label for badge
                 let categoryLabel = 'Nước Uống';
-                if (food.id === 5 || food.id === 6 || food.id === 8) categoryLabel = 'Combo';
+                if (food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20) categoryLabel = 'Combo';
                 else if (food.id === 1) categoryLabel = 'Bắp Rang';
 
                 // Build hidden select element to stay 100% compatible with index.js, synchronized with interactive pills
@@ -1775,6 +1769,56 @@
                                 ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">7Up</button>` : ''}
                                 ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Mirinda</button>` : ''}
                                 ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Lipton</button>` : ''}
+                            </div>` : ''}
+                        </div>
+                    `;
+                } else if (food.id === 20) {
+                    let popOpts = [];
+                    if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
+                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai</option>');
+                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel</option>');
+
+                    let drinkOpts = [];
+                    if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
+                    if (!isHidden('7Up')) drinkOpts.push('<option value="7Up">7Up</option>');
+                    if (!isHidden('Mirinda Cam')) drinkOpts.push('<option value="Mirinda Cam">Mirinda Cam</option>');
+                    if (!isHidden('Lipton Chanh')) drinkOpts.push('<option value="Lipton Chanh">Lipton Chanh</option>');
+
+                    let hotFoodOpts = [];
+                    if (!isHidden('Gà vòng')) hotFoodOpts.push('<option value="Gà vòng">Gà vòng</option>');
+                    if (!isHidden('Xúc xích')) hotFoodOpts.push('<option value="Xúc xích">Xúc xích</option>');
+                    if (!isHidden('Khoai tây chiên')) hotFoodOpts.push('<option value="Khoai tây chiên">Khoai tây chiên</option>');
+
+                    optionsHtml = `
+                        <!-- Hidden standard selects -->
+                        ${popOpts.length > 0 ? `<select id="option-popcorn-${food.id}" style="display:none;" onchange="updateCardPrice(${food.id})">${popOpts.join('')}</select>` : ''}
+                        ${drinkOpts.length > 0 ? `<select id="option-drink-${food.id}" style="display:none;">${drinkOpts.join('')}</select>` : ''}
+                        ${hotFoodOpts.length > 0 ? `<select id="option-hotfood-${food.id}" style="display:none;">${hotFoodOpts.join('')}</select>` : ''}
+                        
+                        <div class="option-group-wrapper">
+                            ${popOpts.length > 0 ? `
+                            <span class="option-label">Chọn vị bắp:</span>
+                            <div class="pill-container" style="margin-bottom: 0.5rem;">
+                                ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
+                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
+                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                            </div>` : ''}
+                            
+                            ${drinkOpts.length > 0 ? `
+                            <span class="option-label">Chọn loại nước:</span>
+                            <div class="pill-container" style="margin-bottom: 0.5rem;">
+                                ${!isHidden('Pepsi') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'drink', 'Pepsi')">Pepsi</button>` : ''}
+                                ${!isHidden('7Up') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', '7Up')">7Up</button>` : ''}
+                                ${!isHidden('Mirinda Cam') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Mirinda Cam')">Mirinda</button>` : ''}
+                                ${!isHidden('Lipton Chanh') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'drink', 'Lipton Chanh')">Lipton</button>` : ''}
+                            </div>` : ''}
+
+                            ${hotFoodOpts.length > 0 ? `
+                            <span class="option-label">Chọn thức ăn nóng:</span>
+                            <div class="pill-container">
+                                ${!isHidden('Gà vòng') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'hotfood', 'Gà vòng')">Gà vòng</button>` : ''}
+                                ${!isHidden('Xúc xích') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'hotfood', 'Xúc xích')">Xúc xích</button>` : ''}
+                                ${!isHidden('Khoai tây chiên') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'hotfood', 'Khoai tây chiên')">Khoai tây chiên</button>` : ''}
                             </div>` : ''}
                         </div>
                     `;

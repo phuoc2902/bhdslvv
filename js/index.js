@@ -98,6 +98,16 @@ const DEFAULT_FOOD_CATALOG = [
         image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
         hidden: false,
         hiddenOptions: []
+    },
+    {
+        id: 20,
+        name: "Combo Food",
+        description: "Combo đặc biệt gồm: 1 bắp rang lớn + 1 ly nước ngọt lạnh + 1 thức ăn nóng tuỳ chọn.",
+        price: 121000,
+        category: "combo",
+        image: "./assets/combofood.png",
+        hidden: false,
+        hiddenOptions: []
     }
 ];
 
@@ -111,7 +121,6 @@ function loadFoodCatalog() {
             const data = snapshot.val();
             if (data) {
                 foodCatalog = data;
-
                 localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
             } else {
 
@@ -153,9 +162,7 @@ let activeWebhookUrl = _sysUrl;
 
 // ── Category management (read from Firebase, sync with admin) ──
 const DEFAULT_CATEGORIES_INDEX = [
-    { id: 'combo',   label: 'Combo Tiết Kiệm' },
-    { id: 'popcorn', label: 'Bắp Rang Giòn' },
-    { id: 'drink',   label: 'Nước Giải Khát' }
+    { id: 'combo',   label: 'Combo Tiết Kiệm' }
 ];
 let indexCategories = [...DEFAULT_CATEGORIES_INDEX];
 let activeCategoryFilter = 'all';
@@ -192,6 +199,46 @@ function setCategoryFilter(filter) {
     activeCategoryFilter = filter;
     renderCategoryFilterBar();
     renderFoodCatalog();
+}
+// ─────────────────────────────────────────────────────────────
+
+// ── Theater management (read from Firebase) ────────────────
+let hiddenTheaters = [];
+function loadTheaters() {
+    if (database) {
+        database.ref('hiddenTheaters').on('value', snapshot => {
+            const val = snapshot.val();
+            if (Array.isArray(val)) {
+                hiddenTheaters = val;
+            } else if (val && typeof val === 'object') {
+                hiddenTheaters = Object.values(val);
+            } else {
+                hiddenTheaters = [];
+            }
+            updateTheaterSelect();
+        });
+    } else {
+        updateTheaterSelect();
+    }
+}
+
+function updateTheaterSelect() {
+    const select = document.getElementById('customer-theater');
+    if (!select) return;
+    
+    const allRooms = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4', 'Rạp 5', 'Rạp 6'];
+    const availableRooms = allRooms.filter(room => !hiddenTheaters.includes(room));
+    
+    // Remember the currently selected value if any
+    const currentValue = select.value;
+    
+    select.innerHTML = '<option value="" disabled selected>-- Chọn rạp --</option>' + 
+        availableRooms.map(room => `<option value="${room}">${room}</option>`).join('');
+        
+    // Restore selection if it's still available
+    if (currentValue && availableRooms.includes(currentValue)) {
+        select.value = currentValue;
+    }
 }
 // ─────────────────────────────────────────────────────────────
 
@@ -293,6 +340,50 @@ function renderFoodCatalog() {
                     </div>
                 `;
             }
+        } else if (food.id === 20) {
+            let popOpts = [];
+            if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+
+            let drinkOpts = [];
+            if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
+            if (!isHidden('7Up')) drinkOpts.push('<option value="7Up">7Up</option>');
+            if (!isHidden('Mirinda Cam')) drinkOpts.push('<option value="Mirinda Cam">Mirinda Cam</option>');
+            if (!isHidden('Lipton Chanh')) drinkOpts.push('<option value="Lipton Chanh">Lipton Chanh</option>');
+            
+            let hotFoodOpts = [];
+            if (!isHidden('Gà vòng')) hotFoodOpts.push('<option value="Gà vòng">Gà vòng</option>');
+            if (!isHidden('Xúc xích')) hotFoodOpts.push('<option value="Xúc xích">Xúc xích</option>');
+            if (!isHidden('Khoai tây chiên')) hotFoodOpts.push('<option value="Khoai tây chiên">Khoai tây chiên</option>');
+
+            optionsHtml = `
+                <div class="food-options" style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        ${popOpts.length > 0 ? `
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Vị bắp:</label>
+                            <select id="option-popcorn-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;" onchange="updateCardPrice(${food.id})">
+                                ${popOpts.join('')}
+                            </select>
+                        </div>` : ''}
+                        ${drinkOpts.length > 0 ? `
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Nước ngọt:</label>
+                            <select id="option-drink-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                ${drinkOpts.join('')}
+                            </select>
+                        </div>` : ''}
+                    </div>
+                    ${hotFoodOpts.length > 0 ? `
+                    <div>
+                        <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text-secondary);">Thức ăn nóng:</label>
+                        <select id="option-hotfood-${food.id}" class="form-control" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                            ${hotFoodOpts.join('')}
+                        </select>
+                    </div>` : ''}
+                </div>
+            `;
         } else if (food.id === 8) {
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
@@ -404,6 +495,7 @@ function addToCart(foodId) {
 
     let popcornOption = '';
     let drinkOption = '';
+    let hotFoodOption = '';
     let extraPrice = 0;
 
     const popcornSelect = document.getElementById(`option-popcorn-${foodId}`);
@@ -420,6 +512,11 @@ function addToCart(foodId) {
         drinkOption = drinkSelect.value;
     }
 
+    const hotFoodSelect = document.getElementById(`option-hotfood-${foodId}`);
+    if (hotFoodSelect && hotFoodSelect.selectedIndex >= 0) {
+        hotFoodOption = hotFoodSelect.value;
+    }
+
     const itemPrice = foodItem.price + extraPrice;
 
 
@@ -433,13 +530,16 @@ function addToCart(foodId) {
             optionParts.push(`Nước: ${drinkOption}`);
         }
     }
+    if (hotFoodOption) {
+        optionParts.push(`Đồ ăn: ${hotFoodOption}`);
+    }
 
     let optionText = optionParts.join(', ');
     if (optionText) {
         displayName = `${foodItem.name} (${optionText})`;
     }
 
-    const cartKey = `${foodId}_${popcornOption}_${drinkOption}`;
+    const cartKey = `${foodId}_${popcornOption}_${drinkOption}_${hotFoodOption}`;
 
     const existingItem = cart.find(item => item.cartKey === cartKey);
 
@@ -632,7 +732,7 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
     }
 
     return {
-        username: "BHDS Lê Văn Việt Delivery",
+        username: "BHDS Thảo Điền Delivery",
         avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
         embeds: [
             {
@@ -667,13 +767,13 @@ async function testDiscordConnection() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: "BHDS Lê Văn Việt Delivery",
+                username: "BHDS Thảo Điền Delivery",
                 avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
                 embeds: [
                     {
                         title: "👋 Xin chào!",
                         color: 65280,
-                        description: "Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **BHDS Lê Văn Việt**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉",
+                        description: "Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **BHDS Thảo Điền**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉",
                         footer: {
                             text: `Thời gian: ${new Date().toLocaleString('vi-VN')}`
                         }
@@ -1210,11 +1310,25 @@ function initSecretAdmin() {
 }
 
 
+// ── Zalo Config ────────────────────────────────────────────────
+function loadZaloLink() {
+    if (database) {
+        database.ref('config/zaloLink').on('value', snapshot => {
+            const link = snapshot.val() || 'https://zalo.me/g/xclnxkmdtrh9mzvn2apl';
+            const btn = document.getElementById('btn-zalo-float');
+            if (btn) btn.href = link;
+        });
+    }
+}
+// ─────────────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', () => {
 
     initSecretAdmin();
     loadIndexCategories();
     loadFoodCatalog();
+    loadTheaters();
+    loadZaloLink();
 
 
     renderFoodCatalog();
@@ -1320,11 +1434,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const webhookUrl = _sysFbUrl;
 
             const payload = {
-                username: "BHDS Lê Văn Việt - Khiếu Nại",
+                username: "BHDS Thảo Điền - Khiếu Nại",
                 avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
                 embeds: [
                     {
-                        title: "🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ RẠP LÊ VĂN VIỆT!",
+                        title: "🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ RẠP Thảo Điền!",
                         color: 16738304,
                         fields: [
                             { name: "👤 Khách hàng", value: name, inline: true },
