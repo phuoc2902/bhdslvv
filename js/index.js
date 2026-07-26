@@ -1030,7 +1030,7 @@ function openPaymentModal() {
     // Show static momo.jpg for 100% reliable scanning
     const qrImgEl = document.getElementById('payment-qr-img');
     if (qrImgEl) {
-        qrImgEl.src = './assets/momo.jpg';
+        qrImgEl.src = './assets/qrthaodien.png';
     }
     
     // Bind Banking App buttons (keeps dynamic deep links for banks that support autofill)
@@ -1046,8 +1046,8 @@ function openPaymentModal() {
     // Bind Download QR button to download static momo.jpg
     const downloadBtn = document.getElementById('btn-payment-download');
     if (downloadBtn) {
-        downloadBtn.href = './assets/momo.jpg';
-        downloadBtn.setAttribute('download', 'momo_payment_qr.jpg');
+        downloadBtn.href = './assets/qrthaodien.png';
+        downloadBtn.setAttribute('download', 'qrthaodien.png');
         downloadBtn.removeAttribute('target');
     }
 
