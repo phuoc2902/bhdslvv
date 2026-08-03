@@ -86,8 +86,14 @@ function editCategoryLabel(id) {
 const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
 
 if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
-    alert("Bạn không có quyền truy cập trang này!");
-    window.location.href = "index.html";
+    const pin = prompt("Vui lòng nhập mã PIN quản trị để truy cập:");
+    if (pin === "2902" || pin === "1234") {
+        sessionStorage.setItem('bhds_is_admin', 'true');
+        sessionStorage.setItem('bhds_admin_pin', pin);
+    } else {
+        alert("Mã PIN không chính xác hoặc bạn đã hủy!");
+        window.location.href = "trangchu.html";
+    }
 }
 
 const DEFAULT_FOOD_CATALOG = [
@@ -650,7 +656,7 @@ function initOrdersListener() {
             let hasNewPending = false;
             Object.keys(data).forEach(key => {
                 const order = data[key];
-                if (order.status === 'pending' && (!orders[key] || orders[key].status !== 'pending')) {
+                if (!order.sentToDiscord && (!orders[key] || orders[key].sentToDiscord)) {
                     hasNewPending = true;
                 }
             });
@@ -666,7 +672,6 @@ function initOrdersListener() {
             orders = {};
         }
         renderOrderList();
-        updatePendingBadge();
     });
 }
 
@@ -696,34 +701,25 @@ let selectedOrderId = null;
 function renderOrderList() {
     const container = document.getElementById('order-list-container');
     if (!container) return;
-
-    const filterStatus = document.getElementById('filter-order-status').value;
     
     const orderList = Object.keys(orders).map(key => ({
         key: key,
         ...orders[key]
     })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    const filteredList = orderList.filter(o => filterStatus === 'all' || o.status === filterStatus);
-
-    if (filteredList.length === 0) {
+    if (orderList.length === 0) {
         container.innerHTML = `<div class="empty-catalog-state" style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48" stroke-width="1.5" style="stroke: var(--text-muted); margin-bottom: 1rem;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            <p>Không có đơn hàng nào phù hợp.</p>
+            <p>Chưa có đơn hàng nào trong ca này.</p>
         </div>`;
         return;
     }
 
-    container.innerHTML = filteredList.map(order => {
+    container.innerHTML = orderList.map(order => {
         const dateStr = new Date(order.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(order.createdAt).toLocaleDateString('vi-VN');
         const isSelected = order.key === selectedOrderId ? 'selected' : '';
-        
-        let statusText = 'Chờ xử lý';
-        if (order.status === 'preparing') statusText = 'Đang làm';
-        else if (order.status === 'completed') statusText = 'Hoàn thành';
-        else if (order.status === 'cancelled') statusText = 'Đã hủy';
 
         return `
             <div class="order-card ${isSelected}" onclick="selectOrder('${order.key}')">
@@ -732,7 +728,6 @@ function renderOrderList() {
                     <div class="order-subtitle">${order.customerName} • ${dateStr}</div>
                     <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${order.totalPrice.toLocaleString('vi-VN')}đ</div>
                 </div>
-                <span class="status-badge status-${order.status}">${statusText}</span>
             </div>
         `;
     }).join('');
@@ -759,10 +754,6 @@ function renderOrderDetails() {
     }
 
     const dateStr = new Date(order.createdAt).toLocaleString('vi-VN');
-    let statusText = 'Chờ xử lý';
-    if (order.status === 'preparing') statusText = 'Đang làm';
-    else if (order.status === 'completed') statusText = 'Hoàn thành';
-    else if (order.status === 'cancelled') statusText = 'Đã hủy';
 
     let itemsHtml = order.items.map(item => `
         <div class="order-item-row">
@@ -783,22 +774,11 @@ function renderOrderDetails() {
         </div>
     ` : '';
 
-    let actionsHtml = '';
-    if (order.status === 'pending') {
-        actionsHtml = `
-            <div class="order-actions-container">
-                <button class="btn-status-change btn-status-prep" onclick="updateOrderStatus('${selectedOrderId}', 'preparing')">Nhận đơn (Đang làm)</button>
-                <button class="btn-status-change btn-status-cancel" onclick="updateOrderStatus('${selectedOrderId}', 'cancelled')">Hủy đơn</button>
-            </div>
-        `;
-    } else if (order.status === 'preparing') {
-        actionsHtml = `
-            <div class="order-actions-container">
-                <button class="btn-status-change btn-status-complete" onclick="updateOrderStatus('${selectedOrderId}', 'completed')">Hoàn thành</button>
-                <button class="btn-status-change btn-status-cancel" onclick="updateOrderStatus('${selectedOrderId}', 'cancelled')">Hủy đơn</button>
-            </div>
-        `;
-    }
+    let actionsHtml = `
+        <div class="order-actions-container" style="margin-top: 1rem;">
+            <button class="btn-status-change btn-status-cancel" style="width: 100%;" onclick="deleteOrder('${selectedOrderId}')">Xóa đơn hàng</button>
+        </div>
+    `;
 
     container.innerHTML = `
         <div class="order-detail-view">
@@ -826,10 +806,6 @@ function renderOrderDetails() {
                 <span class="detail-label">Thời gian đặt:</span>
                 <span class="detail-value">${dateStr}</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Trạng thái:</span>
-                <span class="status-badge status-${order.status}">${statusText}</span>
-            </div>
             
             <div style="font-weight: 700; margin-top: 0.5rem;">Danh sách món đã đặt:</div>
             <div class="order-items-list">
@@ -851,27 +827,121 @@ function renderOrderDetails() {
     `;
 }
 
-function updateOrderStatus(key, newStatus) {
+function deleteOrder(key) {
     if (!database) return;
-    database.ref(`orders/${key}`).update({
-        status: newStatus
-    }).then(() => {
-        if (selectedOrderId === key) {
-            renderOrderDetails();
+    if (confirm("Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này?")) {
+        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để xóa đơn hàng:");
+        if (adminPin !== "2902" && adminPin !== "1234") {
+            showPopup("Lỗi", "Mã PIN không chính xác!", false);
+            return;
+        }
+
+        database.ref(`orders/${key}`).remove().then(() => {
+            if (selectedOrderId === key) {
+                selectedOrderId = null;
+                renderOrderDetails();
+            }
+            showPopup("Đã xóa", "Đơn hàng đã được xóa khỏi hệ thống.", true);
+        }).catch(err => {
+            showPopup("Lỗi", "Không thể xóa đơn hàng: " + err.message, false);
+        });
+    }
+}
+
+// ── Store Status (Open/Close Day) ─────────────────────────────────
+
+let currentStoreStatus = 'open'; // default open
+let currentBusinessDate = '';
+
+function loadStoreStatus() {
+    if (!database) return;
+    database.ref('config').on('value', snapshot => {
+        const config = snapshot.val() || {};
+        currentStoreStatus = config.storeStatus || 'open';
+        currentBusinessDate = config.currentBusinessDate || '';
+        
+        const badge = document.getElementById('store-status-badge');
+        const btnOpen = document.getElementById('btn-open-day');
+        const btnClose = document.getElementById('btn-close-day');
+        
+        if (badge && btnOpen && btnClose) {
+            if (currentStoreStatus === 'open') {
+                badge.textContent = 'Đang Mở Ca';
+                badge.style.background = 'rgba(34, 197, 94, 0.15)';
+                badge.style.color = '#22c55e';
+                btnOpen.style.display = 'none';
+                btnClose.style.display = 'inline-block';
+            } else {
+                badge.textContent = 'Đã Đóng Ca';
+                badge.style.background = 'rgba(239, 68, 68, 0.15)';
+                badge.style.color = '#ef4444';
+                btnOpen.style.display = 'inline-block';
+                btnClose.style.display = 'none';
+            }
         }
     });
 }
 
-function updatePendingBadge() {
-    const badge = document.getElementById('pending-orders-badge');
-    if (!badge) return;
+function openDay() {
+    if (!database) return;
+    if (!confirm("Xác nhận mở ca kinh doanh mới? Khách hàng sẽ có thể đặt đồ ăn trở lại.")) return;
 
-    const pendingCount = Object.keys(orders).filter(key => orders[key].status === 'pending').length;
-    if (pendingCount > 0) {
-        badge.textContent = pendingCount;
-        badge.style.display = 'inline-block';
-    } else {
-        badge.style.display = 'none';
+    let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để mở ca:");
+    if (adminPin !== "2902" && adminPin !== "1234") {
+        showPopup("Lỗi", "Mã PIN không chính xác!", false);
+        return;
+    }
+
+    const todayDateStr = new Date().toISOString().split('T')[0];
+    
+    const updates = {};
+    updates['/config/storeStatus'] = 'open';
+    updates['/config/currentBusinessDate'] = todayDateStr;
+    updates['/auth_pin'] = adminPin;
+
+    database.ref().update(updates).then(() => {
+        showPopup("Đã mở ca", "Đã mở ca kinh doanh. Khách hàng có thể đặt hàng.", true);
+    }).catch(err => {
+        showPopup("Lỗi", "Không thể cập nhật trạng thái: " + err.message, false);
+    });
+}
+
+async function closeDay() {
+    if (!database) return;
+    if (!confirm("Xác nhận đóng ca? Toàn bộ đơn hàng hiện tại sẽ được lưu vào doanh thu và bị xóa khỏi danh sách. Khách hàng sẽ không thể đặt đơn được nữa.")) return;
+
+    let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để đóng ca:");
+    if (adminPin !== "2902" && adminPin !== "1234") {
+        showPopup("Lỗi", "Mã PIN không chính xác!", false);
+        return;
+    }
+
+    if (!currentBusinessDate) {
+        currentBusinessDate = new Date().toISOString().split('T')[0];
+    }
+    
+    try {
+        const snapshot = await database.ref('orders').once('value');
+        const currentOrders = snapshot.val();
+        
+        const updates = {};
+        updates['/config/storeStatus'] = 'closed';
+        updates['/orders'] = null; // clear orders
+        updates['/auth_pin'] = adminPin;
+        
+        if (currentOrders) {
+            Object.keys(currentOrders).forEach(key => {
+                updates[`/revenue/${currentBusinessDate}/${key}`] = currentOrders[key];
+            });
+        }
+        
+        await database.ref().update(updates);
+        
+        selectedOrderId = null;
+        renderOrderDetails();
+        showPopup("Đã đóng ca", "Toàn bộ đơn hàng đã được chuyển vào doanh thu.", true);
+    } catch (err) {
+        showPopup("Lỗi", "Không thể đóng ca: " + err.message, false);
     }
 }
 
@@ -968,7 +1038,7 @@ function buildAdminOrderDiscordPayload(order) {
 // ── Theater Management ────────────────────────────────────────
 
 let hiddenTheaters = [];
-const ALL_THEATERS = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'VIP', 'Rạp 5', 'First Class'];
+const ALL_THEATERS = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4', 'Rạp 5', 'Rạp 6'];
 
 function loadTheaters() {
     if (database) {
@@ -1104,27 +1174,22 @@ function saveCinemaName() {
     }
     
     if (database) {
-        let adminPin = sessionStorage.getItem('bhds_admin_pin');
-        if (!adminPin) {
-            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật tên rạp:");
-            if (adminPin) {
-                sessionStorage.setItem('bhds_admin_pin', adminPin);
-            } else {
-                showPopup("Thất bại", "Cần có mã PIN để lưu thay đổi.", false);
-                return;
-            }
+        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật tên rạp:");
+        if (adminPin !== "2902" && adminPin !== "1234") {
+            showPopup("Lỗi", "Mã PIN không chính xác!", false);
+            return;
         }
         
         const updates = {};
         updates['/config/cinemaName'] = newName;
         updates['/auth_pin'] = adminPin;
 
-        database.ref().update(updates)
-            .then(() => showPopup("Thành công!", "Đã lưu tên rạp.", true))
-            .catch(e => {
-                console.error("Error updating cinema name:", e);
-                showPopup("Lỗi!", "Mã PIN không đúng hoặc không thể lưu: " + e.message, false);
-            });
+        database.ref().update(updates).then(() => {
+            showPopup("Thành công!", "Đã lưu tên rạp.", true);
+        }).catch(e => {
+            console.error("Error updating cinema name:", e);
+            showPopup("Lỗi!", "Không thể lưu: " + e.message, false);
+        });
     } else {
         currentCinemaName = newName;
         loadCinemaName(); // update UI locally
@@ -1160,27 +1225,22 @@ function saveZaloLink() {
     }
     
     if (database) {
-        let adminPin = sessionStorage.getItem('bhds_admin_pin');
-        if (!adminPin) {
-            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật link Zalo:");
-            if (adminPin) {
-                sessionStorage.setItem('bhds_admin_pin', adminPin);
-            } else {
-                showPopup("Thất bại", "Cần có mã PIN để lưu thay đổi.", false);
-                return;
-            }
+        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật link Zalo:");
+        if (adminPin !== "2902" && adminPin !== "1234") {
+            showPopup("Lỗi", "Mã PIN không chính xác!", false);
+            return;
         }
         
         const updates = {};
         updates['/config/zaloLink'] = newLink;
         updates['/auth_pin'] = adminPin;
 
-        database.ref().update(updates)
-            .then(() => showPopup("Thành công!", "Đã lưu đường dẫn Zalo.", true))
-            .catch(e => {
-                console.error("Error updating Zalo link:", e);
-                showPopup("Lỗi!", "Mã PIN không đúng hoặc không thể lưu: " + e.message, false);
-            });
+        database.ref().update(updates).then(() => {
+            showPopup("Thành công!", "Đã lưu đường dẫn Zalo.", true);
+        }).catch(e => {
+            console.error("Error updating Zalo link:", e);
+            showPopup("Lỗi!", "Không thể lưu: " + e.message, false);
+        });
     } else {
         showPopup("Chế độ Offline", "Đã lưu đường dẫn Zalo (ảo).", true);
     }
@@ -1193,6 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTheaters();
     loadCinemaName();
     loadZaloLink();
+    loadStoreStatus();
 
     document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
 

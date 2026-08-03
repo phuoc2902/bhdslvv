@@ -25,12 +25,12 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo" aria-label="BHDS Thảo Điền Home">
+            <a href="trangchu.html" class="logo" aria-label="BHDS Thảo Điền Home">
                 <img src="./assets/logo.png" alt="BHDS Logo">
                 <span id="admin-cinema-logo-text">BHDS Thảo Điền</span> Admin
             </a>
             <div class="header-actions">
-                <a href="index.html" class="btn-action btn-back">
+                <a href="trangchu.html" class="btn-action btn-back">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -180,20 +180,18 @@
             <div class="orders-layout">
                 <!-- Left panel: Order list with filter -->
                 <section class="card-panel">
-                    <div class="order-list-header">
+                    <div class="order-list-header" style="flex-wrap: wrap; gap: 1rem;">
                         <h2 class="panel-title" style="margin-bottom: 0;">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22" stroke-width="2" style="color: var(--primary);">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                            Đơn hàng nhận được
+                            Đơn hàng hiện tại
                         </h2>
-                        <select id="filter-order-status" class="select-filter" onchange="renderOrderList()">
-                            <option value="all">Tất cả</option>
-                            <option value="pending">Chờ xử lý</option>
-                            <option value="preparing">Đang làm</option>
-                            <option value="completed">Hoàn thành</option>
-                            <option value="cancelled">Đã hủy</option>
-                        </select>
+                        <div class="store-status-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span id="store-status-badge" style="padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">Đang tải...</span>
+                            <button id="btn-open-day" class="btn-submit" style="margin: 0; padding: 0.4rem 1rem; width: auto; font-size: 0.9rem; display: none;" onclick="openDay()">Mở ca</button>
+                            <button id="btn-close-day" class="btn-cancel" style="margin: 0; padding: 0.4rem 1rem; font-size: 0.9rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); display: none;" onclick="closeDay()">Đóng ca</button>
+                        </div>
                     </div>
                     
                     <div class="order-list" id="order-list-container">

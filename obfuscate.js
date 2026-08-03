@@ -70,7 +70,7 @@ function obfuscateJsFile(filePath) {
     }
 }
 
-const htmlFiles = ['index.html', 'admin.html'];
+const htmlFiles = ['trangchu.html', 'adminbhd.html'];
 htmlFiles.forEach(file => {
     const p = path.join(__dirname, file);
     if (fs.existsSync(p)) {

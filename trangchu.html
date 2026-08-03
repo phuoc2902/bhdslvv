@@ -1338,6 +1338,15 @@
     </style>
 </head>
 <body>
+    
+    <!-- Store Closed Overlay -->
+    <div id="store-closed-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 5, 3, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="80" height="80" stroke-width="1.5" style="color: var(--neon-red); margin-bottom: 1.5rem; filter: drop-shadow(0 0 15px rgba(255,51,102,0.4));">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <h2 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 1rem; text-transform: uppercase;">Ngừng nhận đơn</h2>
+        <p style="font-size: 1.1rem; color: var(--text-body-green); max-width: 500px; line-height: 1.6;">Cửa hàng hiện tại đã đóng ca hoặc đang tạm ngừng nhận đơn. Vui lòng quay lại sau nhé!</p>
+    </div>
 
     <!-- Header -->
     <header>
@@ -1358,7 +1367,7 @@
         
         <div class="immersive-title-card">
             <span class="title-brand-label">🍿 <span id="client-cinema-title-text">BHDS Thảo Điền</span></span>
-            <h1>SHOWCASE HỘ LINH TRÁNG SĨ</h1>
+            <h1>GIAO ĐỒ ĂN TẬN RẠP</h1>
             <p>Bắp nóng giòn thơm ngọt, nước mát lạnh giao tận ghế phòng chiếu. Đặt món siêu nhanh, giữ trọn từng giây phút phim kịch tính!</p>
         </div>
     </div>
@@ -1421,6 +1430,10 @@
                         <div class="form-group">
                             <label class="form-label" for="customer-name">Tên khách hàng *</label>
                             <input type="text" id="customer-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="customer-phone">Số điện thoại *</label>
+                            <input type="tel" id="customer-phone" class="form-control" placeholder="Ví dụ: 0901234567" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="customer-theater">Số rạp *</label>
@@ -1548,7 +1561,7 @@
 
                 <!-- QR Code Block -->
                 <div id="payment-qr-wrapper" style="background: white; padding: 12px; border-radius: 16px; display: inline-block; margin: 0 auto 1.25rem auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); max-width: 240px; border: 2px dashed rgba(0,255,102,0.35);">
-                    <img src="./assets/qrthaodien.png" alt="VietQR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: 10px; display: block;">
+                    <img src="./assets/momo.jpg" alt="VietQR Payment" id="payment-qr-img" style="width: 100%; height: auto; border-radius: 10px; display: block;">
                 </div>
                 
                 <div id="payment-download-wrapper" style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
@@ -1568,14 +1581,10 @@
                     <strong style="color: var(--neon-green); font-size: 1.25rem; text-shadow: 0 0 10px var(--neon-green-glow);" id="cash-payment-total">0 ₫</strong>
                 </div>
 
-                <label class="form-label" style="margin-bottom: 0.65rem; display: block;">Chọn mệnh giá tiền mặt bạn sẽ đưa:</label>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem; margin-bottom: 1.25rem;">
-                    <!-- Denomination choices chips -->
-                    <button type="button" class="cash-chip" data-value="exact" onclick="selectExactCashAmount()" style="grid-column: span 2;">Đưa đủ số tiền</button>
-                    <button type="button" class="cash-chip" data-value="50000" onclick="selectCashAmount(50000)">50.000 ₫</button>
-                    <button type="button" class="cash-chip" data-value="100000" onclick="selectCashAmount(100000)">100.000 ₫</button>
-                    <button type="button" class="cash-chip" data-value="200000" onclick="selectCashAmount(200000)">200.000 ₫</button>
-                    <button type="button" class="cash-chip" data-value="500000" onclick="selectCashAmount(500000)">500.000 ₫</button>
+                <label class="form-label" style="margin-bottom: 0.65rem; display: block;">Nhập số tiền mặt bạn sẽ đưa:</label>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+                    <input type="number" id="cash-input-amount" class="form-control" placeholder="Ví dụ: 100000" oninput="validateCashInputAmount()">
+                    <button type="button" class="btn-submit" onclick="selectExactCashAmount()" style="width: auto; padding: 0.8rem 1rem; white-space: nowrap; font-size: 0.85rem; border-radius: 10px;">Đưa đủ tiền</button>
                 </div>
 
                 <!-- Validation and feedback message -->
@@ -1591,6 +1600,28 @@
                     </svg>
                     <span>Xác nhận & Gửi đơn</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Payment Confirmation Modal -->
+    <div class="popup-modal" id="popup-qr-confirm">
+        <div class="popup-card" style="max-width: 400px; text-align: center;">
+            <div class="popup-icon-circle" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="popup-title" style="color: #f97316;">Xác nhận thanh toán QR</h3>
+            <p class="popup-text" id="popup-qr-confirm-text" style="margin-bottom: 1rem;"></p>
+            
+            <div style="background: white; padding: 0.5rem; border-radius: 12px; display: inline-block; margin-bottom: 1.5rem; border: 2px dashed rgba(0,0,0,0.1);">
+                <img src="./assets/momo.jpg" alt="Mã QR Thanh Toán" style="width: 180px; height: 180px; object-fit: contain; border-radius: 8px;">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: center; width: 100%;">
+                <button class="btn-popup-close" id="btn-qr-confirm-cancel" style="flex: 1; margin: 0; padding: 0.8rem; font-weight: 700;">Chưa, để tôi quét</button>
+                <button class="btn-submit" id="btn-qr-confirm-ok" style="flex: 1; margin: 0; padding: 0.8rem; font-weight: 800;">Đã chuyển khoản</button>
             </div>
         </div>
     </div>

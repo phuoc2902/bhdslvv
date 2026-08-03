@@ -187,6 +187,26 @@ function updateCinemaUI() {
 }
 // ─────────────────────────────────────────────────────────────
 
+// ── Store Status Management ────────────────────────────────────
+function loadStoreStatus() {
+    if (database) {
+        database.ref('config/storeStatus').on('value', snapshot => {
+            const status = snapshot.val() || 'open';
+            const overlay = document.getElementById('store-closed-overlay');
+            if (overlay) {
+                if (status === 'closed') {
+                    overlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; // block scrolling
+                } else {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+    }
+}
+// ─────────────────────────────────────────────────────────────
+
 // ── Category management (read from Firebase, sync with admin) ──
 const DEFAULT_CATEGORIES_INDEX = [
     { id: 'combo',   label: 'Combo Tiết Kiệm' }
@@ -253,7 +273,7 @@ function updateTheaterSelect() {
     const select = document.getElementById('customer-theater');
     if (!select) return;
     
-    const allRooms = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'VIP', 'Rạp 5', 'First Class'];
+    const allRooms = ['Rạp 1', 'Rạp 2', 'Rạp 3', 'Rạp 4', 'Rạp 5', 'Rạp 6'];
     const availableRooms = allRooms.filter(room => !hiddenTheaters.includes(room));
     
     // Remember the currently selected value if any
@@ -729,6 +749,7 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
     const fields = [];
     fields.push(
         { name: "👤 Khách hàng", value: customerName || "Khách vô danh", inline: true },
+        { name: "📱 Số điện thoại", value: customerPhone || "Không có", inline: true },
         { name: "🎬 Số rạp", value: customerTheater, inline: true },
         { name: "💺 Số ghế", value: customerSeat, inline: true }
     );
@@ -862,61 +883,24 @@ function selectPaymentMethod(method) {
 
 function resetCashPayment() {
     selectedCashAmount = 0;
-
-    const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const chips = document.querySelectorAll('.cash-chip');
-    chips.forEach(chip => {
-        chip.classList.remove('active');
-        const valAttr = chip.getAttribute('data-value');
-        if (valAttr && valAttr !== 'exact') {
-            const valNum = parseInt(valAttr);
-            if (valNum < totalPrice) {
-                chip.disabled = true;
-                chip.style.opacity = '0.3';
-                chip.style.cursor = 'not-allowed';
-                chip.style.pointerEvents = 'none';
-            } else {
-                chip.disabled = false;
-                chip.style.opacity = '1';
-                chip.style.cursor = 'pointer';
-                chip.style.pointerEvents = 'auto';
-            }
-        }
-    });
-
+    const inputEl = document.getElementById('cash-input-amount');
+    if (inputEl) inputEl.value = '';
     validateCashPayment();
 }
 
-function selectCashAmount(amount) {
-    selectedCashAmount = amount;
-
-    const chips = document.querySelectorAll('.cash-chip');
-    chips.forEach(chip => {
-        const valAttr = chip.getAttribute('data-value');
-        if (valAttr === String(amount)) {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
-    });
-
+function validateCashInputAmount() {
+    const inputEl = document.getElementById('cash-input-amount');
+    if (!inputEl) return;
+    const val = parseInt(inputEl.value);
+    selectedCashAmount = isNaN(val) ? 0 : val;
     validateCashPayment();
 }
 
 function selectExactCashAmount() {
     const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     selectedCashAmount = totalPrice;
-
-    const chips = document.querySelectorAll('.cash-chip');
-    chips.forEach(chip => {
-        const valAttr = chip.getAttribute('data-value');
-        if (valAttr === 'exact') {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
-    });
-
+    const inputEl = document.getElementById('cash-input-amount');
+    if (inputEl) inputEl.value = totalPrice;
     validateCashPayment();
 }
 
@@ -1030,7 +1014,7 @@ function openPaymentModal() {
     // Show static momo.jpg for 100% reliable scanning
     const qrImgEl = document.getElementById('payment-qr-img');
     if (qrImgEl) {
-        qrImgEl.src = './assets/qrthaodien.png';
+        qrImgEl.src = './assets/momo.jpg';
     }
     
     // Bind Banking App buttons (keeps dynamic deep links for banks that support autofill)
@@ -1046,8 +1030,8 @@ function openPaymentModal() {
     // Bind Download QR button to download static momo.jpg
     const downloadBtn = document.getElementById('btn-payment-download');
     if (downloadBtn) {
-        downloadBtn.href = './assets/qrthaodien.png';
-        downloadBtn.setAttribute('download', 'qrthaodien.png');
+        downloadBtn.href = './assets/momo.jpg';
+        downloadBtn.setAttribute('download', 'momo.jpg');
         downloadBtn.removeAttribute('target');
     }
 
@@ -1063,8 +1047,27 @@ function closePaymentModal() {
 }
 
 async function confirmAndSendOrder() {
+    if (selectedPaymentMethod === 'qr') {
+        const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const popupText = document.getElementById('popup-qr-confirm-text');
+        if (popupText) {
+            popupText.innerHTML = `Bạn đã chuyển khoản số tiền <strong>${formatCurrency(total)}</strong> của đơn hàng chưa?`;
+        }
+        
+        const popupQRConfirm = document.getElementById('popup-qr-confirm');
+        if (popupQRConfirm) popupQRConfirm.classList.add('open');
+        return; // Dừng lại chờ bấm nút trong popup
+    }
+
+    await executeSendOrder();
+}
+
+async function executeSendOrder() {
+    const popupQRConfirm = document.getElementById('popup-qr-confirm');
+    if (popupQRConfirm) popupQRConfirm.classList.remove('open');
+
     const customerName = document.getElementById('customer-name').value.trim() || "Khách vô danh";
-    const customerPhone = "";
+    const customerPhone = document.getElementById('customer-phone').value.trim();
     const customerTheater = document.getElementById('customer-theater').value;
     const customerSeat = document.getElementById('customer-seat').value.trim();
     const customerNote = document.getElementById('customer-note').value.trim();
@@ -1330,7 +1333,7 @@ function initSecretAdmin() {
                     }
                     showPopup("Chào Admin!", "Chế độ quản trị đã được kích hoạt.", true);
                     setTimeout(() => {
-                        window.location.href = "admin.html";
+                        window.location.href = "adminbhd.html";
                     }, 1000);
                 } else if (pin !== null) {
                     showPopup("Lỗi", "Mã PIN không chính xác!", false);
@@ -1361,7 +1364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTheaters();
     loadCinemaName();
     loadZaloLink();
-
+    loadStoreStatus();
 
     renderFoodCatalog();
     updateCartUI();
@@ -1411,6 +1414,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (popupPayment) {
         popupPayment.addEventListener('click', (e) => {
             if (e.target.id === 'popup-payment') closePaymentModal();
+        });
+    }
+
+    const btnQRConfirmOk = document.getElementById('btn-qr-confirm-ok');
+    const btnQRConfirmCancel = document.getElementById('btn-qr-confirm-cancel');
+    const popupQRConfirm = document.getElementById('popup-qr-confirm');
+    
+    if (btnQRConfirmOk) btnQRConfirmOk.addEventListener('click', executeSendOrder);
+    if (btnQRConfirmCancel) {
+        btnQRConfirmCancel.addEventListener('click', () => {
+            if (popupQRConfirm) popupQRConfirm.classList.remove('open');
+        });
+    }
+    if (popupQRConfirm) {
+        popupQRConfirm.addEventListener('click', (e) => {
+            if (e.target.id === 'popup-qr-confirm') popupQRConfirm.classList.remove('open');
         });
     }
 
