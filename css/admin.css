@@ -1013,6 +1013,8 @@ footer {
     }
     
     .workspace {
+        display: flex;
+        flex-direction: column-reverse;
         gap: 1.5rem;
     }
     
@@ -1030,8 +1032,14 @@ footer {
     
     .food-item-actions {
         width: 100%;
-        justify-content: flex-end;
-        margin-top: 0.5rem;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .btn-icon-action {
+        flex: 1;
+        max-width: 50px;
     }
     
     .order-list-header {
