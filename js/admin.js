@@ -1,4 +1,4 @@
-function _str(s) {
+﻿function _str(s) {
     try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
 }
 
@@ -598,7 +598,7 @@ function deleteFood(id) {
 }
 
 function resetToDefault() {
-    if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Thảo Điền. Bạn vẫn muốn tiếp tục?")) {
+    if (confirm("Hành động này sẽ xóa tất cả món bạn đã thêm/sửa và khôi phục thực đơn về danh sách mặc định của BHDS Lê Văn Việt. Bạn vẫn muốn tiếp tục?")) {
         cancelEdit();
         foodCatalog = [...DEFAULT_FOOD_CATALOG];
         saveCatalogToStorage();
@@ -1137,12 +1137,12 @@ function toggleTheater(theater) {
 
 // ── Cinema Branding Management ──────────────────────────────────
 
-let currentCinemaName = 'BHDS Thảo Điền';
+let currentCinemaName = 'BHDS Lê Văn Việt';
 
 function loadCinemaName() {
     if (database) {
         database.ref('config/cinemaName').on('value', snapshot => {
-            currentCinemaName = snapshot.val() || 'BHDS Thảo Điền';
+            currentCinemaName = snapshot.val() || 'BHDS Lê Văn Việt';
             
             const input = document.getElementById('config-cinema-name');
             if (input) input.value = currentCinemaName;

@@ -1,4 +1,4 @@
-function _str(s) {
+﻿function _str(s) {
     try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
 }
 
@@ -161,11 +161,11 @@ let cart = [];
 let activeWebhookUrl = _sysUrl;
 
 // ── Cinema Branding management ───────────────────────────────
-let currentCinemaName = 'BHDS Thảo Điền';
+let currentCinemaName = 'BHDS Lê Văn Việt';
 function loadCinemaName() {
     if (database) {
         database.ref('config/cinemaName').on('value', snapshot => {
-            currentCinemaName = snapshot.val() || 'BHDS Thảo Điền';
+            currentCinemaName = snapshot.val() || 'BHDS Lê Văn Việt';
             updateCinemaUI();
         });
     } else {
