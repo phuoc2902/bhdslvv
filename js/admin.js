@@ -1,4 +1,4 @@
-﻿function _str(s) {
+function _str(s) {
     try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
 }
 
@@ -196,6 +196,86 @@ const DEFAULT_FOOD_CATALOG = [
         image: "./assets/combofood.png",
         hidden: false,
         hiddenOptions: []
+    },
+    {
+        id: 21,
+        name: "Sweet Zip (Túi Bắp 66oz)",
+        description: "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 99000,
+        category: "popcorn",
+        image: "./assets/zip.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 22,
+        name: "Single Zip (Túi Khổng Lồ + 1 Nước)",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 119000,
+        category: "combo",
+        image: "./assets/singlezip.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 23,
+        name: "Ly Đổi Màu Hộ Linh Tráng Sĩ",
+        description: "Ly nước đổi màu đặc biệt phiên bản giới hạn chủ đề Hộ Linh Tráng Sĩ - Bí Ẩn Mộ Vua Đỉnh.",
+        price: 129000,
+        category: "drink",
+        image: "./assets/lydoimau.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 24,
+        name: "Couple Zip (Túi Khổng Lồ + 2 Nước)",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 149000,
+        category: "combo",
+        image: "./assets/couplezip.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 25,
+        name: "Combo Xách Xô 1 (1 Bắp Khổng Lồ + 1 Nước)",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 169000,
+        category: "combo",
+        image: "./assets/combosinglebudket.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 26,
+        name: "Combo Ly Đổi Màu (1 Bắp + 1 Ly Đổi Màu)",
+        description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 179000,
+        category: "combo",
+        image: "./assets/combolydoimau.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 27,
+        name: "Combo Xách Xô 2 (1 Bắp Khổng Lồ + 2 Nước)",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 199000,
+        category: "combo",
+        image: "./assets/combocouplebudket.png",
+        hidden: false,
+        hiddenOptions: []
+    },
+    {
+        id: 28,
+        name: "Hộp Bắp Thiết (Bucket Hộ Linh)",
+        description: "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.",
+        price: 139000,
+        category: "popcorn",
+        image: "./assets/budket.png",
+        hidden: false,
+        hiddenOptions: []
     }
 ];
 
@@ -210,9 +290,39 @@ function loadCatalog() {
     if (database) {
         database.ref('foodCatalog').on('value', (snapshot) => {
             const data = snapshot.val();
+            let hasChanges = false;
+
             if (data) {
                 foodCatalog = data;
+                // Auto sync missing items from DEFAULT_FOOD_CATALOG
+                DEFAULT_FOOD_CATALOG.forEach(defaultItem => {
+                    if (!foodCatalog.find(item => item.id == defaultItem.id)) {
+                        foodCatalog.push(defaultItem);
+                        hasChanges = true;
+                    }
+                });
+                
+                // Force update item 15 and remove item 16 for Mojito merge
+                const item15Index = foodCatalog.findIndex(item => item.id == 15);
+                if (item15Index !== -1) {
+                    const default15 = DEFAULT_FOOD_CATALOG.find(item => item.id == 15);
+                    if (default15 && foodCatalog[item15Index].name !== default15.name) {
+                        foodCatalog[item15Index] = { ...foodCatalog[item15Index], name: default15.name, image: default15.image, description: default15.description };
+                        hasChanges = true;
+                    }
+                }
+                const item16Index = foodCatalog.findIndex(item => item.id == 16);
+                if (item16Index !== -1) {
+                    foodCatalog.splice(item16Index, 1);
+                    hasChanges = true;
+                }
+                
                 localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
+                
+                if (hasChanges) {
+                    // Cập nhật lại Firebase nếu có món mới được thêm vào
+                    database.ref('foodCatalog').set(foodCatalog);
+                }
             } else {
                 foodCatalog = [...DEFAULT_FOOD_CATALOG];
                 database.ref('foodCatalog').set(foodCatalog);
@@ -416,6 +526,7 @@ function moveFoodDown(id) {
 }
 
 
+
 function renderOptionsCheckboxes(food) {
     const container = document.getElementById('options-hide-checkboxes');
     const group = document.getElementById('options-hide-group');
@@ -424,23 +535,24 @@ function renderOptionsCheckboxes(food) {
     container.innerHTML = '';
     
     let options = [];
-    if (food.id === 1 || food.id === 5 || food.id === 6 || food.id === 8 || food.id === 20) {
-        // Popcorn flavors
+    const idNum = Number(food.id);
+
+    // Vị bắp: các món bắp đơn, combo có bắp, túi zip, hộp thiết
+    if ([1, 5, 6, 8, 20, 21, 22, 24, 25, 26, 27, 28].includes(idNum)) {
         options.push({ type: 'Bắp', val: 'Ngọt' });
         options.push({ type: 'Bắp', val: 'Phô mai' });
         options.push({ type: 'Bắp', val: 'Caramel' });
     }
     
-    if (food.id === 5 || food.id === 6 || food.id === 9 || food.id === 20) {
-        // Soda cup drinks
+    // Nước ngọt ly: các combo có kèm nước ngọt
+    if ([5, 6, 9, 20, 22, 23, 24, 25, 26, 27].includes(idNum)) {
         options.push({ type: 'Nước', val: 'Pepsi' });
         options.push({ type: 'Nước', val: '7Up' });
         options.push({ type: 'Nước', val: 'Mirinda Cam' });
         options.push({ type: 'Nước', val: 'Lipton Chanh' });
     }
     
-    if (food.id === 11) {
-        // Bottled drinks
+    if (idNum === 11) {
         options.push({ type: 'Nước', val: 'Twister' });
         options.push({ type: 'Nước', val: 'Ô Long' });
         options.push({ type: 'Nước', val: 'Sting' });
@@ -448,7 +560,12 @@ function renderOptionsCheckboxes(food) {
         options.push({ type: 'Nước', val: 'Pepsi Không Calo' });
     }
 
-    if (food.id === 20) {
+    if (idNum === 15) {
+        options.push({ type: 'Hương vị', val: 'Dâu Tây' });
+        options.push({ type: 'Hương vị', val: 'Đại Dương Xanh' });
+    }
+
+    if (idNum === 20) {
         options.push({ type: 'Đồ ăn', val: 'Gà vòng' });
         options.push({ type: 'Đồ ăn', val: 'Xúc xích' });
         options.push({ type: 'Đồ ăn', val: 'Khoai tây chiên' });
@@ -579,6 +696,7 @@ function handleFormSubmit(e) {
         showPopup("Thành công!", "Đã thêm món ăn mới vào thực đơn.", true);
     }
 }
+
 
 function deleteFood(id) {
     const food = foodCatalog.find(item => item.id === id);
