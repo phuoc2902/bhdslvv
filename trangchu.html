@@ -1349,9 +1349,299 @@
             70%, 95% { color: #ff3366; text-shadow: 0 0 5px rgba(255, 51, 102, 0.3); }
             98%, 100% { color: var(--text-body-green); text-shadow: none; }
         }
+
+        /* ── Neon flicker title ── */
+        .neon-flicker-title {
+            animation: neon-flicker 5.5s ease-in-out infinite;
+        }
+        @keyframes neon-flicker {
+            0%, 17%, 21%, 58%, 62%, 100% {
+                opacity: 1;
+                text-shadow:
+                    0 0 30px rgba(0, 255, 102, 0.35),
+                    0 0 60px rgba(0, 255, 102, 0.15),
+                    0 2px 8px rgba(0, 0, 0, 0.6);
+            }
+            19%, 60% {
+                opacity: 0.88;
+                text-shadow:
+                    0 0 6px rgba(0, 255, 102, 0.15),
+                    0 0 14px rgba(0, 255, 102, 0.06),
+                    0 2px 8px rgba(0, 0, 0, 0.6);
+            }
+            20%, 59% {
+                opacity: 0.96;
+            }
+        }
+
+        /* ── Cinema marquee ── */
+        .cinema-marquee {
+            overflow: hidden;
+            background: rgba(0, 255, 102, 0.04);
+            border: 1px solid rgba(0, 255, 102, 0.12);
+            border-radius: var(--radius-pill);
+            padding: 0.55rem 0;
+            margin-bottom: 1.75rem;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+        }
+        .marquee-track {
+            display: flex;
+            gap: 4rem;
+            width: max-content;
+            animation: marquee-scroll 32s linear infinite;
+            padding-left: 1rem;
+        }
+        .marquee-track span {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-body-green);
+            white-space: nowrap;
+        }
+        .marquee-track span strong {
+            color: var(--neon-green);
+            font-weight: 800;
+        }
+        @keyframes marquee-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ── Skeleton shimmer (catalog loading) ── */
+        .skeleton-card {
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-neon);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .skeleton-img {
+            height: 175px;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.02) 0%,
+                rgba(0, 255, 102, 0.07) 45%,
+                rgba(255, 255, 255, 0.02) 90%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        .skeleton-body {
+            padding: 1.5rem;
+        }
+        .skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 0.65rem;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.03) 0%,
+                rgba(0, 255, 102, 0.06) 50%,
+                rgba(255, 255, 255, 0.03) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        .skeleton-line.w-70 { width: 70%; }
+        .skeleton-line.w-100 { width: 100%; }
+        .skeleton-line.w-50 { width: 50%; margin-bottom: 1.25rem; }
+        .skeleton-line.w-30 { width: 35%; margin-bottom: 0; }
+        .skeleton-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .skeleton-btn {
+            width: 120px;
+            height: 36px;
+            border-radius: var(--radius-pill);
+            background: linear-gradient(90deg,
+                rgba(0, 255, 102, 0.05) 0%,
+                rgba(0, 255, 102, 0.12) 50%,
+                rgba(0, 255, 102, 0.05) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── Cinema curtain (first visit) ── */
+        #cinema-curtain {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            background: #020503;
+            display: none;
+            overflow: hidden;
+        }
+        #cinema-curtain.active {
+            display: block;
+        }
+        .curtain-panel {
+            position: absolute;
+            top: 0;
+            width: 51%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(90deg,
+                    rgba(0, 0, 0, 0.18) 0px,
+                    rgba(0, 0, 0, 0.18) 14px,
+                    rgba(255, 255, 255, 0.03) 14px,
+                    rgba(255, 255, 255, 0.03) 28px),
+                linear-gradient(180deg, #5c0a18 0%, #8b1530 35%, #6b1025 70%, #3d0610 100%);
+            box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.55);
+        }
+        .curtain-left {
+            left: 0;
+            border-right: 2px solid rgba(0, 0, 0, 0.35);
+        }
+        .curtain-right {
+            right: 0;
+            border-left: 2px solid rgba(0, 0, 0, 0.35);
+        }
+        #cinema-curtain.opening .curtain-left {
+            animation: curtain-open-left 2.4s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+        }
+        #cinema-curtain.opening .curtain-right {
+            animation: curtain-open-right 2.4s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+        }
+        @keyframes curtain-open-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-102%); }
+        }
+        @keyframes curtain-open-right {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(102%); }
+        }
+        .curtain-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+            opacity: 0;
+            animation: curtain-logo-fade 2.4s ease forwards;
+        }
+        .curtain-logo img {
+            width: 56px;
+            height: 56px;
+            filter: drop-shadow(0 0 12px rgba(0, 255, 102, 0.5));
+            margin-bottom: 0.75rem;
+        }
+        .curtain-logo span {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.3em;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
+        }
+        @keyframes curtain-logo-fade {
+            0%, 15% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            30%, 70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        /* ── Ticket print on order success ── */
+        #ticket-print-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 280;
+        }
+        .printed-ticket {
+            position: fixed;
+            background: linear-gradient(180deg, #0a1a0f 0%, #061008 100%);
+            border: 1px dashed rgba(0, 255, 102, 0.35);
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 102, 0.12);
+            overflow: hidden;
+            clip-path: inset(0 0 100% 0);
+            opacity: 0;
+        }
+        .printed-ticket.printing {
+            animation: ticket-print-out 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes ticket-print-out {
+            0% { clip-path: inset(0 0 100% 0); opacity: 0; transform: translateY(0); }
+            12% { opacity: 1; }
+            35% { clip-path: inset(0 0 0 0); opacity: 1; transform: translateY(0); }
+            75% { clip-path: inset(0 0 0 0); opacity: 1; transform: translateY(8px); }
+            100% { clip-path: inset(0 0 0 0); opacity: 0; transform: translateY(24px); }
+        }
+        .printed-ticket-header {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--neon-green);
+            text-align: center;
+            margin-bottom: 0.6rem;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+        }
+        .printed-ticket-divider {
+            border-top: 1px dashed rgba(0, 255, 102, 0.2);
+            margin: 0.5rem 0;
+        }
+        .printed-ticket-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-body-green);
+            margin-bottom: 0.25rem;
+        }
+        .printed-ticket-row strong {
+            color: #fff;
+        }
+        .printed-ticket-status {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-top: 0.5rem;
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .neon-flicker-title,
+            .marquee-track,
+            .skeleton-img,
+            .skeleton-line,
+            .skeleton-btn,
+            .curtain-panel,
+            .curtain-logo,
+            .printed-ticket.printing {
+                animation: none !important;
+            }
+            #cinema-curtain.opening .curtain-left,
+            #cinema-curtain.opening .curtain-right {
+                transform: translateX(-102%);
+            }
+            #cinema-curtain.opening .curtain-right {
+                transform: translateX(102%);
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Cinema curtain — first visit only -->
+    <div id="cinema-curtain" aria-hidden="true">
+        <div class="curtain-logo">
+            <img src="assets/logo.png" alt="">
+            <span>BHDS Cinema</span>
+        </div>
+        <div class="curtain-panel curtain-left"></div>
+        <div class="curtain-panel curtain-right"></div>
+    </div>
+
+    <!-- Ticket print layer (order success) -->
+    <div id="ticket-print-layer" aria-hidden="true"></div>
     
     <!-- Store Closed Overlay -->
     <div id="store-closed-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 5, 3, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
@@ -1381,15 +1671,27 @@
         
         <div class="immersive-title-card">
             <span class="title-brand-label">🍿 <span id="client-cinema-title-text">BHDS Lê Văn Việt</span></span>
-            <h1>GIAO ĐỒ ĂN TẬN RẠP</h1>
+            <h1 class="neon-flicker-title">GIAO ĐỒ ĂN TẬN RẠP</h1>
             <p>Bắp nóng giòn thơm ngọt, nước mát lạnh giao tận ghế phòng chiếu. Đặt món siêu nhanh, giữ trọn từng giây phút phim kịch tính!</p>
         </div>
     </div>
 
     <!-- Main App Container -->
     <main class="app-container">
-        
 
+        <!-- Marquee — phim & combo hot -->
+        <div class="cinema-marquee" aria-label="Thông báo phim và combo">
+            <div class="marquee-track">
+                <span>🔥 <strong>Combo hot</strong> — Giao trong 5 phút tận ghế</span>
+                <span>🎬 <strong>Phim mới:</strong> Hộ Linh Tráng Sĩ — Đặt combo chủ đề ngay!</span>
+                <span>🍿 <strong>Bắp nóng giòn</strong> — Giao siêu tốc, không bỏ lỡ cảnh phim</span>
+                <span>🥤 <strong>Couple Combo</strong> — 1 bắp lớn + 2 nước chỉ từ 121K</span>
+                <span>🔥 <strong>Combo hot</strong> — Giao trong 5 phút tận ghế</span>
+                <span>🎬 <strong>Phim mới:</strong> Hộ Linh Tráng Sĩ — Đặt combo chủ đề ngay!</span>
+                <span>🍿 <strong>Bắp nóng giòn</strong> — Giao siêu tốc, không bỏ lỡ cảnh phim</span>
+                <span>🥤 <strong>Couple Combo</strong> — 1 bắp lớn + 2 nước chỉ từ 121K</span>
+            </div>
+        </div>
 
         <!-- Dynamic Category Selector Switcher (rendered by JS from Firebase) -->
         <div class="category-filter-bar" id="category-filter-bar">
@@ -1733,10 +2035,178 @@
         // Store current filter category state
         let currentFilter = 'all';
 
+        // ── Cinema FX: skeleton, curtain, ticket print ──
+        const CURTAIN_SEEN_KEY = 'bhds_curtain_seen_v1';
+
+        function renderCatalogSkeleton(container) {
+            container.innerHTML = Array(4).fill(0).map(() => `
+                <div class="skeleton-card" aria-hidden="true">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-body">
+                        <div class="skeleton-line w-70"></div>
+                        <div class="skeleton-line w-100"></div>
+                        <div class="skeleton-line w-50"></div>
+                        <div class="skeleton-footer">
+                            <div class="skeleton-line w-30"></div>
+                            <div class="skeleton-btn"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playPrintSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const duration = 0.14;
+                const bufferSize = Math.floor(ctx.sampleRate * duration);
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize) * 0.6;
+                }
+                const source = ctx.createBufferSource();
+                source.buffer = buffer;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 2200;
+                filter.Q.value = 0.8;
+                const gain = ctx.createGain();
+                gain.gain.value = 0.06;
+                source.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                source.start();
+                source.stop(ctx.currentTime + duration);
+                setTimeout(() => ctx.close(), 300);
+            } catch (_) {}
+        }
+
+        function playTicketPrintEffect() {
+            const panel = document.querySelector('.ticket-panel');
+            const layer = document.getElementById('ticket-print-layer');
+            if (!panel || !layer) return;
+
+            playPrintSound();
+
+            const rect = panel.getBoundingClientRect();
+            const snap = window.__lastOrderSnapshot || {};
+            const name = snap.name || 'Khách hàng';
+            const theater = snap.theater || '—';
+            const seat = snap.seat || '—';
+            const orderId = snap.orderId || ('BHDS-' + Date.now().toString().slice(-6));
+
+            const ticket = document.createElement('div');
+            ticket.className = 'printed-ticket';
+            ticket.style.left = Math.max(12, rect.left) + 'px';
+            ticket.style.top = rect.top + 'px';
+            ticket.style.width = Math.min(rect.width, window.innerWidth - 24) + 'px';
+            ticket.innerHTML = `
+                <div class="printed-ticket-header">🎟 Vé Đặt Món Bắp Nước</div>
+                <div class="printed-ticket-row"><span>Mã đơn</span><strong>${orderId}</strong></div>
+                <div class="printed-ticket-row"><span>Khách</span><strong>${name}</strong></div>
+                <div class="printed-ticket-row"><span>Vị trí</span><strong>${theater} · Ghế ${seat}</strong></div>
+                <div class="printed-ticket-divider"></div>
+                <div class="printed-ticket-status">✓ Đã gửi đến bếp — Giao tận ghế!</div>
+            `;
+            layer.appendChild(ticket);
+            requestAnimationFrame(() => ticket.classList.add('printing'));
+            setTimeout(() => ticket.remove(), 3200);
+        }
+
+        function reopenAdsPopupAfterCurtain() {
+            const popupAds = document.getElementById('popup-ads');
+            const adsSecs = document.getElementById('ads-secs');
+            const btnAdsClose = document.getElementById('btn-ads-close');
+            if (!popupAds || sessionStorage.getItem('bhds_ads_shown') === 'true') return;
+
+            popupAds.classList.add('open');
+            let countdown = 5;
+            if (adsSecs) adsSecs.textContent = countdown;
+
+            const closeAds = () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+                popupAds.classList.remove('open');
+                sessionStorage.setItem('bhds_ads_shown', 'true');
+            };
+
+            if (btnAdsClose) {
+                btnAdsClose.onclick = closeAds;
+            }
+            popupAds.onclick = (e) => {
+                if (e.target.id === 'popup-ads') closeAds();
+            };
+
+            const interval = setInterval(() => {
+                countdown--;
+                if (adsSecs) adsSecs.textContent = countdown;
+                if (countdown <= 0) closeAds();
+            }, 1000);
+            const timeout = setTimeout(closeAds, 5000);
+        }
+
+        function initCinemaCurtain() {
+            const curtain = document.getElementById('cinema-curtain');
+            if (!curtain) return;
+
+            const popupAds = document.getElementById('popup-ads');
+            if (popupAds) popupAds.classList.remove('open');
+
+            curtain.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            requestAnimationFrame(() => {
+                curtain.classList.add('opening');
+            });
+
+            setTimeout(() => {
+                curtain.classList.remove('active', 'opening');
+                document.body.style.overflow = '';
+                reopenAdsPopupAfterCurtain();
+            }, 2600);
+        }
+
+        function initCinemaEffects() {
+            initCinemaCurtain();
+
+            if (typeof executeSendOrder === 'function') {
+                const _origExecute = executeSendOrder;
+                window.executeSendOrder = async function() {
+                    window.__lastOrderSnapshot = {
+                        name: document.getElementById('customer-name')?.value || 'Khách hàng',
+                        theater: document.getElementById('customer-theater')?.value || '—',
+                        seat: document.getElementById('customer-seat')?.value || '—',
+                        orderId: 'BHDS-' + Date.now().toString().slice(-6)
+                    };
+                    return _origExecute.apply(this, arguments);
+                };
+            }
+
+            if (typeof showPopup === 'function') {
+                const _origShowPopup = showPopup;
+                window.showPopup = function(title, message, isSuccess) {
+                    _origShowPopup(title, message, isSuccess);
+                    if (isSuccess && /đặt hàng|ghi nhận thành công/i.test(title)) {
+                        setTimeout(playTicketPrintEffect, 350);
+                    }
+                };
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initCinemaEffects);
+
         // Override renderFoodCatalog from index.js using hoisting redefinition
         function renderFoodCatalog() {
             const container = document.getElementById('food-grid-container');
             if (!container) return;
+
+            if (!foodCatalog || foodCatalog.length === 0) {
+                renderCatalogSkeleton(container);
+                return;
+            }
 
             // Generate clean filtered grid
             container.innerHTML = foodCatalog.filter(food => {
