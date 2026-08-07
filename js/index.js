@@ -188,7 +188,7 @@ let foodCatalog = [];
 
 function loadFoodCatalog() {
     if (database) {
-        database.ref('foodCatalog').once('value', (snapshot) => {
+        database.ref('foodCatalog').on('value', (snapshot) => {
             const data = snapshot.val();
 
             if (data) {
@@ -287,7 +287,7 @@ let activeCategoryFilter = 'all';
 
 function loadIndexCategories() {
     if (database) {
-        database.ref('categories').once('value', snapshot => {
+        database.ref('categories').on('value', snapshot => {
             const data = snapshot.val();
             indexCategories = (data && Array.isArray(data) && data.length > 0)
                 ? data : [...DEFAULT_CATEGORIES_INDEX];

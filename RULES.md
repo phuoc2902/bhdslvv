@@ -5,25 +5,25 @@
 
 ---
 
-## 🔥 QUY TẮC 1 — Firebase: Phân biệt `.on()` vs `.once()`
+## 🔥 QUY TẮC 1 — Firebase: `.on()` + Auto-sync ghi đè = Vòng lặp vô hạn
 
 ### ❌ Vấn đề đã gặp
-Trang khách hàng (`trangchu.html`) dùng `.on('value')` để đọc `foodCatalog` từ Firebase.
-Mỗi khi Firebase có **bất kỳ thay đổi nào** (do Admin sửa món, do bất kỳ client nào ghi),
-trang khách lập tức nhận sự kiện và gọi lại `renderFoodCatalog()` → xóa sạch và rebuild
-toàn bộ HTML của lưới món ăn → mọi dropdown đang mở, lựa chọn đang chọn bị **reset ngay**.
+`loadFoodCatalog()` dùng `.on('value')` (realtime) **VÀ** đồng thời có code tự ghi đè lại Firebase khi nhận dữ liệu (auto-sync). Khi 2 bên (`index.js` và `admin.js`) có catalog mặc định khác nhau, mỗi bên nhận event → tự sửa → ghi lên Firebase → bên kia nhận event mới → lại sửa → vòng lặp vô hạn → Firebase nhấp nháy hàng trăm lần/giây → `renderFoodCatalog()` bị gọi liên tục → toàn bộ DOM card bị rebuild → mất trạng thái người dùng đang chọn.
 
 ### ✅ Quy tắc
+- **`.on()` hoàn toàn an toàn** để dùng realtime cho `foodCatalog`, `categories` — miễn là callback **KHÔNG tự ghi đè lại Firebase**.
+- **Cấm tuyệt đối** pattern: nhận dữ liệu từ Firebase → sửa → ghi trả lại Firebase trong cùng một `.on()` listener.
+- Nếu cần cập nhật dữ liệu mặc định/migration → làm thủ công 1 lần từ Admin panel, sau đó **xóa code migration đi**.
+
 | Tình huống | Dùng |
 |---|---|
-| Trang Admin cần xem thay đổi ngay khi admin khác sửa | `.on('value')` |
-| Trang khách hàng chỉ cần tải dữ liệu 1 lần khi mở trang | `.once('value')` |
-| Bất kỳ listener nào sau khi nhận dữ liệu sẽ rebuild lại DOM | `.once('value')` |
-| Trạng thái cần realtime (ví dụ: cửa hàng mở/đóng, tên rạp) | `.on('value')` nhưng **chỉ cập nhật text/style, không rebuild DOM card** |
+| Trang khách cần nhận ngay khi admin ẩn/hiện món | ✅ `.on('value')` — **không ghi lại Firebase** |
+| Trang Admin xem đơn hàng mới theo realtime | ✅ `.on('value')` |
+| Bất kỳ listener nào tự ghi đè lại Firebase sau khi nhận | ❌ Xóa code ghi đè đi, dùng `.on()` vẫn được |
 
 ### 📌 Kiểm tra nhanh
-Trước khi dùng `.on()`, hỏi: *"Nếu Firebase thay đổi lúc khách đang chọn món, có bị ảnh hưởng không?"*
-Nếu có → **dùng `.once()`**.
+Sau khi viết một `.on()` listener, hỏi: *"Callback này có gọi `.set()` hay `.update()` lên Firebase không?"*
+Nếu có → **đó là nguyên nhân vòng lặp vô hạn, xóa code ghi đó đi**.
 
 ---
 
