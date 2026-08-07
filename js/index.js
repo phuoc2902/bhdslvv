@@ -188,43 +188,13 @@ let foodCatalog = [];
 
 function loadFoodCatalog() {
     if (database) {
-        database.ref('foodCatalog').on('value', (snapshot) => {
+        database.ref('foodCatalog').once('value', (snapshot) => {
             const data = snapshot.val();
-            let hasChanges = false;
 
             if (data) {
                 foodCatalog = data;
-                
-                // Auto sync missing items from DEFAULT_FOOD_CATALOG
-                DEFAULT_FOOD_CATALOG.forEach(defaultItem => {
-                    if (!foodCatalog.find(item => item.id == defaultItem.id)) {
-                        foodCatalog.push(defaultItem);
-                        hasChanges = true;
-                    }
-                });
-
-                // Force update item 15 and remove item 16 for Mojito merge
-                const item15Index = foodCatalog.findIndex(item => item.id == 15);
-                if (item15Index !== -1) {
-                    const default15 = DEFAULT_FOOD_CATALOG.find(item => item.id == 15);
-                    if (default15 && foodCatalog[item15Index].name !== default15.name) {
-                        foodCatalog[item15Index] = { ...foodCatalog[item15Index], name: default15.name, image: default15.image, description: default15.description };
-                        hasChanges = true;
-                    }
-                }
-                const item16Index = foodCatalog.findIndex(item => item.id == 16);
-                if (item16Index !== -1) {
-                    foodCatalog.splice(item16Index, 1);
-                    hasChanges = true;
-                }
-
                 localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-                
-                if (hasChanges) {
-                    database.ref('foodCatalog').set(foodCatalog);
-                }
             } else {
-
                 foodCatalog = [...DEFAULT_FOOD_CATALOG];
                 database.ref('foodCatalog').set(foodCatalog);
             }
@@ -317,7 +287,7 @@ let activeCategoryFilter = 'all';
 
 function loadIndexCategories() {
     if (database) {
-        database.ref('categories').on('value', snapshot => {
+        database.ref('categories').once('value', snapshot => {
             const data = snapshot.val();
             indexCategories = (data && Array.isArray(data) && data.length > 0)
                 ? data : [...DEFAULT_CATEGORIES_INDEX];
@@ -903,57 +873,76 @@ function animateCartBadge() {
 
 function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote) {
     const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('vi-VN');
 
-    let description = `**🛒 DANH SÁCH MÓN ĐẶT:**\n`;
-    cart.forEach((item, index) => {
-        description += `${index + 1}. **${item.name}**\n`;
-        description += `   └ Số lượng: ${item.quantity} x ${formatCurrency(item.price)} = **${formatCurrency(item.price * item.quantity)}**\n`;
+    // ── Ánh xạ tên ngắn theo ID ──────────────────────────────────
+    const SHORT_NAMES = {
+        1:  'Bắp Rang',    5:  'Single Combo',  6:  'Couple Combo',
+        8:  'Refresh CB',  9:  'Nước Ngọt',     10: 'Aquafina',
+        11: 'Nước Chai',   15: 'Mojito',         20: 'Combo Food',
+        21: 'Sweet Zip',   22: 'Single Zip',     23: 'Ly Đổi Màu',
+        24: 'Couple Zip',  25: 'Xô Đơn',         26: 'CB Đổi Màu',
+        27: 'Xô Đôi',     28: 'Bucket'
+    };
+
+    // Strip label prefixes: "Bắp: X, Nước: Y" → "X, Y"
+    const cleanOption = (opt) => opt
+        .replace(/Bắp:\s*/g, '')
+        .replace(/Nước:\s*/g, '')
+        .replace(/Loại:\s*/g, '')
+        .replace(/Hương vị:\s*/g, '')
+        .replace(/Đồ ăn:\s*/g, '');
+
+    // ── Danh sách món (embed description) ───────────────────────
+    let itemLines = '';
+    cart.forEach((item, i) => {
+        const shortName = SHORT_NAMES[item.id] || item.name.split(' (')[0];
+        const lineTotal = formatCurrency(item.price * item.quantity);
+        if (item.option) {
+            const opts = cleanOption(item.option);
+            itemLines += `${i + 1}. **${shortName}**: ${opts} ×${item.quantity} — ${lineTotal}\n`;
+        } else {
+            itemLines += `${i + 1}. **${shortName}** ×${item.quantity} — ${lineTotal}\n`;
+        }
     });
 
-    const fields = [];
-    fields.push(
-        { name: "👤 Khách hàng", value: customerName || "Khách vô danh", inline: true },
-        { name: "📱 Số điện thoại", value: customerPhone || "Không có", inline: true },
-        { name: "🎬 Số rạp", value: customerTheater, inline: true },
-        { name: "💺 Số ghế", value: customerSeat, inline: true }
-    );
-
-
+    // ── Thanh toán ───────────────────────────────────────────────
+    let paymentText = '';
     if (selectedPaymentMethod === 'qr') {
-        fields.push({ name: "💳 Phương thức thanh toán", value: "Chuyển khoản MoMo", inline: false });
+        paymentText = 'Chuyển khoản MoMo';
     } else {
         const change = selectedCashAmount - totalPrice;
-        let cashDetail = `- Khách đưa: **${formatCurrency(selectedCashAmount)}**\n`;
-        if (change === 0) {
-            cashDetail += `- Tiền thừa: **Khách đưa vừa đủ, không cần thối**`;
-        } else {
-            cashDetail += `- Tiền thừa thối lại: **${formatCurrency(change)}**`;
-        }
-        fields.push({
-            name: "💵 Phương thức thanh toán",
-            value: `Tiền mặt\n${cashDetail}`,
-            inline: false
-        });
+        paymentText = `Tiền mặt — Đưa: ${formatCurrency(selectedCashAmount)}`;
+        if (change > 0) paymentText += ` · Thối: ${formatCurrency(change)}`;
     }
 
+    // ── Embed fields ─────────────────────────────────────────────
+    const fields = [
+        { name: '👤 Khách hàng',    value: customerName || 'Khách vô danh', inline: true },
+        { name: '📱 Số điện thoại', value: customerPhone || 'Không có',      inline: true },
+        { name: '🎬 Số rạp',        value: customerTheater,                  inline: true },
+        { name: '💺 Số ghế',        value: customerSeat,                     inline: true },
+        { name: '💳 Thanh toán',    value: paymentText,                      inline: true },
+    ];
+
     if (customerNote.trim()) {
-        fields.push({ name: "📝 Ghi chú", value: customerNote, inline: false });
+        fields.push({ name: '📝 Ghi chú', value: customerNote, inline: false });
     }
 
     return {
         username: `${currentCinemaName} Delivery`,
         avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
-        embeds: [
-            {
-                title: `🔔 ĐƠN HÀNG MỚI: #${currentOrderId || 'N/A'}`,
-                color: selectedPaymentMethod === 'qr' ? 2278750 : 16753920,
-                description: description,
-                fields: fields,
-                footer: {
-                    text: `Tổng tiền: ${formatCurrency(totalPrice)} | Thời gian: ${new Date().toLocaleString('vi-VN')}`
-                }
+        embeds: [{
+            title: `🔔 ĐƠN HÀNG MỚI: #${currentOrderId || 'N/A'}`,
+            color: 0x00FF66,
+            description: `🛒 **DANH SÁCH MÓN ĐẶT:**\n${itemLines}`,
+            fields: fields,
+            footer: {
+                text: `💰 Tổng tiền: ${formatCurrency(totalPrice)}  |  🕐 ${timeStr} ${dateStr}`
             }
-        ]
+        }]
     };
 }
 

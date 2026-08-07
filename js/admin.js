@@ -169,20 +169,10 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 15,
-        name: "Strawberry Mojito",
-        description: "Sự kết hợp hoàn hảo giữa soda ga nhẹ, dâu tây ngọt thơm và lá bạc hà tươi mát.",
+        name: "Mojito Trái Cây",
+        description: "Mojito đại dương xanh hoặc dâu tây hương vị nhiệt đới tươi mát mang đậm không khí biển khơi.",
         price: 48000,
-        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
-        category: "drink",
-        hidden: false,
-        hiddenOptions: []
-    },
-    {
-        id: 16,
-        name: "Blue Ocean Mojito",
-        description: "Mojito đại dương xanh hương vị trái cây nhiệt đới tươi mát mang đậm không khí biển khơi.",
-        price: 48000,
-        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+        image: "./assets/Blue-Ocean.jpg",
         category: "drink",
         hidden: false,
         hiddenOptions: []
@@ -290,39 +280,10 @@ function loadCatalog() {
     if (database) {
         database.ref('foodCatalog').on('value', (snapshot) => {
             const data = snapshot.val();
-            let hasChanges = false;
 
             if (data) {
                 foodCatalog = data;
-                // Auto sync missing items from DEFAULT_FOOD_CATALOG
-                DEFAULT_FOOD_CATALOG.forEach(defaultItem => {
-                    if (!foodCatalog.find(item => item.id == defaultItem.id)) {
-                        foodCatalog.push(defaultItem);
-                        hasChanges = true;
-                    }
-                });
-                
-                // Force update item 15 and remove item 16 for Mojito merge
-                const item15Index = foodCatalog.findIndex(item => item.id == 15);
-                if (item15Index !== -1) {
-                    const default15 = DEFAULT_FOOD_CATALOG.find(item => item.id == 15);
-                    if (default15 && foodCatalog[item15Index].name !== default15.name) {
-                        foodCatalog[item15Index] = { ...foodCatalog[item15Index], name: default15.name, image: default15.image, description: default15.description };
-                        hasChanges = true;
-                    }
-                }
-                const item16Index = foodCatalog.findIndex(item => item.id == 16);
-                if (item16Index !== -1) {
-                    foodCatalog.splice(item16Index, 1);
-                    hasChanges = true;
-                }
-                
                 localStorage.setItem('bhds_cine_catalog', JSON.stringify(foodCatalog));
-                
-                if (hasChanges) {
-                    // Cập nhật lại Firebase nếu có món mới được thêm vào
-                    database.ref('foodCatalog').set(foodCatalog);
-                }
             } else {
                 foodCatalog = [...DEFAULT_FOOD_CATALOG];
                 database.ref('foodCatalog').set(foodCatalog);
