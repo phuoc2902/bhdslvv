@@ -21,7 +21,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 1,
         name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
-        description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 9K nếu chọn vị Phô mai hoặc Caramel.",
+        description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 11K nếu chọn vị Phô mai hoặc Caramel.",
         price: 62000,
         image: "./assets/bap.png",
         hidden: false,
@@ -103,7 +103,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 21,
         name: "Sweet Zip (Túi Bắp 66oz)",
-        description: "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 99000,
         category: "popcorn",
         image: "./assets/zip.png",
@@ -113,7 +113,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 22,
         name: "Single Zip (Túi Khổng Lồ + 1 Nước)",
-        description: "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 119000,
         category: "combo",
         image: "./assets/singlezip.png",
@@ -133,7 +133,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 24,
         name: "Couple Zip (Túi Khổng Lồ + 2 Nước)",
-        description: "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 149000,
         category: "combo",
         image: "./assets/couplezip.png",
@@ -143,7 +143,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 25,
         name: "Combo Xách Xô 1 (1 Bắp Khổng Lồ + 1 Nước)",
-        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 169000,
         category: "combo",
         image: "./assets/combosinglebudket.png",
@@ -153,7 +153,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 26,
         name: "Combo Ly Đổi Màu (1 Bắp + 1 Ly Đổi Màu)",
-        description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 179000,
         category: "combo",
         image: "./assets/combolydoimau.png",
@@ -163,7 +163,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 27,
         name: "Combo Xách Xô 2 (1 Bắp Khổng Lồ + 2 Nước)",
-        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 199000,
         category: "combo",
         image: "./assets/combocouplebudket.png",
@@ -173,7 +173,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 28,
         name: "Hộp Bắp Thiết (Bucket Hộ Linh)",
-        description: "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.",
+        description: "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.",
         price: 139000,
         category: "popcorn",
         image: "./assets/budket.png",
@@ -415,8 +415,8 @@ function renderFoodCatalog() {
 
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
             
             if (opts.length > 0) {
                 optionsHtml = `
@@ -431,8 +431,8 @@ function renderFoodCatalog() {
         } else if (food.id == 5 || food.id == 6) {
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
 
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -463,8 +463,8 @@ function renderFoodCatalog() {
         } else if (food.id == 20) {
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
 
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -507,8 +507,8 @@ function renderFoodCatalog() {
         } else if (food.id == 8) {
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
 
             if (opts.length > 0) {
                 optionsHtml = `
@@ -574,8 +574,8 @@ function renderFoodCatalog() {
             // Sweet Zip (túi bắp) & Hộp Bắp Thiết — chỉ có vị bắp
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
             if (opts.length > 0) {
                 optionsHtml = `
                     <div class="food-options" style="margin-bottom: 1rem;">
@@ -590,8 +590,8 @@ function renderFoodCatalog() {
             // Single Zip, Couple Zip, Combo Xách Xô 1, Combo Ly Đổi Màu, Combo Xách Xô 2 — vị bắp + nước
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai (+9.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel (+9.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
             if (!isHidden('7Up')) drinkOpts.push('<option value="7Up">7Up</option>');

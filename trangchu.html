@@ -2230,8 +2230,8 @@
                 if (food.id === 1) {
                     let opts = [];
                     if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai</option>');
-                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel</option>');
+                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai</option>');
+                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel</option>');
                     
                     if (opts.length > 0) {
                         optionsHtml = `
@@ -2245,8 +2245,8 @@
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container">
                                     ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 1, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 1, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                                 </div>
                             </div>
                         `;
@@ -2254,8 +2254,8 @@
                 } else if (food.id === 5 || food.id === 6) {
                     let popOpts = [];
                     if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai</option>');
-                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel</option>');
+                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai</option>');
+                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel</option>');
 
                     let drinkOpts = [];
                     if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -2273,8 +2273,8 @@
                             <span class="option-label">Chọn vị bắp:</span>
                             <div class="pill-container" style="margin-bottom: 0.5rem;">
                                 ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                             </div>` : ''}
                             
                             ${drinkOpts.length > 0 ? `
@@ -2290,8 +2290,8 @@
                 } else if (food.id === 20) {
                     let popOpts = [];
                     if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai</option>');
-                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Vị Caramel</option>');
+                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai</option>');
+                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel</option>');
 
                     let drinkOpts = [];
                     if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -2315,8 +2315,8 @@
                             <span class="option-label">Chọn vị bắp:</span>
                             <div class="pill-container" style="margin-bottom: 0.5rem;">
                                 ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                             </div>` : ''}
                             
                             ${drinkOpts.length > 0 ? `
@@ -2340,8 +2340,8 @@
                 } else if (food.id === 8) {
                     let opts = [];
                     if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Vị Phô mai</option>');
-                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Vị Caramel</option>');
+                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai</option>');
+                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel</option>');
 
                     if (opts.length > 0) {
                         optionsHtml = `
@@ -2353,8 +2353,8 @@
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container">
                                     ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, 8, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, 8, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                                 </div>
                             </div>
                         `;
@@ -2432,8 +2432,8 @@
                 } else if (food.id == 21 || food.id == 28) {
                     let opts = [];
                     if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="9000">Phô mai (+9K)</option>');
-                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="9000">Caramel (+9K)</option>');
+                    if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Phô mai (+11K)</option>');
+                    if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Caramel (+11K)</option>');
                     if (opts.length > 0) {
                         optionsHtml = `
                             <select id="option-popcorn-${food.id}" style="display:none;" onchange="updateCardPrice(${food.id})">
@@ -2443,8 +2443,8 @@
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container">
                                     ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                                 </div>
                             </div>
                         `;
@@ -2452,8 +2452,8 @@
                 } else if (food.id == 22 || food.id == 24 || food.id == 25 || food.id == 26 || food.id == 27) {
                     let popOpts = [];
                     if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt</option>');
-                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="9000">Phô mai (+9K)</option>');
-                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="9000">Caramel (+9K)</option>');
+                    if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Phô mai (+11K)</option>');
+                    if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Caramel (+11K)</option>');
                     
                     let drinkOpts = [];
                     if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -2471,8 +2471,8 @@
                                 <span class="option-label">Chọn vị bắp:</span>
                                 <div class="pill-container" style="margin-bottom: 0.5rem;">
                                     ${!isHidden('Ngọt') ? `<button type="button" class="pill-chip active" onclick="selectPill(this, ${food.id}, 'popcorn', 'Ngọt')">Vị Ngọt</button>` : ''}
-                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+9K)</button>` : ''}
-                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+9K)</button>` : ''}
+                                    ${!isHidden('Phô mai') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Phô mai')">Phô mai (+11K)</button>` : ''}
+                                    ${!isHidden('Caramel') ? `<button type="button" class="pill-chip" onclick="selectPill(this, ${food.id}, 'popcorn', 'Caramel')">Caramel (+11K)</button>` : ''}
                                 </div>` : ''}
                                 
                                 ${drinkOpts.length > 0 ? `
@@ -2499,14 +2499,14 @@
                 else if (food.id == 11) shortDescription = "Các loại Twister, Trà Ô Long, Sting hoặc Pepsi lon.";
                 else if (food.id == 15) shortDescription = "Soda Mojito dâu tây ngọt mát.";
                 else if (food.id == 16) shortDescription = "Mojito hương vị trái cây nhiệt đới tươi mát.";
-                else if (food.id == 21) shortDescription = "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.";
-                else if (food.id == 22) shortDescription = "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.";
+                else if (food.id == 21) shortDescription = "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.";
+                else if (food.id == 22) shortDescription = "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.";
                 else if (food.id == 23) shortDescription = "Ly nước đổi màu đặc biệt phiên bản giới hạn chủ đề Hộ Linh Tráng Sĩ - Bí Ẩn Mộ Vua Đỉnh.";
-                else if (food.id == 24) shortDescription = "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +9K cho vị Phô mai/Caramel.";
-                else if (food.id == 25) shortDescription = "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +9K cho vị Phô mai/Caramel.";
-                else if (food.id == 26) shortDescription = "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +9K cho vị Phô mai/Caramel.";
-                else if (food.id == 27) shortDescription = "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +9K cho vị Phô mai/Caramel.";
-                else if (food.id == 28) shortDescription = "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +9K cho vị Phô mai/Caramel.";
+                else if (food.id == 24) shortDescription = "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.";
+                else if (food.id == 25) shortDescription = "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +11K cho vị Phô mai/Caramel.";
+                else if (food.id == 26) shortDescription = "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +11K cho vị Phô mai/Caramel.";
+                else if (food.id == 27) shortDescription = "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +11K cho vị Phô mai/Caramel.";
+                else if (food.id == 28) shortDescription = "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.";
 
                 return `
                     <article class="food-card" data-id="${food.id}">
