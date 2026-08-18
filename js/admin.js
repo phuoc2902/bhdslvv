@@ -73,28 +73,33 @@ function renderCatalogFilterBar() {
 function editCategoryLabel(id) {
     const cat = categories.find(c => c.id === id);
     if (!cat) return;
-    const newLabel = prompt(`Đổi tên danh mục "${cat.label}" thành:`, cat.label);
-    if (!newLabel || newLabel.trim() === '' || newLabel.trim() === cat.label) return;
-    cat.label = newLabel.trim();
-    saveCategories();
-    renderCatalogFilterBar();
-    renderFoodList();
-    showPopup('Cập nhật thành công!', `Danh mục đã được đổi tên thành "${cat.label}".`, true);
+    
+    showTextInputPrompt(`Đổi tên danh mục "${cat.label}" thành:`, cat.label).then(newLabel => {
+        if (!newLabel || newLabel.trim() === '' || newLabel.trim() === cat.label) return;
+        cat.label = newLabel.trim();
+        saveCategories();
+        renderCatalogFilterBar();
+        renderFoodList();
+        showPopup('Cập nhật thành công!', `Danh mục đã được đổi tên thành "${cat.label}".`, true);
+    });
 }
 // ─────────────────────────────────────────────────────────────
 
 const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
 
-if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
-    const pin = prompt("Vui lòng nhập mã PIN quản trị để truy cập:");
-    if (pin === "2902" || pin === "1234") {
-        sessionStorage.setItem('bhds_is_admin', 'true');
-        sessionStorage.setItem('bhds_admin_pin', pin);
-    } else {
-        alert("Mã PIN không chính xác hoặc bạn đã hủy!");
-        window.location.href = "trangchu.html";
+// Initialize admin access with password prompt
+(async () => {
+    if (sessionStorage.getItem('bhds_is_admin') !== 'true') {
+        const pin = await showPasswordPrompt("Vui lòng nhập mã PIN quản trị để truy cập:");
+        if (pin === "2902" || pin === "1234") {
+            sessionStorage.setItem('bhds_is_admin', 'true');
+            sessionStorage.setItem('bhds_admin_pin', pin);
+        } else {
+            alert("Mã PIN không chính xác hoặc bạn đã hủy!");
+            window.location.href = "trangchu.html";
+        }
     }
-}
+})();
 
 const DEFAULT_FOOD_CATALOG = [
     {
@@ -313,10 +318,10 @@ function loadLocalCatalogFallback() {
     renderFoodList();
 }
 
-function saveCatalogToStorage() {
+async function saveCatalogToStorage() {
     let adminPin = sessionStorage.getItem('bhds_admin_pin');
     if (!adminPin) {
-        adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật thực đơn:");
+        adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để cập nhật thực đơn:");
         if (adminPin) {
             sessionStorage.setItem('bhds_admin_pin', adminPin);
         } else {
@@ -686,6 +691,464 @@ function resetToDefault() {
     }
 }
 
+// Password prompt dialog — hides password as user types
+function showPasswordPrompt(message) {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        `;
+        
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const title = document.createElement('h3');
+        title.textContent = message;
+        title.style.cssText = `
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #333;
+        `;
+        
+        const input = document.createElement('input');
+        input.type = 'password';
+        input.placeholder = 'Nhập mã PIN...';
+        input.style.cssText = `
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: "Outfit", sans-serif;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        `;
+        
+        const btnContainer = document.createElement('div');
+        btnContainer.style.cssText = `
+            display: flex;
+            gap: 1rem;
+        `;
+        
+        const btnOk = document.createElement('button');
+        btnOk.textContent = 'OK';
+        btnOk.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.textContent = 'Hủy';
+        btnCancel.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const cleanup = () => {
+            document.body.removeChild(dialog);
+        };
+        
+        btnOk.onclick = () => {
+            cleanup();
+            resolve(input.value || null);
+        };
+        
+        btnCancel.onclick = () => {
+            cleanup();
+            resolve(null);
+        };
+        
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                cleanup();
+                resolve(input.value || null);
+            }
+        };
+        
+        btnContainer.appendChild(btnOk);
+        btnContainer.appendChild(btnCancel);
+        
+        box.appendChild(title);
+        box.appendChild(input);
+        box.appendChild(btnContainer);
+        
+        dialog.appendChild(box);
+        document.body.appendChild(dialog);
+        
+        input.focus();
+    });
+}
+
+// Text input prompt dialog — for general text input (category name, etc.)
+function showTextInputPrompt(message, defaultValue = '') {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        `;
+        
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const title = document.createElement('h3');
+        title.textContent = message;
+        title.style.cssText = `
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #333;
+        `;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = defaultValue;
+        input.placeholder = 'Nhập giá trị...';
+        input.style.cssText = `
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: "Outfit", sans-serif;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        `;
+        
+        const btnContainer = document.createElement('div');
+        btnContainer.style.cssText = `
+            display: flex;
+            gap: 1rem;
+        `;
+        
+        const btnOk = document.createElement('button');
+        btnOk.textContent = 'OK';
+        btnOk.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.textContent = 'Hủy';
+        btnCancel.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const cleanup = () => {
+            document.body.removeChild(dialog);
+        };
+        
+        btnOk.onclick = () => {
+            cleanup();
+            resolve(input.value || null);
+        };
+        
+        btnCancel.onclick = () => {
+            cleanup();
+            resolve(null);
+        };
+        
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                cleanup();
+                resolve(input.value || null);
+            }
+        };
+        
+        btnContainer.appendChild(btnOk);
+        btnContainer.appendChild(btnCancel);
+        
+        box.appendChild(title);
+        box.appendChild(input);
+        box.appendChild(btnContainer);
+        
+        dialog.appendChild(box);
+        document.body.appendChild(dialog);
+        
+        input.focus();
+        input.select();
+    });
+}
+
+// ── Audio Notification System for New Orders ──────────────────────────────────
+
+let notificationAudioQueue = [];
+let isPlayingNotification = false;
+let notificationAudioUnlocked = false;
+let notificationAudioContext = null;
+let notificationAudioElement = null;
+
+function ensureNotificationAudio() {
+    if (!notificationAudioElement) {
+        const audio = new Audio('./assets/order-notification.mp3');
+        audio.preload = 'auto';
+        audio.volume = 0.8;
+        audio.muted = false;
+        audio.load();
+        notificationAudioElement = audio;
+    }
+    return notificationAudioElement;
+}
+
+function unlockNotificationAudio() {
+    if (notificationAudioUnlocked) return;
+    notificationAudioUnlocked = true;
+
+    try {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtor && !notificationAudioContext) {
+            notificationAudioContext = new AudioCtor();
+        }
+        if (notificationAudioContext && notificationAudioContext.state === 'suspended') {
+            notificationAudioContext.resume().catch(() => {});
+        }
+    } catch (e) {
+        console.warn('Không thể unlock audio thông báo đơn mới:', e);
+    }
+
+    ensureNotificationAudio();
+
+    if (notificationAudioQueue.length > 0 && !isPlayingNotification) {
+        processNotificationQueue();
+    }
+}
+
+function getPreferredSpeechVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    const preferredLangs = ['vi-VN', 'vi', 'Vietnamese'];
+
+    const best = voices.find(voice => preferredLangs.some(lang => voice.lang && voice.lang.toLowerCase().includes(lang.toLowerCase())))
+        || voices.find(voice => /vietnamese|vi/i.test(voice.name || ''))
+        || voices[0]
+        || null;
+
+    return best;
+}
+
+function speakNewOrderAlert() {
+    if (!('speechSynthesis' in window)) return false;
+
+    try {
+        const speak = () => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance('Có đơn hàng điện tử mới');
+            const voice = getPreferredSpeechVoice();
+            utterance.lang = voice ? voice.lang : 'vi-VN';
+            utterance.voice = voice || null;
+            utterance.volume = 1;
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.onerror = () => {};
+            window.speechSynthesis.speak(utterance);
+        };
+
+        if (window.speechSynthesis.getVoices && window.speechSynthesis.getVoices().length === 0) {
+            const handleVoicesReady = () => {
+                speak();
+                window.speechSynthesis.onvoiceschanged = null;
+            };
+            window.speechSynthesis.onvoiceschanged = handleVoicesReady;
+            setTimeout(handleVoicesReady, 500);
+            return true;
+        }
+
+        speak();
+        return true;
+    } catch (e) {
+        console.warn('Không thể phát giọng nói thông báo đơn mới:', e);
+        return false;
+    }
+}
+
+document.addEventListener('pointerdown', unlockNotificationAudio, { passive: true });
+document.addEventListener('keydown', unlockNotificationAudio, { passive: true });
+document.addEventListener('touchstart', unlockNotificationAudio, { passive: true });
+
+async function playOrderNotification(count = 1) {
+    // Add notification to queue
+    for (let i = 0; i < count; i++) {
+        notificationAudioQueue.push(true);
+    }
+    
+    // Start processing queue if not already playing
+    if (!isPlayingNotification) {
+        processNotificationQueue();
+    }
+}
+
+async function processNotificationQueue() {
+    if (notificationAudioQueue.length === 0) {
+        isPlayingNotification = false;
+        return;
+    }
+
+    if (!notificationAudioUnlocked) {
+        isPlayingNotification = false;
+        return;
+    }
+    
+    isPlayingNotification = true;
+    notificationAudioQueue.shift();
+    
+    let audioPlayed = false;
+    
+    let speechPlayed = false;
+    if (notificationAudioUnlocked) {
+        speechPlayed = speakNewOrderAlert();
+    }
+
+    // Try to play MP3 file only as backup in case speech is unavailable
+    if (!speechPlayed) {
+        try {
+            const audio = ensureNotificationAudio();
+            audio.volume = 0.8;
+            audio.muted = false;
+            audio.currentTime = 0;
+            audio.pause();
+
+            const playPromise = audio.play().catch(err => {
+                console.warn("Could not play notification audio file:", err);
+                return false;
+            });
+            
+            if (playPromise instanceof Promise) {
+                await playPromise.then(() => { audioPlayed = true; });
+            }
+            
+            // Wait for audio to finish or timeout
+            if (audioPlayed) {
+                await new Promise(resolve => {
+                    const finish = () => {
+                        audio.onended = null;
+                        resolve();
+                    };
+                    audio.onended = finish;
+                    setTimeout(finish, 2500);
+                });
+            }
+        } catch (e) {
+            console.warn("Error loading notification audio:", e);
+        }
+    }
+    
+    // Fallback to Web Audio API beep if both speech and MP3 file failed
+    if (!audioPlayed && !speechPlayed) {
+        try {
+            const AudioCtor = window.AudioContext || window.webkitAudioContext;
+            if (!notificationAudioContext && AudioCtor) {
+                notificationAudioContext = new AudioCtor();
+            }
+            if (notificationAudioContext && notificationAudioContext.state === 'suspended') {
+                await notificationAudioContext.resume().catch(() => {});
+            }
+
+            const audioCtx = notificationAudioContext;
+            const playBeep = (delay, freq, duration) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + delay + duration);
+                osc.start(audioCtx.currentTime + delay);
+                osc.stop(audioCtx.currentTime + delay + duration);
+            };
+            playBeep(0, 523.25, 0.15);
+            playBeep(0.2, 659.25, 0.2);
+            
+            // Wait for beep to finish
+            await new Promise(resolve => setTimeout(resolve, 600));
+        } catch (e) {
+            console.warn("Web Audio API fallback also failed:", e);
+        }
+    }
+    
+    // Delay before next notification (0.5s gap)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Process next in queue
+    processNotificationQueue();
+}
+
+// Helper function to verify admin PIN with password prompt
+async function verifyAdminPin(message = "Vui lòng xác nhận mã PIN admin:") {
+    let adminPin = sessionStorage.getItem('bhds_admin_pin');
+    if (!adminPin) {
+        adminPin = await showPasswordPrompt(message);
+        if (adminPin) {
+            sessionStorage.setItem('bhds_admin_pin', adminPin);
+        }
+    }
+    return adminPin;
+}
+
 function showPopup(title, message, isSuccess) {
     const popup = document.getElementById('popup-result');
     const popupIcon = document.getElementById('popup-icon');
@@ -727,54 +1190,41 @@ function switchTab(tabId) {
     document.getElementById(`tab-content-${tabId}`).style.display = 'block';
 }
 
+let initialOrdersLoaded = false;
+
 function initOrdersListener() {
     if (!database) return;
     database.ref('orders').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            let hasNewPending = false;
+        const data = snapshot.val() || {};
+
+        if (initialOrdersLoaded) {
+            const previousKeys = new Set(Object.keys(orders));
+            let newOrderCount = 0;
+
             Object.keys(data).forEach(key => {
                 const order = data[key];
-                if (!order.sentToDiscord && (!orders[key] || orders[key].sentToDiscord)) {
-                    hasNewPending = true;
+                const prevOrder = orders[key];
+                const isNewOrder = !previousKeys.has(key)
+                    || (prevOrder && prevOrder.id !== order.id)
+                    || (prevOrder && prevOrder.createdAt !== order.createdAt);
+
+                if (isNewOrder) {
+                    newOrderCount++;
                 }
             });
 
-            orders = data;
-            
-            if (hasNewPending) {
-                playNotificationSound();
+            if (newOrderCount > 0) {
+                playOrderNotification(newOrderCount);
             }
-
-            queueUnsentOrders();
-        } else {
-            orders = {};
         }
+
+        orders = data;
+        initialOrdersLoaded = true;
+        queueUnsentOrders();
         renderOrderList();
     });
 }
 
-function playNotificationSound() {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const playBeep = (delay, freq, duration) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + delay + duration);
-            osc.start(audioCtx.currentTime + delay);
-            osc.stop(audioCtx.currentTime + delay + duration);
-        };
-
-        playBeep(0, 523.25, 0.15);
-        playBeep(0.2, 659.25, 0.2);
-    } catch (e) {
-        console.warn("Autoplay audio blocked or not supported:", e);
-    }
-}
 
 let selectedOrderId = null;
 function renderOrderList() {
@@ -799,6 +1249,9 @@ function renderOrderList() {
     container.innerHTML = orderList.map(order => {
         const dateStr = new Date(order.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(order.createdAt).toLocaleDateString('vi-VN');
         const isSelected = order.key === selectedOrderId ? 'selected' : '';
+        const statusBadge = order.status === 'done'
+            ? '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(34,197,94,0.12);color:#15803d;font-size:0.7rem;font-weight:700;">Đã giao</span>'
+            : '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(245,158,11,0.12);color:#b45309;font-size:0.7rem;font-weight:700;">Chờ giao</span>';
 
         return `
             <div class="order-card ${isSelected}" onclick="selectOrder('${order.key}')">
@@ -806,6 +1259,7 @@ function renderOrderList() {
                     <div class="order-title">${order.theater} - Ghế ${order.seat}</div>
                     <div class="order-subtitle">${order.customerName} • ${dateStr}</div>
                     <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${order.totalPrice.toLocaleString('vi-VN')}đ</div>
+                    ${statusBadge}
                 </div>
             </div>
         `;
@@ -853,11 +1307,21 @@ function renderOrderDetails() {
         </div>
     ` : '';
 
-    let actionsHtml = `
-        <div class="order-actions-container" style="margin-top: 1rem;">
-            <button class="btn-status-change btn-status-cancel" style="width: 100%;" onclick="deleteOrder('${selectedOrderId}')">Xóa đơn hàng</button>
-        </div>
-    `;
+    let actionsHtml = '';
+    if (order.status === 'done') {
+        actionsHtml = `
+            <div class="order-actions-container" style="margin-top: 1rem;">
+                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25); cursor: default;" disabled>Đã giao thành công</button>
+            </div>
+        `;
+    } else {
+        actionsHtml = `
+            <div class="order-actions-container" style="margin-top: 1rem; display: grid; gap: 0.75rem;">
+                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25);" onclick="markOrderDone('${selectedOrderId}')">Done</button>
+                <button class="btn-status-change btn-status-cancel" style="width: 100%;" onclick="deleteOrder('${selectedOrderId}')">Xóa đơn hàng</button>
+            </div>
+        `;
+    }
 
     container.innerHTML = `
         <div class="order-detail-view">
@@ -906,10 +1370,116 @@ function renderOrderDetails() {
     `;
 }
 
-function deleteOrder(key) {
+async function markOrderDone(key) {
+    const order = orders[key];
+    if (!order || order.status === 'done') return;
+
+    if (!confirm(`Xác nhận đơn ${order.id} đã giao thành công?`)) return;
+
+    let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để đánh dấu đơn hàng đã giao:");
+    if (adminPin !== "2902" && adminPin !== "1234") {
+        showPopup("Lỗi", "Mã PIN không chính xác!", false);
+        return;
+    }
+
+    try {
+        const updates = {
+            status: 'done',
+            doneAt: new Date().toISOString(),
+            sentToDiscord: true
+        };
+
+        if (database) {
+            await database.ref(`orders/${key}`).update(updates);
+        }
+
+        const updatedOrder = { ...orders[key], ...updates };
+        await sendDoneOrderToDiscord(updatedOrder);
+
+        if (selectedOrderId === key) {
+            renderOrderDetails();
+        }
+        renderOrderList();
+        showPopup("Thành công", `Đơn ${order.id} đã được đánh dấu là giao thành công.`, true);
+    } catch (err) {
+        console.error("Lỗi khi cập nhật trạng thái giao hàng:", err);
+        showPopup("Lỗi", "Không thể cập nhật trạng thái giao hàng: " + err.message, false);
+    }
+}
+
+async function sendDoneOrderToDiscord(order) {
+    if (!order) return;
+
+    const webhookUrl = localStorage.getItem('bhds_discord_webhook')
+        || sessionStorage.getItem('bhds_discord_webhook')
+        || _sysUrl;
+
+    if (!webhookUrl || !webhookUrl.includes('discord')) {
+        console.warn('Webhook Done không hợp lệ hoặc chưa được cấu hình:', webhookUrl);
+        throw new Error('Webhook Discord chưa được cấu hình cho tin nhắn Done.');
+    }
+
+    const productLines = order.items.map(item => {
+        const optionText = item.option ? ` (${item.option})` : '';
+        return `${item.name}${optionText} **x${item.quantity}**`;
+    }).join('\n');
+
+    const payload = {
+        username: `${currentCinemaName} - Đơn Đã Giao`,
+        avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
+        embeds: [
+            {
+                title: `✅ ĐƠN ĐÃ GIAO THÀNH CÔNG`,
+                color: 3066993,
+                fields: [
+                    { name: '📦 Mã đơn', value: order.id, inline: true },
+                    { name: '💰 Tổng tiền', value: `${order.totalPrice.toLocaleString('vi-VN')}đ`, inline: true },
+                    { name: '🧾 Danh sách món', value: productLines || 'Không có món', inline: false },
+                    { name: '📌 Trạng thái', value: 'Đã giao thành công.', inline: false }
+                ],
+                footer: {
+                    text: `Thời gian giao: ${new Date().toLocaleString('vi-VN')}`
+                }
+            }
+        ]
+    };
+
+    console.log('Sending done webhook to Discord:', webhookUrl);
+    console.log('Done webhook payload:', payload);
+
+    try {
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const responseText = await response.text();
+        console.log('Done webhook status:', response.status, responseText);
+
+        if (!response.ok) {
+            throw new Error(`Discord trả về mã ${response.status}: ${responseText}`);
+        }
+
+        return responseText;
+    } catch (e) {
+        console.warn('Không thể gửi Discord thông báo giao hàng:', e);
+        throw e;
+    }
+}
+
+async function deleteOrder(key) {
+    const order = orders[key];
+    if (!order) return;
+
+    if (order.status === 'done') {
+        showPopup("Thông báo", "Đơn hàng đã giao xong và chỉ được reset khi đóng ca.", false);
+        return;
+    }
+
     if (!database) return;
     if (confirm("Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này?")) {
-        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để xóa đơn hàng:");
+        let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để xóa đơn hàng:");
         if (adminPin !== "2902" && adminPin !== "1234") {
             showPopup("Lỗi", "Mã PIN không chính xác!", false);
             return;
@@ -957,19 +1527,39 @@ function loadStoreStatus() {
                 btnOpen.style.display = 'inline-block';
                 btnClose.style.display = 'none';
             }
+
+            const isAdminLoggedIn = sessionStorage.getItem('bhds_is_admin') === 'true';
+            btnOpen.disabled = !isAdminLoggedIn;
+            btnClose.disabled = !isAdminLoggedIn;
+            btnOpen.style.opacity = isAdminLoggedIn ? '1' : '0.5';
+            btnClose.style.opacity = isAdminLoggedIn ? '1' : '0.5';
+            btnOpen.style.cursor = isAdminLoggedIn ? 'pointer' : 'not-allowed';
+            btnClose.style.cursor = isAdminLoggedIn ? 'pointer' : 'not-allowed';
         }
     });
 }
 
-function openDay() {
+async function openDay() {
     if (!database) return;
-    if (!confirm("Xác nhận mở ca kinh doanh mới? Khách hàng sẽ có thể đặt đồ ăn trở lại.")) return;
 
-    let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để mở ca:");
+    const adminAuthorized = sessionStorage.getItem('bhds_is_admin') === 'true';
+    if (!adminAuthorized) {
+        const pin = await showPasswordPrompt("Vui lòng nhập mã PIN quản trị để mở ca:");
+        if (pin !== "2902" && pin !== "1234") {
+            showPopup("Lỗi", "Mã PIN không chính xác hoặc bạn đã hủy!", false);
+            return;
+        }
+        sessionStorage.setItem('bhds_is_admin', 'true');
+        sessionStorage.setItem('bhds_admin_pin', pin);
+    }
+
+    let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để mở ca:");
     if (adminPin !== "2902" && adminPin !== "1234") {
         showPopup("Lỗi", "Mã PIN không chính xác!", false);
         return;
     }
+
+    if (!confirm("Xác nhận mở ca kinh doanh mới? Khách hàng sẽ có thể đặt đồ ăn trở lại.")) return;
 
     const todayDateStr = new Date().toISOString().split('T')[0];
     
@@ -987,13 +1577,25 @@ function openDay() {
 
 async function closeDay() {
     if (!database) return;
-    if (!confirm("Xác nhận đóng ca? Toàn bộ đơn hàng hiện tại sẽ được lưu vào doanh thu và bị xóa khỏi danh sách. Khách hàng sẽ không thể đặt đơn được nữa.")) return;
 
-    let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để đóng ca:");
+    const adminAuthorized = sessionStorage.getItem('bhds_is_admin') === 'true';
+    if (!adminAuthorized) {
+        const pin = await showPasswordPrompt("Vui lòng nhập mã PIN quản trị để đóng ca:");
+        if (pin !== "2902" && pin !== "1234") {
+            showPopup("Lỗi", "Mã PIN không chính xác hoặc bạn đã hủy!", false);
+            return;
+        }
+        sessionStorage.setItem('bhds_is_admin', 'true');
+        sessionStorage.setItem('bhds_admin_pin', pin);
+    }
+
+    let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để đóng ca:");
     if (adminPin !== "2902" && adminPin !== "1234") {
         showPopup("Lỗi", "Mã PIN không chính xác!", false);
         return;
     }
+
+    if (!confirm("Xác nhận đóng ca? Toàn bộ đơn hàng hiện tại sẽ được lưu vào doanh thu và bị xóa khỏi danh sách. Khách hàng sẽ không thể đặt đơn được nữa.")) return;
 
     if (!currentBusinessDate) {
         currentBusinessDate = new Date().toISOString().split('T')[0];
@@ -1163,7 +1765,7 @@ function renderTheatersList() {
     }).join('');
 }
 
-function toggleTheater(theater) {
+async function toggleTheater(theater) {
     if (hiddenTheaters.includes(theater)) {
         hiddenTheaters = hiddenTheaters.filter(t => t !== theater);
     } else {
@@ -1173,7 +1775,7 @@ function toggleTheater(theater) {
     if (database) {
         let adminPin = sessionStorage.getItem('bhds_admin_pin');
         if (!adminPin) {
-            adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật trạng thái rạp:");
+            adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để cập nhật trạng thái rạp:");
             if (adminPin) {
                 sessionStorage.setItem('bhds_admin_pin', adminPin);
             } else {
@@ -1243,7 +1845,7 @@ function loadCinemaName() {
     }
 }
 
-function saveCinemaName() {
+async function saveCinemaName() {
     const input = document.getElementById('config-cinema-name');
     if (!input) return;
     const newName = input.value.trim();
@@ -1253,7 +1855,7 @@ function saveCinemaName() {
     }
     
     if (database) {
-        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật tên rạp:");
+        let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để cập nhật tên rạp:");
         if (adminPin !== "2902" && adminPin !== "1234") {
             showPopup("Lỗi", "Mã PIN không chính xác!", false);
             return;
@@ -1294,7 +1896,7 @@ function loadZaloLink() {
     }
 }
 
-function saveZaloLink() {
+async function saveZaloLink() {
     const input = document.getElementById('config-zalo-link');
     if (!input) return;
     const newLink = input.value.trim();
@@ -1304,7 +1906,7 @@ function saveZaloLink() {
     }
     
     if (database) {
-        let adminPin = prompt("Vui lòng xác nhận lại mã PIN admin để cập nhật link Zalo:");
+        let adminPin = await verifyAdminPin("Vui lòng xác nhận lại mã PIN admin để cập nhật link Zalo:");
         if (adminPin !== "2902" && adminPin !== "1234") {
             showPopup("Lỗi", "Mã PIN không chính xác!", false);
             return;

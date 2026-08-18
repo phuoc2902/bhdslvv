@@ -1452,6 +1452,126 @@ function initAdsPopup() {
     }, 5000);
 }
 
+// Password prompt dialog — hides password as user types
+function showPasswordPrompt(message) {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        `;
+        
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const title = document.createElement('h3');
+        title.textContent = message;
+        title.style.cssText = `
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #333;
+        `;
+        
+        const input = document.createElement('input');
+        input.type = 'password';
+        input.placeholder = 'Nhập mã PIN...';
+        input.style.cssText = `
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: "Outfit", sans-serif;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        `;
+        
+        const btnContainer = document.createElement('div');
+        btnContainer.style.cssText = `
+            display: flex;
+            gap: 1rem;
+        `;
+        
+        const btnOk = document.createElement('button');
+        btnOk.textContent = 'OK';
+        btnOk.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.textContent = 'Hủy';
+        btnCancel.style.cssText = `
+            flex: 1;
+            padding: 0.75rem;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: "Outfit", sans-serif;
+        `;
+        
+        const cleanup = () => {
+            document.body.removeChild(dialog);
+        };
+        
+        btnOk.onclick = () => {
+            cleanup();
+            resolve(input.value || null);
+        };
+        
+        btnCancel.onclick = () => {
+            cleanup();
+            resolve(null);
+        };
+        
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                cleanup();
+                resolve(input.value || null);
+            }
+        };
+        
+        btnContainer.appendChild(btnOk);
+        btnContainer.appendChild(btnCancel);
+        
+        box.appendChild(title);
+        box.appendChild(input);
+        box.appendChild(btnContainer);
+        
+        dialog.appendChild(box);
+        document.body.appendChild(dialog);
+        
+        input.focus();
+    });
+}
 
 function initSecretAdmin() {
     const isAdmin = sessionStorage.getItem('bhds_is_admin') === 'true';
@@ -1477,20 +1597,21 @@ function initSecretAdmin() {
 
             if (logoClickCount >= 5) {
                 logoClickCount = 0;
-                const pin = prompt("Nhập mã PIN quản trị để tiếp tục:");
-                if (pin === "2902" || pin === "1234") {
-                    sessionStorage.setItem('bhds_is_admin', 'true');
-                    sessionStorage.setItem('bhds_admin_pin', pin);
-                    if (headerActions) {
-                        headerActions.style.display = 'flex';
+                showPasswordPrompt("Nhập mã PIN quản trị để tiếp tục:").then((pin) => {
+                    if (pin === "2902" || pin === "1234") {
+                        sessionStorage.setItem('bhds_is_admin', 'true');
+                        sessionStorage.setItem('bhds_admin_pin', pin);
+                        if (headerActions) {
+                            headerActions.style.display = 'flex';
+                        }
+                        showPopup("Chào Admin!", "Chế độ quản trị đã được kích hoạt.", true);
+                        setTimeout(() => {
+                            window.location.href = "adminbhd.html";
+                        }, 1000);
+                    } else if (pin !== null) {
+                        showPopup("Lỗi", "Mã PIN không chính xác!", false);
                     }
-                    showPopup("Chào Admin!", "Chế độ quản trị đã được kích hoạt.", true);
-                    setTimeout(() => {
-                        window.location.href = "adminbhd.html";
-                    }, 1000);
-                } else if (pin !== null) {
-                    showPopup("Lỗi", "Mã PIN không chính xác!", false);
-                }
+                });
             }
         });
     }
