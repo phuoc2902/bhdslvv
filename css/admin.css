@@ -843,6 +843,13 @@ textarea.form-control {
     align-items: center;
 }
 
+.btn-status-change.order-keyed {
+    background: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.55);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
+}
+
 .btn-status-prep {
     background-color: #3b82f6;
 }
@@ -1043,13 +1050,14 @@ footer {
     }
     
     .order-list-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
     }
     
     .store-status-actions {
-        width: 100%;
-        justify-content: space-between;
+        width: auto;
+        justify-content: flex-end;
+        flex-wrap: wrap;
     }
     
     .order-actions-container {
@@ -1076,5 +1084,17 @@ footer {
     
     .popup-card {
         padding: 1.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .order-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .store-status-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }

@@ -1235,6 +1235,9 @@ function renderOrderList() {
         key: key,
         ...orders[key]
     })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const totalOrdersAmount = orderList.reduce((total, order) => total + (Number(order.totalPrice) || 0), 0);
+    const totalOrdersEl = document.getElementById('current-orders-total');
+    if (totalOrdersEl) totalOrdersEl.textContent = formatCurrency(totalOrdersAmount);
 
     if (orderList.length === 0) {
         container.innerHTML = `<div class="empty-catalog-state" style="padding: 3rem 1.5rem; text-align: center; color: var(--text-secondary);">
@@ -1252,6 +1255,12 @@ function renderOrderList() {
         const statusBadge = order.status === 'done'
             ? '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(34,197,94,0.12);color:#15803d;font-size:0.7rem;font-weight:700;">Đã giao</span>'
             : '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(245,158,11,0.12);color:#b45309;font-size:0.7rem;font-weight:700;">Chờ giao</span>';
+        const paymentBadge = order.paymentMethod === 'cash'
+            ? '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(59,130,246,0.12);color:#2563eb;font-size:0.7rem;font-weight:700;">Tiền mặt</span>'
+            : '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(168,85,247,0.12);color:#7e22ce;font-size:0.7rem;font-weight:700;">Chuyển khoản</span>';
+        const keyedBadge = order.keyed
+            ? '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(34,197,94,0.12);color:#15803d;font-size:0.7rem;font-weight:700;">Đã key</span>'
+            : '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(107,114,128,0.12);color:#6b7280;font-size:0.7rem;font-weight:700;">Chưa key</span>';
 
         return `
             <div class="order-card ${isSelected}" onclick="selectOrder('${order.key}')">
@@ -1259,7 +1268,7 @@ function renderOrderList() {
                     <div class="order-title">${order.theater} - Ghế ${order.seat}</div>
                     <div class="order-subtitle">${order.customerName} • ${dateStr}</div>
                     <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${order.totalPrice.toLocaleString('vi-VN')}đ</div>
-                    ${statusBadge}
+                    <div>${paymentBadge} ${keyedBadge} ${statusBadge}</div>
                 </div>
             </div>
         `;
@@ -1307,21 +1316,22 @@ function renderOrderDetails() {
         </div>
     ` : '';
 
-    let actionsHtml = '';
-    if (order.status === 'done') {
-        actionsHtml = `
-            <div class="order-actions-container" style="margin-top: 1rem;">
-                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25); cursor: default;" disabled>Đã giao thành công</button>
+    const keyButtonLabel = order.keyed ? 'Đã key' : 'Đã key đơn';
+    const keyButtonClass = order.keyed ? 'order-keyed' : '';
+    const actionsHtml = `
+        <div class="order-actions-container" style="margin-top: 1rem; display: grid; gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <button class="btn-status-change ${keyButtonClass}" style="width: 100%;" onclick="toggleOrderKey('${selectedOrderId}')">${keyButtonLabel}</button>
+                <button class="btn-status-change" style="width: 100%;" onclick="copyOrder('${selectedOrderId}')">Copy đơn hàng</button>
             </div>
-        `;
-    } else {
-        actionsHtml = `
-            <div class="order-actions-container" style="margin-top: 1rem; display: grid; gap: 0.75rem;">
+            ${order.status === 'done' ? `
+                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25); cursor: default;" disabled>Đã giao thành công</button>
+            ` : `
                 <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25);" onclick="markOrderDone('${selectedOrderId}')">Done</button>
                 <button class="btn-status-change btn-status-cancel" style="width: 100%;" onclick="deleteOrder('${selectedOrderId}')">Xóa đơn hàng</button>
-            </div>
-        `;
-    }
+            `}
+        </div>
+    `;
 
     container.innerHTML = `
         <div class="order-detail-view">
@@ -1368,6 +1378,86 @@ function renderOrderDetails() {
             ${actionsHtml}
         </div>
     `;
+}
+
+async function toggleOrderKey(key) {
+    const order = orders[key];
+    if (!order || !database) return;
+
+    const keyed = !order.keyed;
+    try {
+        await database.ref(`orders/${key}`).update({
+            keyed,
+            keyedAt: keyed ? new Date().toISOString() : null
+        });
+        orders[key] = { ...order, keyed };
+        renderOrderDetails();
+        renderOrderList();
+    } catch (error) {
+        showPopup("Lỗi", "Không thể cập nhật trạng thái key: " + error.message, false);
+    }
+}
+
+function getCopyOption(item, label) {
+    const match = (item.option || '').match(new RegExp(`${label}:\\s*([^,]+)`));
+    return match ? match[1].trim() : '';
+}
+
+function getCopyDrink(item) {
+    return getCopyOption(item, 'Nước') || getCopyOption(item, 'Loại') || '';
+}
+
+function getCopyItemLines(item) {
+    const quantity = Number(item.quantity) || 1;
+    const itemName = item.name || '';
+    const itemId = Number(item.id);
+    const popcorn = getCopyOption(item, 'Bắp');
+    const popcornText = popcorn && popcorn !== 'Ngọt' ? ` ${popcorn.toLowerCase()}` : '';
+    const flavor = getCopyOption(item, 'Hương vị');
+    const drink = getCopyDrink(item);
+    const drinkText = drink ? drink.toLowerCase() : 'nước';
+    const name = itemName.split(' (')[0];
+    let products;
+
+    if (itemId === 5 || name === 'Single Combo') products = ['1 bắp' + popcornText, `1 ${drinkText}`];
+    else if (itemId === 6 || name === 'Couple Combo') products = ['1 bắp' + popcornText, `2 ${drinkText}`];
+    else if (itemId === 8 || name === 'Refresh Combo') products = ['1 bắp' + popcornText, '1 aquafina'];
+    else if (itemId === 20 || name === 'Combo Food') products = ['1 bắp' + popcornText, `1 ${drinkText}`, `1 ${getCopyOption(item, 'Đồ ăn').toLowerCase() || 'đồ ăn nóng'}`];
+    else if (itemId === 22 || itemId === 24 || itemId === 25 || itemId === 26 || itemId === 27 || /Zip|Xách Xô|Ly Đổi Màu/.test(name)) {
+        const drinkCount = itemId === 24 || itemId === 27 || /Couple Zip|Xách Xô 2/.test(name) ? 2 : 1;
+        const base = /Ly Đổi Màu/.test(name) ? '1 bắp' : (/Xách Xô/.test(name) ? '1 xô thiết' : '1 túi zip');
+        products = [base + popcornText, ...Array(drinkCount).fill(`1 ${drinkText}`)];
+    } else if (itemId === 1 || itemId === 21 || itemId === 28 || /Bắp|Sweet Zip|Hộp Bắp/.test(name)) {
+        products = [(itemId === 21 ? '1 túi zip' : itemId === 28 ? '1 hộp bắp thiết' : '1 bắp') + popcornText];
+    } else if (itemId === 9 || itemId === 11 || itemId === 15 || itemId === 23) {
+        products = [`1 ${name.toLowerCase()}${flavor ? ` ${flavor.toLowerCase()}` : ''}${popcornText}`];
+    } else {
+        products = [`1 ${name.toLowerCase()}`];
+    }
+
+    return products.flatMap(product => Array(quantity).fill(product));
+}
+
+async function copyOrder(key) {
+    const order = orders[key];
+    if (!order) return;
+
+    const lines = [`${order.seat}, ${order.theater}`, ...order.items.flatMap(getCopyItemLines)];
+    const copyText = lines.join(', ');
+    try {
+        await navigator.clipboard.writeText(copyText);
+        showPopup("Đã copy", copyText, true);
+    } catch (error) {
+        const textArea = document.createElement('textarea');
+        textArea.value = copyText;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+        showPopup("Đã copy", copyText, true);
+    }
 }
 
 async function markOrderDone(key) {
