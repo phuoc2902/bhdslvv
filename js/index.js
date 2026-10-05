@@ -1402,57 +1402,6 @@ function saveConfig() {
     showPopup("Lưu thành công", "Cấu hình Discord đã được cập nhật.", true);
 }
 
-function initAdsPopup() {
-    const popupAds = document.getElementById('popup-ads');
-    const btnAdsClose = document.getElementById('btn-ads-close');
-    const adsSecs = document.getElementById('ads-secs');
-
-    if (!popupAds) return;
-
-    const adsShown = sessionStorage.getItem('bhds_ads_shown') === 'true';
-    if (adsShown) {
-        popupAds.classList.remove('open');
-        return;
-    }
-
-    popupAds.classList.add('open');
-
-    let countdown = 5;
-    let adsInterval;
-    let adsTimeout;
-
-    const closeAds = () => {
-        clearInterval(adsInterval);
-        clearTimeout(adsTimeout);
-        popupAds.classList.remove('open');
-        sessionStorage.setItem('bhds_ads_shown', 'true');
-    };
-
-    if (btnAdsClose) {
-        btnAdsClose.addEventListener('click', closeAds);
-    }
-
-    popupAds.addEventListener('click', (e) => {
-        if (e.target.id === 'popup-ads') {
-            closeAds();
-        }
-    });
-
-    adsInterval = setInterval(() => {
-        countdown--;
-        if (adsSecs) {
-            adsSecs.textContent = countdown;
-        }
-        if (countdown <= 0) {
-            closeAds();
-        }
-    }, 1000);
-
-    adsTimeout = setTimeout(() => {
-        closeAds();
-    }, 5000);
-}
-
 // Password prompt dialog — hides password as user types
 function showPasswordPrompt(message) {
     return new Promise((resolve) => {
@@ -1646,9 +1595,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     loadDiscordConfig();
-
-
-    initAdsPopup();
 
 
     const checkoutForm = document.getElementById('checkout-form');
