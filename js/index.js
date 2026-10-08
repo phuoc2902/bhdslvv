@@ -22,7 +22,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 1,
         name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
         description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 11K nếu chọn vị Phô mai hoặc Caramel.",
-        price: 62000,
+        price: 65000,
         image: "./assets/bap.png",
         hidden: false,
         hiddenOptions: []
@@ -31,7 +31,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 5,
         name: "Single Combo",
         description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
-        price: 88000,
+        price: 91000,
         image: "./assets/singlecombo.png",
         hidden: false,
         hiddenOptions: []
@@ -40,7 +40,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 6,
         name: "Couple Combo",
         description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
-        price: 121000,
+        price: 124000,
         image: "./assets/couplecombo.png",
         hidden: false,
         hiddenOptions: []
@@ -49,7 +49,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 8,
         name: "Refresh Combo",
         description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
-        price: 78000,
+        price: 81000,
         image: "./assets/prefreshcb.png",
         hidden: false,
         hiddenOptions: []
@@ -58,7 +58,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 9,
         name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
         description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
-        price: 38000,
+        price: 40000,
         image: "./assets/nuocngotly.png",
         hidden: false,
         hiddenOptions: []
@@ -94,7 +94,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 20,
         name: "Combo Food",
         description: "Combo đặc biệt gồm: 1 bắp rang lớn + 1 ly nước ngọt lạnh + 1 thức ăn nóng tuỳ chọn.",
-        price: 121000,
+        price: 124000,
         category: "combo",
         image: "./assets/combofood.png",
         hidden: false,
@@ -124,7 +124,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 23,
         name: "Ly Đổi Màu Hộ Linh Tráng Sĩ",
         description: "Ly nước đổi màu đặc biệt phiên bản giới hạn chủ đề Hộ Linh Tráng Sĩ - Bí Ẩn Mộ Vua Đỉnh.",
-        price: 129000,
+        price: 89000,
         category: "drink",
         image: "./assets/lydoimau.png",
         hidden: false,
@@ -152,9 +152,9 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 26,
-        name: "Combo Ly Đổi Màu (1 Bắp + 1 Ly Đổi Màu)",
+        name: "Combo Thu Đông (1 Bắp + 1 Ly Đổi Màu)",
         description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +11K cho vị Phô mai/Caramel.",
-        price: 179000,
+        price: 129000,
         category: "combo",
         image: "./assets/combolydoimau.png",
         hidden: false,
@@ -181,6 +181,8 @@ const DEFAULT_FOOD_CATALOG = [
         hiddenOptions: []
     }
 ];
+
+DEFAULT_FOOD_CATALOG.sort((a, b) => b.price - a.price);
 
 
 let foodCatalog = [];

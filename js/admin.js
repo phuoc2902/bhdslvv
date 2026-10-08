@@ -2,6 +2,21 @@ function _str(s) {
     try { return decodeURIComponent(escape(atob(s.split("").reverse().join("")))); } catch(e) { return ""; }
 }
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[character]);
+}
+
+function formatOrderAmount(value) {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount.toLocaleString('vi-VN') : '0';
+}
+
 const _cfg = "==QfikzV1gkSFZ0V5oVLHJiOiQWS05WZtVmc1NXYl1mIsICN5EzYzUjZidzMmlDM0UjZ0gTZllTM6IWZ3pTN4ATMyUDNxETOxUjOxIiOiQWSwBXYiwiI1gDMxITN0ETM5ETNiojIklkclRmblN1Zul2ZhN3cl1mIsICcwFmLldWYy9GdzV2chJWZylmZuYndsRGaiJiOiQXZrNWdCV2ZhJ3b0NnIsIid2xGZoJmI6ICZJR3Ylp2byBnIsICcwFmLlNXYiFGdhRWZzFmYlJXam5SM0NXYlhGd192ctEWazFmLiRGdy1CdsVXYmVGZtYndsRGai9yL6MHc0RHaiojIMJVVlNXYiFGdhRmIsISbvNmLwBXYlNXYiVmcpZmL2ZHbkhmYiojIulWYt9GRoRXdhJCLikFaLpWdzVjMsFjVs5kRxE2XX1Wa1AXWIlHa5ZVRX1yaCl3UhpXSBJiOikXZLlGchJye";
 const firebaseConfig = JSON.parse(_str(_cfg));
 
@@ -106,7 +121,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 1,
         name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
         description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 11K nếu chọn vị Phô mai hoặc Caramel.",
-        price: 62000,
+        price: 65000,
         image: "./assets/bap.png",
         category: "popcorn",
         hidden: false,
@@ -116,7 +131,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 5,
         name: "Single Combo",
         description: "Combo 1 người gồm: 1 bắp rang ngọt lớn + 1 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton).",
-        price: 88000,
+        price: 91000,
         image: "./assets/singlecombo.png",
         category: "combo",
         hidden: false,
@@ -126,7 +141,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 6,
         name: "Couple Combo",
         description: "Combo cặp đôi gồm: 1 bắp rang ngọt lớn + 2 ly nước ngọt lạnh mát lành.",
-        price: 121000,
+        price: 124000,
         image: "./assets/couplecombo.png",
         category: "combo",
         hidden: false,
@@ -136,7 +151,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 8,
         name: "Refresh Combo",
         description: "Combo thanh mát gồm: 1 bắp rang ngọt lớn + 1 chai nước suối Aquafina đóng chai.",
-        price: 78000,
+        price: 81000,
         image: "./assets/prefreshcb.png",
         category: "combo",
         hidden: false,
@@ -146,7 +161,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 9,
         name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
         description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
-        price: 38000,
+        price: 40000,
         image: "./assets/nuocngotly.png",
         category: "drink",
         hidden: false,
@@ -186,7 +201,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 20,
         name: "Combo Food",
         description: "Combo đặc biệt gồm: 1 bắp rang lớn + 1 ly nước ngọt lạnh + 1 thức ăn nóng tuỳ chọn.",
-        price: 121000,
+        price: 124000,
         category: "combo",
         image: "./assets/combofood.png",
         hidden: false,
@@ -216,7 +231,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 23,
         name: "Ly Đổi Màu Hộ Linh Tráng Sĩ",
         description: "Ly nước đổi màu đặc biệt phiên bản giới hạn chủ đề Hộ Linh Tráng Sĩ - Bí Ẩn Mộ Vua Đỉnh.",
-        price: 129000,
+        price: 89000,
         category: "drink",
         image: "./assets/lydoimau.png",
         hidden: false,
@@ -244,9 +259,9 @@ const DEFAULT_FOOD_CATALOG = [
     },
     {
         id: 26,
-        name: "Combo Ly Đổi Màu (1 Bắp + 1 Ly Đổi Màu)",
+        name: "Combo Thu Đông (1 Bắp + 1 Ly Đổi Màu)",
         description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +11K cho vị Phô mai/Caramel.",
-        price: 179000,
+        price: 129000,
         category: "combo",
         image: "./assets/combolydoimau.png",
         hidden: false,
@@ -273,6 +288,8 @@ const DEFAULT_FOOD_CATALOG = [
         hiddenOptions: []
     }
 ];
+
+DEFAULT_FOOD_CATALOG.sort((a, b) => b.price - a.price);
 
 let foodCatalog = [];
 let isEditing = false;
@@ -1263,11 +1280,11 @@ function renderOrderList() {
             : '<span style="display:inline-block;margin-top:0.5rem;padding:0.25rem 0.55rem;border-radius:999px;background:rgba(107,114,128,0.12);color:#6b7280;font-size:0.7rem;font-weight:700;">Chưa key</span>';
 
         return `
-            <div class="order-card ${isSelected}" onclick="selectOrder('${order.key}')">
+            <div class="order-card ${isSelected}" data-order-key="${escapeHtml(order.key)}" role="button" tabindex="0">
                 <div class="order-meta">
-                    <div class="order-title">${order.theater} - Ghế ${order.seat}</div>
-                    <div class="order-subtitle">${order.customerName} • ${dateStr}</div>
-                    <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${order.totalPrice.toLocaleString('vi-VN')}đ</div>
+                    <div class="order-title">${escapeHtml(order.theater)} - Ghế ${escapeHtml(order.seat)}</div>
+                    <div class="order-subtitle">${escapeHtml(order.customerName)} • ${escapeHtml(dateStr)}</div>
+                    <div class="order-subtitle" style="font-weight: 700; color: var(--primary);">${escapeHtml(formatOrderAmount(order.totalPrice))}đ</div>
                     <div>${paymentBadge} ${keyedBadge} ${statusBadge}</div>
                 </div>
             </div>
@@ -1297,10 +1314,10 @@ function renderOrderDetails() {
 
     const dateStr = new Date(order.createdAt).toLocaleString('vi-VN');
 
-    let itemsHtml = order.items.map(item => `
+    let itemsHtml = (Array.isArray(order.items) ? order.items : []).map(item => `
         <div class="order-item-row">
-            <span>${item.name} <strong>x${item.quantity}</strong></span>
-            <span>${(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
+            <span>${escapeHtml(item.name)} <strong>x${escapeHtml(item.quantity)}</strong></span>
+            <span>${escapeHtml(formatOrderAmount(Number(item.price) * Number(item.quantity)))}đ</span>
         </div>
     `).join('');
 
@@ -1308,11 +1325,11 @@ function renderOrderDetails() {
     let cashAmountHtml = order.paymentMethod === 'cash' ? `
         <div class="detail-row">
             <span class="detail-label">Khách đưa:</span>
-            <span class="detail-value">${order.cashAmount.toLocaleString('vi-VN')}đ</span>
+            <span class="detail-value">${escapeHtml(formatOrderAmount(order.cashAmount))}đ</span>
         </div>
         <div class="detail-row">
             <span class="detail-label">Thối lại:</span>
-            <span class="detail-value" style="color: #22c55e;">${(order.cashAmount - order.totalPrice).toLocaleString('vi-VN')}đ</span>
+            <span class="detail-value" style="color: #22c55e;">${escapeHtml(formatOrderAmount(Number(order.cashAmount) - Number(order.totalPrice)))}đ</span>
         </div>
     ` : '';
 
@@ -1321,14 +1338,14 @@ function renderOrderDetails() {
     const actionsHtml = `
         <div class="order-actions-container" style="margin-top: 1rem; display: grid; gap: 0.75rem;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                <button class="btn-status-change ${keyButtonClass}" style="width: 100%;" onclick="toggleOrderKey('${selectedOrderId}')">${keyButtonLabel}</button>
-                <button class="btn-status-change" style="width: 100%;" onclick="copyOrder('${selectedOrderId}')">Copy đơn hàng</button>
+                <button class="btn-status-change ${keyButtonClass}" style="width: 100%;" data-order-action="toggle-key">${keyButtonLabel}</button>
+                <button class="btn-status-change" style="width: 100%;" data-order-action="copy">Copy đơn hàng</button>
             </div>
             ${order.status === 'done' ? `
                 <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25); cursor: default;" disabled>Đã giao thành công</button>
             ` : `
-                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25);" onclick="markOrderDone('${selectedOrderId}')">Done</button>
-                <button class="btn-status-change btn-status-cancel" style="width: 100%;" onclick="deleteOrder('${selectedOrderId}')">Xóa đơn hàng</button>
+                <button class="btn-status-change" style="width: 100%; background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25);" data-order-action="done">Done</button>
+                <button class="btn-status-change btn-status-cancel" style="width: 100%;" data-order-action="delete">Xóa đơn hàng</button>
             `}
         </div>
     `;
@@ -1337,27 +1354,27 @@ function renderOrderDetails() {
         <div class="order-detail-view">
             <div class="detail-row">
                 <span class="detail-label">Mã đơn:</span>
-                <span class="detail-value">${order.id}</span>
+                <span class="detail-value">${escapeHtml(order.id)}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Khách hàng:</span>
-                <span class="detail-value">${order.customerName}</span>
+                <span class="detail-value">${escapeHtml(order.customerName)}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Số điện thoại:</span>
-                <span class="detail-value">${order.customerPhone || 'Không có'}</span>
+                <span class="detail-value">${escapeHtml(order.customerPhone || 'Không có')}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Vị trí:</span>
-                <span class="detail-value">${order.theater} - Ghế ${order.seat}</span>
+                <span class="detail-value">${escapeHtml(order.theater)} - Ghế ${escapeHtml(order.seat)}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Ghi chú:</span>
-                <span class="detail-value">${order.note || 'Không có'}</span>
+                <span class="detail-value">${escapeHtml(order.note || 'Không có')}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Thời gian đặt:</span>
-                <span class="detail-value">${dateStr}</span>
+                <span class="detail-value">${escapeHtml(dateStr)}</span>
             </div>
             
             <div style="font-weight: 700; margin-top: 0.5rem;">Danh sách món đã đặt:</div>
@@ -1372,7 +1389,7 @@ function renderOrderDetails() {
             ${cashAmountHtml}
             <div class="detail-row" style="font-size: 1.1rem; border-top: 2px solid var(--primary); padding-top: 0.5rem;">
                 <span class="detail-label" style="font-weight: 700; color: var(--text-primary);">Tổng thanh toán:</span>
-                <span class="detail-value" style="font-size: 1.15rem; color: var(--primary); font-weight: 800;">${order.totalPrice.toLocaleString('vi-VN')}đ</span>
+                <span class="detail-value" style="font-size: 1.15rem; color: var(--primary); font-weight: 800;">${escapeHtml(formatOrderAmount(order.totalPrice))}đ</span>
             </div>
 
             ${actionsHtml}
@@ -2021,20 +2038,41 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCategories();
     loadCatalog();
     initOrdersListener();
+    const orderListContainer = document.getElementById('order-list-container');
+    orderListContainer?.addEventListener('click', event => {
+        const card = event.target.closest('[data-order-key]');
+        if (card && orderListContainer.contains(card)) {
+            selectOrder(card.dataset.orderKey);
+        }
+    });
+    orderListContainer?.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const card = event.target.closest('[data-order-key]');
+        if (card && orderListContainer.contains(card)) {
+            event.preventDefault();
+            selectOrder(card.dataset.orderKey);
+        }
+    });
+    const orderDetailsContainer = document.getElementById('order-details-container');
+    orderDetailsContainer?.addEventListener('click', event => {
+        const button = event.target.closest('[data-order-action]');
+        if (!button || !orderDetailsContainer.contains(button) || !selectedOrderId) return;
+
+        if (button.dataset.orderAction === 'toggle-key') toggleOrderKey(selectedOrderId);
+        else if (button.dataset.orderAction === 'copy') copyOrder(selectedOrderId);
+        else if (button.dataset.orderAction === 'done') markOrderDone(selectedOrderId);
+        else if (button.dataset.orderAction === 'delete') deleteOrder(selectedOrderId);
+    });
     loadTheaters();
     loadCinemaName();
     loadZaloLink();
     loadStoreStatus();
 
     document.getElementById('food-editor-form').addEventListener('submit', handleFormSubmit);
-
     document.getElementById('btn-cancel-edit').addEventListener('click', cancelEdit);
-
     document.getElementById('btn-reset-default').addEventListener('click', resetToDefault);
-
     document.getElementById('btn-popup-close').addEventListener('click', closePopup);
-    document.getElementById('popup-result').addEventListener('click', (e) => {
-        if (e.target.id === 'popup-result') closePopup();
+    document.getElementById('popup-result').addEventListener('click', event => {
+        if (event.target.id === 'popup-result') closePopup();
     });
 });
-
