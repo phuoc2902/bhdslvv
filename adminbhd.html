@@ -19,6 +19,8 @@
     <!-- Firebase SDK (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- ExcelJS for styled multi-sheet Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </head>
 <body>
 
@@ -187,9 +189,15 @@
                             </svg>
                             Đơn hàng hiện tại
                         </h2>
-                        <div class="store-status-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div class="store-status-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                             <span style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(34, 197, 94, 0.12); color: var(--primary); font-weight: 700; font-size: 0.85rem;">Tổng tiền: <span id="current-orders-total">0đ</span></span>
                             <span id="store-status-badge" style="padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">Đang tải...</span>
+                            <button id="btn-export-revenue" type="button" class="btn-reset" style="margin: 0; padding: 0.4rem 0.9rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.35rem; border-color: rgba(16, 185, 129, 0.35); color: #10b981;" onclick="openExportRevenueModal()">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Xuất Excel
+                            </button>
                             <button id="btn-open-day" class="btn-submit" style="margin: 0; padding: 0.4rem 1rem; width: auto; font-size: 0.9rem; display: none;" onclick="openDay()">Mở ca</button>
                             <button id="btn-close-day" class="btn-cancel" style="width: auto; margin: 0; padding: 0.4rem 1rem; font-size: 0.9rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); display: none;" onclick="closeDay()">Đóng ca</button>
                         </div>
@@ -306,6 +314,34 @@
 
     </main>
 
+    <!-- Export Revenue Excel Modal -->
+    <div class="popup-modal" id="modal-export-revenue">
+        <div class="popup-card" style="max-width: 460px; text-align: left;">
+            <h3 class="popup-title" style="margin-bottom: 0.35rem;">Xuất Báo Cáo Doanh Thu & Kho</h3>
+            <p class="popup-text" style="margin-bottom: 1.25rem;">Xuất file Excel (.xlsx) gồm 5 sheet: Tổng quan, Kế toán kho theo Combo, Chi tiết thành phần, Thống kê món và Danh sách đơn.</p>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" for="export-source-select">Nguồn dữ liệu</label>
+                <select id="export-source-select" class="form-control">
+                    <option value="current">Ca hiện tại (Đơn hàng đang mở)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label" for="export-status-filter">Trạng thái đơn hàng</label>
+                <select id="export-status-filter" class="form-control">
+                    <option value="all">Tất cả đơn hàng (Đã giao + Chờ giao)</option>
+                    <option value="done">Chỉ đơn Đã giao (Done)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" class="btn-cancel" style="width: auto; margin: 0; padding: 0.6rem 1.25rem;" onclick="closeExportRevenueModal()">Hủy</button>
+                <button type="button" id="btn-confirm-export-excel" class="btn-submit" style="width: auto; margin: 0; padding: 0.6rem 1.5rem;" onclick="exportRevenueExcel()">Tải file Excel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pop-up Alert Modal (Success/Failure) -->
     <div class="popup-modal" id="popup-result">
         <div class="popup-card">
@@ -324,6 +360,6 @@
     </footer>
 
     <!-- JS Logic -->
-    <script src="js/admin.js?v=2.0.2"></script>
+    <script src="js/admin.js?v=2.0.3"></script>
 </body>
 </html>

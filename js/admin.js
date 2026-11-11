@@ -2148,6 +2148,678 @@ async function testTelegramFromAdmin() {
     }
 }
 
+// ── Export Revenue & Warehouse Excel ──────────────────────────────
+const EXPORT_COMBO_SOURCES = [
+    { key: 'single_combo',  label: 'Single CB (1B+1N)' },
+    { key: 'couple_combo',  label: 'Couple CB (1B+2N)' },
+    { key: 'refresh_combo', label: 'Refresh CB (1B+1Aqf)' },
+    { key: 'combo_food',    label: 'Combo Food (1B+1N+1ĐN)' },
+    { key: 'single_zip',    label: 'Single Zip (1Túi+1N)' },
+    { key: 'couple_zip',    label: 'Couple Zip (1Túi+2N)' },
+    { key: 'xo_1',          label: 'Xách Xô 1 (1Xô+1N)' },
+    { key: 'xo_2',          label: 'Xách Xô 2 (1Xô+2N)' },
+    { key: 'thu_dong',      label: 'CB Thu Đông (1B+1LyĐM)' },
+    { key: 'retail',        label: 'Bán lẻ' }
+];
+
+const EXPORT_WAREHOUSE_MATERIALS = [
+    { matKey: 'box_popcorn',    label: 'Hộp bắp tiêu chuẩn (tất cả vị)', unit: 'Hộp' },
+    { matKey: 'zip_popcorn',    label: 'Túi bắp Zip 66oz', unit: 'Túi' },
+    { matKey: 'bucket_popcorn', label: 'Xô bắp thiết Hộ Linh', unit: 'Xô' },
+    { matKey: 'cup_soda',       label: 'Ly nước ngọt lớn (Pepsi/7Up/Mirinda/Lipton)', unit: 'Ly' },
+    { matKey: 'cup_color',      label: 'Ly Đổi Màu Hộ Linh', unit: 'Ly' },
+    { matKey: 'aquafina',       label: 'Aquafina (Chai)', unit: 'Chai' },
+    { matKey: 'bottle_39k',     label: 'Nước đóng chai / lon 39K', unit: 'Chai/Lon' },
+    { matKey: 'mojito',         label: 'Mojito Trái Cây', unit: 'Ly' },
+    { matKey: 'hot_food',       label: 'Thức ăn nóng (Gà vòng/Xúc xích/Khoai tây)', unit: 'Phần' }
+];
+
+function parseItemOptionDetails(item) {
+    const rawOpt = String(item.option || '').trim();
+    const getLabeled = (label) => {
+        const match = rawOpt.match(new RegExp(`${label}:\\s*([^,]+)`));
+        return match ? match[1].trim() : '';
+    };
+
+    const rawNoLabel = rawOpt.includes(':') ? '' : rawOpt;
+    const popcornFlavor = getLabeled('Bắp') || (/^(Ngọt|Phô mai|Caramel)$/i.test(rawNoLabel) ? rawNoLabel : '') || 'Ngọt';
+    const drinkType = getLabeled('Nước') || getLabeled('Loại') || getLabeled('Hương vị') || rawNoLabel || '';
+    const hotFood = getLabeled('Đồ ăn') || '';
+
+    return { popcornFlavor, drinkType, hotFood };
+}
+
+function decomposeOrderItemForExport(item) {
+    const itemId = Number(item.id);
+    const rawName = String(item.name || 'Món khác');
+    const cleanName = rawName.split(' (')[0].trim();
+    const { popcornFlavor, drinkType, hotFood } = parseItemOptionDetails(item);
+    const sodaLabel = drinkType || 'Pepsi';
+    const bottleLabel = drinkType || 'Chưa rõ loại';
+    const mojitoLabel = drinkType || 'Chưa rõ vị';
+    const hotFoodLabel = hotFood || 'Đồ ăn nóng';
+
+    let sourceKey = 'retail';
+    let sourceLabel = 'Bán lẻ';
+    let isCombo = false;
+    let components = [];
+
+    if (itemId === 5 || cleanName === 'Single Combo') {
+        sourceKey = 'single_combo';
+        sourceLabel = 'Single Combo';
+        isCombo = true;
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 6 || cleanName === 'Couple Combo') {
+        sourceKey = 'couple_combo';
+        sourceLabel = 'Couple Combo';
+        isCombo = true;
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 2 }
+        ];
+    } else if (itemId === 8 || cleanName === 'Refresh Combo') {
+        sourceKey = 'refresh_combo';
+        sourceLabel = 'Refresh Combo';
+        isCombo = true;
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 },
+            { matKey: 'aquafina', group: 'Nước Chai / Lon', matName: 'Aquafina 500ml', detail: 'Nước suối', unit: 'Chai', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 20 || cleanName === 'Combo Food') {
+        sourceKey = 'combo_food';
+        sourceLabel = 'Combo Food';
+        isCombo = true;
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 },
+            { matKey: 'hot_food', group: 'Thức Ăn Nóng', matName: 'Thức ăn nóng', detail: hotFoodLabel, unit: 'Phần', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 22 || /Single Zip/i.test(cleanName)) {
+        sourceKey = 'single_zip';
+        sourceLabel = 'Single Zip';
+        isCombo = true;
+        components = [
+            { matKey: 'zip_popcorn', group: 'Bắp Rang', matName: 'Túi Zip 66oz After C', detail: `Vị ${popcornFlavor}`, unit: 'Túi', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 24 || /Couple Zip/i.test(cleanName)) {
+        sourceKey = 'couple_zip';
+        sourceLabel = 'Couple Zip';
+        isCombo = true;
+        components = [
+            { matKey: 'zip_popcorn', group: 'Bắp Rang', matName: 'Túi Zip 66oz After C', detail: `Vị ${popcornFlavor}`, unit: 'Túi', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 2 }
+        ];
+    } else if (itemId === 25 || /Xách Xô 1/i.test(cleanName)) {
+        sourceKey = 'xo_1';
+        sourceLabel = 'Xách Xô 1';
+        isCombo = true;
+        components = [
+            { matKey: 'bucket_popcorn', group: 'Bắp Rang', matName: 'Xô Bắp Thiết Hộ Linh', detail: `Vị ${popcornFlavor}`, unit: 'Xô', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 27 || /Xách Xô 2/i.test(cleanName)) {
+        sourceKey = 'xo_2';
+        sourceLabel = 'Xách Xô 2';
+        isCombo = true;
+        components = [
+            { matKey: 'bucket_popcorn', group: 'Bắp Rang', matName: 'Xô Bắp Thiết Hộ Linh', detail: `Vị ${popcornFlavor}`, unit: 'Xô', qtyPerUnit: 1 },
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 2 }
+        ];
+    } else if (itemId === 26 || /Thu Đông/i.test(cleanName)) {
+        sourceKey = 'thu_dong';
+        sourceLabel = 'CB Thu Đông';
+        isCombo = true;
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 },
+            { matKey: 'cup_color', group: 'Ly Đặc Biệt', matName: 'Ly Đổi Màu Hộ Linh', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 1 || cleanName === 'Bắp Rang') {
+        components = [
+            { matKey: 'box_popcorn', group: 'Bắp Rang', matName: 'Hộp bắp tiêu chuẩn', detail: `Vị ${popcornFlavor}`, unit: 'Hộp', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 21 || /Sweet Zip/i.test(cleanName)) {
+        components = [
+            { matKey: 'zip_popcorn', group: 'Bắp Rang', matName: 'Túi Zip 66oz After C', detail: `Vị ${popcornFlavor}`, unit: 'Túi', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 28 || /Hộp Bắp Thiết|Bucket/i.test(cleanName)) {
+        components = [
+            { matKey: 'bucket_popcorn', group: 'Bắp Rang', matName: 'Xô Bắp Thiết Hộ Linh', detail: `Vị ${popcornFlavor}`, unit: 'Xô', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 9 || /Nước Ngọt Ly/i.test(cleanName)) {
+        components = [
+            { matKey: 'cup_soda', group: 'Nước Ngọt Ly', matName: 'Nước ngọt ly lớn', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 23 || /Ly Đổi Màu/i.test(cleanName)) {
+        components = [
+            { matKey: 'cup_color', group: 'Ly Đặc Biệt', matName: 'Ly Đổi Màu Hộ Linh', detail: sodaLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 10 || /Aquafina/i.test(cleanName)) {
+        components = [
+            { matKey: 'aquafina', group: 'Nước Chai / Lon', matName: 'Aquafina 500ml', detail: 'Nước suối', unit: 'Chai', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 11 || /Đóng Chai/i.test(cleanName)) {
+        components = [
+            { matKey: 'bottle_39k', group: 'Nước Chai / Lon', matName: 'Nước đóng chai / lon 39K', detail: bottleLabel, unit: 'Chai/Lon', qtyPerUnit: 1 }
+        ];
+    } else if (itemId === 15 || /Mojito/i.test(cleanName)) {
+        components = [
+            { matKey: 'mojito', group: 'Pha Chế', matName: 'Mojito Trái Cây', detail: mojitoLabel, unit: 'Ly', qtyPerUnit: 1 }
+        ];
+    } else {
+        components = [
+            { matKey: `custom_${itemId || cleanName}`, group: 'Món khác', matName: cleanName, detail: item.option || 'Mặc định', unit: 'Phần', qtyPerUnit: 1 }
+        ];
+    }
+
+    const catalogMatch = (typeof foodCatalog !== 'undefined' ? foodCatalog : []).find(f => Number(f.id) === itemId)
+        || DEFAULT_FOOD_CATALOG.find(f => Number(f.id) === itemId);
+    const hasPaidFlavor = popcornFlavor === 'Phô mai' || popcornFlavor === 'Caramel';
+    const unitPrice = Number(item.price) || 0;
+    const basePrice = catalogMatch ? Number(catalogMatch.price) : unitPrice;
+    const surchargePerUnit = hasPaidFlavor
+        ? Math.max(0, unitPrice > basePrice ? unitPrice - basePrice : 15000)
+        : 0;
+
+    return { sourceKey, sourceLabel, isCombo, components, surchargePerUnit, baseUnitPrice: unitPrice - surchargePerUnit, cleanName };
+}
+
+function buildRevenueReportData(orderList) {
+    const summary = {
+        orderCount: orderList.length,
+        doneCount: 0,
+        pendingCount: 0,
+        totalRevenue: 0,
+        momoCount: 0,
+        momoTotal: 0,
+        cashCount: 0,
+        cashTotal: 0,
+        surchargeCount: 0,
+        surchargeTotal: 0,
+        byTheater: {}
+    };
+
+    const comboSoldCounts = {};
+    EXPORT_COMBO_SOURCES.forEach(s => { comboSoldCounts[s.key] = 0; });
+
+    const matrixCounts = {};
+    const customMaterials = [];
+    EXPORT_WAREHOUSE_MATERIALS.forEach(m => {
+        matrixCounts[m.matKey] = {};
+        EXPORT_COMBO_SOURCES.forEach(s => { matrixCounts[m.matKey][s.key] = 0; });
+    });
+
+    const detailMap = new Map();
+    const menuMap = new Map();
+    const orderRows = [];
+
+    orderList.forEach(order => {
+        const total = Number(order.totalPrice) || 0;
+        summary.totalRevenue += total;
+
+        if (order.status === 'done') summary.doneCount++;
+        else summary.pendingCount++;
+
+        if (order.paymentMethod === 'cash') {
+            summary.cashCount++;
+            summary.cashTotal += total;
+        } else {
+            summary.momoCount++;
+            summary.momoTotal += total;
+        }
+
+        const theaterName = order.theater || 'Khác';
+        if (!summary.byTheater[theaterName]) {
+            summary.byTheater[theaterName] = { count: 0, revenue: 0 };
+        }
+        summary.byTheater[theaterName].count++;
+        summary.byTheater[theaterName].revenue += total;
+
+        const items = Array.isArray(order.items) ? order.items : [];
+        const orderItemLabels = [];
+        const orderCompTotals = new Map();
+
+        items.forEach(item => {
+            const qty = Number(item.quantity) || 1;
+            const unitPrice = Number(item.price) || 0;
+            const lineRevenue = unitPrice * qty;
+            const info = decomposeOrderItemForExport(item);
+
+            const optDisplay = item.option ? ` (${item.option})` : '';
+            orderItemLabels.push(`${info.cleanName}${optDisplay} x${qty}`);
+
+            comboSoldCounts[info.sourceKey] = (comboSoldCounts[info.sourceKey] || 0) + qty;
+
+            if (info.surchargePerUnit > 0) {
+                summary.surchargeCount += qty;
+                summary.surchargeTotal += info.surchargePerUnit * qty;
+            }
+
+            const menuKey = `${item.id || info.cleanName}`;
+            if (!menuMap.has(menuKey)) {
+                menuMap.set(menuKey, {
+                    id: item.id || '-',
+                    name: info.cleanName,
+                    qty: 0,
+                    baseTotal: 0,
+                    surchargeTotal: 0,
+                    revenue: 0
+                });
+            }
+            const mEntry = menuMap.get(menuKey);
+            mEntry.qty += qty;
+            mEntry.baseTotal += info.baseUnitPrice * qty;
+            mEntry.surchargeTotal += info.surchargePerUnit * qty;
+            mEntry.revenue += lineRevenue;
+
+            info.components.forEach(comp => {
+                const totalCompQty = qty * comp.qtyPerUnit;
+
+                if (!matrixCounts[comp.matKey]) {
+                    matrixCounts[comp.matKey] = {};
+                    EXPORT_COMBO_SOURCES.forEach(s => { matrixCounts[comp.matKey][s.key] = 0; });
+                    customMaterials.push({ matKey: comp.matKey, label: comp.matName, unit: comp.unit });
+                }
+                matrixCounts[comp.matKey][info.sourceKey] += totalCompQty;
+
+                const dKey = `${comp.group}|${comp.matName}|${comp.detail}|${comp.unit}`;
+                if (!detailMap.has(dKey)) {
+                    detailMap.set(dKey, {
+                        group: comp.group,
+                        matName: comp.matName,
+                        detail: comp.detail,
+                        unit: comp.unit,
+                        fromCombo: 0,
+                        fromRetail: 0,
+                        total: 0,
+                        sourceCounts: {}
+                    });
+                }
+                const dEntry = detailMap.get(dKey);
+                if (info.isCombo) dEntry.fromCombo += totalCompQty;
+                else dEntry.fromRetail += totalCompQty;
+                dEntry.total += totalCompQty;
+                dEntry.sourceCounts[info.sourceLabel] = (dEntry.sourceCounts[info.sourceLabel] || 0) + totalCompQty;
+
+                const ocKey = `${comp.matName} (${comp.detail})`;
+                orderCompTotals.set(ocKey, (orderCompTotals.get(ocKey) || 0) + totalCompQty);
+            });
+        });
+
+        const compSummary = Array.from(orderCompTotals.entries())
+            .map(([k, v]) => `${v} ${k}`)
+            .join(', ');
+
+        orderRows.push({
+            id: order.id || '',
+            createdAt: order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : '',
+            theaterSeat: `${order.theater || ''} - ${order.seat || ''}`,
+            customerName: order.customerName || 'Khách vô danh',
+            customerPhone: order.customerPhone || '',
+            itemsText: orderItemLabels.join('; '),
+            componentsText: compSummary,
+            paymentText: order.paymentMethod === 'cash' ? 'Tiền mặt' : 'Chuyển khoản / MoMo',
+            statusText: order.status === 'done' ? 'Đã giao' : 'Chờ giao',
+            keyText: order.keyed ? 'Đã key' : 'Chưa key',
+            totalPrice: total,
+            note: order.note || ''
+        });
+    });
+
+    const detailRows = Array.from(detailMap.values()).sort((a, b) => {
+        if (a.group !== b.group) return a.group.localeCompare(b.group, 'vi');
+        if (a.matName !== b.matName) return a.matName.localeCompare(b.matName, 'vi');
+        return b.total - a.total;
+    });
+
+    const menuRows = Array.from(menuMap.values()).sort((a, b) => b.revenue - a.revenue);
+
+    return {
+        summary,
+        comboSoldCounts,
+        allMaterials: [...EXPORT_WAREHOUSE_MATERIALS, ...customMaterials],
+        matrixCounts,
+        detailRows,
+        menuRows,
+        orderRows
+    };
+}
+
+function styleExcelBanner(sheet, title, subtitle, colCount) {
+    const lastCol = sheet.getColumn(colCount).letter;
+    sheet.addRow([title]);
+    sheet.mergeCells(`A1:${lastCol}1`);
+    const r1 = sheet.getRow(1);
+    r1.height = 28;
+    r1.getCell(1).font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+    r1.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF065F46' } };
+    r1.getCell(1).alignment = { horizontal: 'left', vertical: 'center' };
+
+    sheet.addRow([subtitle]);
+    sheet.mergeCells(`A2:${lastCol}2`);
+    const r2 = sheet.getRow(2);
+    r2.height = 18;
+    r2.getCell(1).font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF4B5563' } };
+
+    sheet.addRow([]);
+}
+
+function styleExcelHeaderRow(row) {
+    row.height = 26;
+    row.eachCell(cell => {
+        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF047857' } };
+        cell.alignment = { horizontal: 'center', vertical: 'center', wrapText: true };
+        cell.border = {
+            top: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            left: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            right: { style: 'thin', color: { argb: 'FFD1D5DB' } }
+        };
+    });
+}
+
+function styleExcelDataRow(row, { bold = false, fillHex = null, centerCols = [], numCols = [], pctCols = [] } = {}) {
+    row.eachCell({ includeEmpty: true }, (cell, colIdx) => {
+        cell.font = { name: 'Calibri', size: 11, bold };
+        if (fillHex) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillHex } };
+        }
+        cell.border = {
+            top: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            left: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+            right: { style: 'thin', color: { argb: 'FFD1D5DB' } }
+        };
+        if (numCols.includes(colIdx)) {
+            cell.numFmt = '#,##0';
+            cell.alignment = { horizontal: 'right', vertical: 'center' };
+        } else if (pctCols.includes(colIdx)) {
+            cell.numFmt = '0.0%';
+            cell.alignment = { horizontal: 'right', vertical: 'center' };
+        } else if (centerCols.includes(colIdx)) {
+            cell.alignment = { horizontal: 'center', vertical: 'center', wrapText: true };
+        } else {
+            cell.alignment = { horizontal: 'left', vertical: 'center', wrapText: true };
+        }
+    });
+}
+
+async function openExportRevenueModal() {
+    const modal = document.getElementById('modal-export-revenue');
+    const select = document.getElementById('export-source-select');
+    if (!modal || !select) return;
+
+    select.innerHTML = '<option value="current">Ca hiện tại (Đơn hàng đang mở)</option>';
+
+    if (database) {
+        try {
+            const snap = await database.ref('revenue').once('value');
+            const revData = snap.val();
+            if (revData && typeof revData === 'object') {
+                const dates = Object.keys(revData).sort((a, b) => b.localeCompare(a));
+                if (dates.length > 0) {
+                    const allOpt = document.createElement('option');
+                    allOpt.value = 'all_history';
+                    allOpt.textContent = `Tất cả lịch sử (${dates.length} ngày đã đóng + Ca hiện tại)`;
+                    select.appendChild(allOpt);
+
+                    dates.forEach(dateStr => {
+                        const count = revData[dateStr] ? Object.keys(revData[dateStr]).length : 0;
+                        const opt = document.createElement('option');
+                        opt.value = `date:${dateStr}`;
+                        opt.textContent = `Ngày ${dateStr} (${count} đơn đã đóng ca)`;
+                        select.appendChild(opt);
+                    });
+                }
+            }
+        } catch (err) {
+            console.warn('Không tải được danh sách ngày doanh thu:', err);
+        }
+    }
+
+    modal.classList.add('open');
+}
+
+function closeExportRevenueModal() {
+    const modal = document.getElementById('modal-export-revenue');
+    if (modal) modal.classList.remove('open');
+}
+
+async function exportRevenueExcel() {
+    if (typeof ExcelJS === 'undefined') {
+        showPopup('Thiếu thư viện Excel', 'Không tải được thư viện ExcelJS từ CDN. Vui lòng kiểm tra kết nối mạng và tải lại trang.', false);
+        return;
+    }
+
+    const selectEl = document.getElementById('export-source-select');
+    const statusEl = document.getElementById('export-status-filter');
+    const btnConfirm = document.getElementById('btn-confirm-export-excel');
+    const sourceVal = selectEl ? selectEl.value : 'current';
+    const statusFilter = statusEl ? statusEl.value : 'all';
+
+    const originalText = btnConfirm ? btnConfirm.textContent : 'Tải file Excel';
+    if (btnConfirm) {
+        btnConfirm.disabled = true;
+        btnConfirm.textContent = 'Đang tạo Excel...';
+    }
+
+    try {
+        let rawOrders = [];
+        let sourceTitle = 'Ca hiện tại';
+        let fileTag = currentBusinessDate || new Date().toISOString().split('T')[0];
+
+        if (sourceVal === 'current') {
+            rawOrders = Object.values(orders || {});
+            sourceTitle = `Ca hiện tại (${fileTag})`;
+        } else if (sourceVal === 'all_history') {
+            rawOrders = [...Object.values(orders || {})];
+            if (database) {
+                const snap = await database.ref('revenue').once('value');
+                const revData = snap.val() || {};
+                Object.values(revData).forEach(dayMap => {
+                    if (dayMap && typeof dayMap === 'object') {
+                        rawOrders.push(...Object.values(dayMap));
+                    }
+                });
+            }
+            sourceTitle = 'Tổng hợp tất cả các ngày + Ca hiện tại';
+            fileTag = 'Tong_Hop';
+        } else if (sourceVal.startsWith('date:')) {
+            const dateStr = sourceVal.slice(5);
+            fileTag = dateStr;
+            sourceTitle = `Ngày đã đóng ca: ${dateStr}`;
+            if (database) {
+                const snap = await database.ref(`revenue/${dateStr}`).once('value');
+                const dayMap = snap.val() || {};
+                rawOrders = Object.values(dayMap);
+            }
+        }
+
+        const filteredOrders = rawOrders
+            .filter(o => o && (statusFilter === 'all' || o.status === 'done'))
+            .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+
+        if (filteredOrders.length === 0) {
+            showPopup('Không có dữ liệu', 'Không có đơn hàng nào khớp với lựa chọn để xuất Excel.', false);
+            return;
+        }
+
+        const report = buildRevenueReportData(filteredOrders);
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = currentCinemaName;
+        workbook.created = new Date();
+
+        const exportTimeStr = new Date().toLocaleString('vi-VN');
+        const filterLabel = statusFilter === 'done' ? 'Chỉ đơn Đã giao' : 'Tất cả đơn';
+        const subtitle = `Nguồn: ${sourceTitle} | Lọc: ${filterLabel} | Xuất lúc: ${exportTimeStr}`;
+
+        // ── Sheet 1: Tong_Quan ────────────────────────────────────
+        const s1 = workbook.addWorksheet('Tong_Quan');
+        s1.columns = [{ width: 34 }, { width: 16 }, { width: 22 }, { width: 34 }];
+        styleExcelBanner(s1, `BÁO CÁO DOANH THU - ${currentCinemaName.toUpperCase()}`, subtitle, 4);
+
+        const s1H1 = s1.addRow(['Chỉ tiêu tổng hợp', 'Số lượng', 'Giá trị (VNĐ)', 'Ghi chú']);
+        styleExcelHeaderRow(s1H1);
+
+        const rev = report.summary.totalRevenue || 1;
+        const s1Rows = [
+            ['Tổng số đơn hàng', report.summary.orderCount, report.summary.totalRevenue, `${report.summary.doneCount} đã giao, ${report.summary.pendingCount} chờ giao`],
+            ['Thanh toán Chuyển khoản / MoMo', report.summary.momoCount, report.summary.momoTotal, `Chiếm ${((report.summary.momoTotal / rev) * 100).toFixed(1)}% doanh thu`],
+            ['Thanh toán Tiền mặt', report.summary.cashCount, report.summary.cashTotal, `Chiếm ${((report.summary.cashTotal / rev) * 100).toFixed(1)}% doanh thu`],
+            ['Tổng phụ thu đổi vị (+15K)', report.summary.surchargeCount, report.summary.surchargeTotal, 'Phô mai / Caramel'],
+            ['TỔNG DOANH THU', report.summary.orderCount, report.summary.totalRevenue, 'Khớp tổng tiền toàn bộ đơn']
+        ];
+        s1Rows.forEach((vals, idx) => {
+            const r = s1.addRow(vals);
+            const isTotal = idx === s1Rows.length - 1;
+            styleExcelDataRow(r, { bold: isTotal, fillHex: isTotal ? 'FFD1FAE5' : null, numCols: [2, 3] });
+        });
+
+        s1.addRow([]);
+        const s1H2 = s1.addRow(['Doanh thu theo Rạp chiếu', 'Số đơn', 'Doanh thu (VNĐ)', 'Tỷ trọng']);
+        styleExcelHeaderRow(s1H2);
+
+        const theaterNames = Array.from(new Set([...ALL_THEATERS, ...Object.keys(report.summary.byTheater)]));
+        theaterNames.forEach(tName => {
+            const info = report.summary.byTheater[tName] || { count: 0, revenue: 0 };
+            const r = s1.addRow([tName, info.count, info.revenue, report.summary.totalRevenue > 0 ? info.revenue / report.summary.totalRevenue : 0]);
+            styleExcelDataRow(r, { centerCols: [1], numCols: [2, 3], pctCols: [4] });
+        });
+        const s1TotalR = s1.addRow(['TỔNG CỘNG', report.summary.orderCount, report.summary.totalRevenue, 1]);
+        styleExcelDataRow(s1TotalR, { bold: true, fillHex: 'FFD1FAE5', numCols: [2, 3], pctCols: [4] });
+
+        // ── Sheet 2: Ke_Toan_Kho (Matrix theo Combo) ──────────────
+        const s2 = workbook.addWorksheet('Ke_Toan_Kho');
+        const totalColsS2 = 2 + EXPORT_COMBO_SOURCES.length + 1;
+        s2.columns = [
+            { width: 36 },
+            { width: 10 },
+            ...EXPORT_COMBO_SOURCES.map(() => ({ width: 14 })),
+            { width: 16 }
+        ];
+        styleExcelBanner(s2, 'BẢNG KẾ TOÁN KHO: XUẤT VẬT TƯ THEO TỪNG COMBO & BÁN LẺ', subtitle, totalColsS2);
+
+        const s2Header = s2.addRow([
+            'Vật tư / Thành phần kho',
+            'ĐVT',
+            ...EXPORT_COMBO_SOURCES.map(s => s.label),
+            'TỔNG XUẤT KHO'
+        ]);
+        styleExcelHeaderRow(s2Header);
+
+        const matrixNumCols = Array.from({ length: totalColsS2 - 2 }, (_, i) => i + 3);
+
+        // Reference row: how many combos of each type were sold
+        const comboQtyRow = s2.addRow([
+            'Số lượng Combo / Món bán ra (tham chiếu)',
+            'Phần',
+            ...EXPORT_COMBO_SOURCES.map(s => report.comboSoldCounts[s.key] || 0),
+            EXPORT_COMBO_SOURCES.reduce((sum, s) => sum + (report.comboSoldCounts[s.key] || 0), 0)
+        ]);
+        styleExcelDataRow(comboQtyRow, { bold: true, fillHex: 'FFF3F4F6', centerCols: [2], numCols: matrixNumCols });
+
+        report.allMaterials.forEach(mat => {
+            const rowCounts = report.matrixCounts[mat.matKey] || {};
+            const vals = EXPORT_COMBO_SOURCES.map(s => rowCounts[s.key] || 0);
+            const rowSum = vals.reduce((a, b) => a + b, 0);
+            const r = s2.addRow([mat.label, mat.unit, ...vals, rowSum]);
+            styleExcelDataRow(r, { centerCols: [2], numCols: matrixNumCols });
+            const sumCell = r.getCell(totalColsS2);
+            sumCell.font = { name: 'Calibri', size: 11, bold: true };
+            sumCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+        });
+
+        // ── Sheet 3: Chi_Tiet_Thanh_Phan (Từng vị / loại nước) ────
+        const s3 = workbook.addWorksheet('Chi_Tiet_Thanh_Phan');
+        s3.columns = [
+            { width: 6 }, { width: 16 }, { width: 24 }, { width: 22 },
+            { width: 10 }, { width: 13 }, { width: 12 }, { width: 16 }, { width: 42 }
+        ];
+        styleExcelBanner(s3, 'CHI TIẾT THÀNH PHẦN THEO TỪNG VỊ BẮP & LOẠI NƯỚC', subtitle, 9);
+
+        const s3Header = s3.addRow(['STT', 'Nhóm', 'Thành phần', 'Vị / Loại chi tiết', 'ĐVT', 'Từ Combo', 'Bán lẻ', 'Tổng xuất kho', 'Phân bổ theo nguồn']);
+        styleExcelHeaderRow(s3Header);
+
+        report.detailRows.forEach((d, i) => {
+            const sourceStr = Object.entries(d.sourceCounts)
+                .map(([src, cnt]) => `${cnt} ${src}`)
+                .join(', ');
+            const r = s3.addRow([i + 1, d.group, d.matName, d.detail, d.unit, d.fromCombo, d.fromRetail, d.total, sourceStr]);
+            styleExcelDataRow(r, { centerCols: [1, 5], numCols: [6, 7, 8] });
+            const totalCell = r.getCell(8);
+            totalCell.font = { name: 'Calibri', size: 11, bold: true };
+            totalCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+        });
+
+        // ── Sheet 4: Thong_Ke_Theo_Mon ────────────────────────────
+        const s4 = workbook.addWorksheet('Thong_Ke_Theo_Mon');
+        s4.columns = [{ width: 6 }, { width: 8 }, { width: 40 }, { width: 14 }, { width: 18 }, { width: 20 }, { width: 20 }];
+        styleExcelBanner(s4, 'THỐNG KÊ DOANH THU THEO MÓN / COMBO', subtitle, 7);
+
+        const s4Header = s4.addRow(['STT', 'ID', 'Tên món / Combo', 'Số lượng', 'Tiền gốc (VNĐ)', 'Phụ thu vị (VNĐ)', 'Thành tiền (VNĐ)']);
+        styleExcelHeaderRow(s4Header);
+
+        let sumQty = 0, sumBase = 0, sumSur = 0, sumRev = 0;
+        report.menuRows.forEach((m, i) => {
+            sumQty += m.qty;
+            sumBase += m.baseTotal;
+            sumSur += m.surchargeTotal;
+            sumRev += m.revenue;
+            const r = s4.addRow([i + 1, m.id, m.name, m.qty, m.baseTotal, m.surchargeTotal, m.revenue]);
+            styleExcelDataRow(r, { centerCols: [1, 2], numCols: [4, 5, 6, 7] });
+        });
+        const s4Total = s4.addRow(['', '', 'TỔNG CỘNG', sumQty, sumBase, sumSur, sumRev]);
+        styleExcelDataRow(s4Total, { bold: true, fillHex: 'FFD1FAE5', numCols: [4, 5, 6, 7] });
+
+        // ── Sheet 5: Danh_Sach_Don_Hang ───────────────────────────
+        const s5 = workbook.addWorksheet('Danh_Sach_Don_Hang');
+        s5.columns = [
+            { width: 6 }, { width: 18 }, { width: 20 }, { width: 15 }, { width: 18 },
+            { width: 14 }, { width: 42 }, { width: 36 }, { width: 20 }, { width: 12 }, { width: 12 }, { width: 16 }, { width: 24 }
+        ];
+        styleExcelBanner(s5, 'CHI TIẾT DANH SÁCH ĐƠN HÀNG', subtitle, 13);
+
+        const s5Header = s5.addRow(['STT', 'Mã đơn', 'Thời gian đặt', 'Rạp - Ghế', 'Khách hàng', 'SĐT', 'Món đã đặt', 'Thành phần quy đổi', 'Thanh toán', 'Trạng thái', 'Key đơn', 'Tổng tiền (VNĐ)', 'Ghi chú']);
+        styleExcelHeaderRow(s5Header);
+
+        report.orderRows.forEach((o, i) => {
+            const r = s5.addRow([
+                i + 1, o.id, o.createdAt, o.theaterSeat, o.customerName, o.customerPhone,
+                o.itemsText, o.componentsText, o.paymentText, o.statusText, o.keyText, o.totalPrice, o.note
+            ]);
+            styleExcelDataRow(r, { centerCols: [1, 2, 4, 6, 10, 11], numCols: [12] });
+        });
+        const s5Total = s5.addRow(['', '', '', '', '', '', '', '', '', '', 'TỔNG CỘNG', report.summary.totalRevenue, '']);
+        styleExcelDataRow(s5Total, { bold: true, fillHex: 'FFD1FAE5', numCols: [12] });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `BaoCao_DoanhThu_BHDS_${fileTag}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        closeExportRevenueModal();
+        showPopup('Xuất Excel thành công!', `Đã tải xuống báo cáo (${filteredOrders.length} đơn hàng, 5 sheet chi tiết).`, true);
+    } catch (err) {
+        console.error('Lỗi xuất Excel:', err);
+        showPopup('Lỗi xuất Excel', 'Không thể tạo file báo cáo: ' + err.message, false);
+    } finally {
+        if (btnConfirm) {
+            btnConfirm.disabled = false;
+            btnConfirm.textContent = originalText;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadCategories();
     loadCatalog();
@@ -2190,4 +2862,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('popup-result').addEventListener('click', event => {
         if (event.target.id === 'popup-result') closePopup();
     });
+    const exportModal = document.getElementById('modal-export-revenue');
+    if (exportModal) {
+        exportModal.addEventListener('click', event => {
+            if (event.target.id === 'modal-export-revenue') closeExportRevenueModal();
+        });
+    }
 });
