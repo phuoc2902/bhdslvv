@@ -143,7 +143,7 @@ Trước mỗi lần `git push`, hãy kiểm tra checklist sau:
 ## 🔥 QUY TẮC 8 — Khi thêm/xóa món ăn, nhớ cập nhật bảng `SHORT_NAMES`
 
 ### Vị trí
-File: `js/index.js` — hàm `buildOrderDiscordPayload()` — khoảng dòng 880–888.
+File: `js/index.js` — hàm `buildOrderTelegramMessage()` — khoảng dòng 930–950.
 
 ```js
 const SHORT_NAMES = {
@@ -160,7 +160,7 @@ const SHORT_NAMES = {
 
 **Khi THÊM món mới:**
 - Bảng có **fallback tự động**: nếu ID chưa có trong `SHORT_NAMES`, hệ thống tự lấy phần tên trước dấu `(` đầu tiên.
-  - Ví dụ: `"Gà Rán Giòn (Spicy)"` → tự hiển thị `Gà Rán Giòn` trong thông báo Discord.
+  - Ví dụ: `"Gà Rán Giòn (Spicy)"` → tự hiển thị `Gà Rán Giòn` trong thông báo Telegram.
 - Nếu tên fallback **quá dài hoặc không rõ ràng**, hãy thêm thủ công vào bảng:
   ```js
   29: 'Gà Rán'   // thêm dòng mới với ID mới

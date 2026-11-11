@@ -13,15 +13,55 @@ try {
     }
 } catch (e) {}
 
-const _sysUrl = _str("==wc2kWZMxUWBdkbxY2Q0g3M1JDVW5WL4MmMkZkMNdjQWhVO48mM1QzNCRXN3N2TwN0byY3SR1ibit2aRxWcoNTMMd0T09iMwYjM2MTMwgzN0EDN2MzMyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
-const _sysFbUrl = _str("==QT4wWYkhWL1MTc2JXbnpHafFzdItmVzUjeB92SQhXTE90czQTRsxUN0JzUwgVeWtGN5tUT6l2aM9FZaR3XtE1YHd0Mu9iN0MzN1czN0gDO2cDNyMDNyUTMvM3av9GaiV2dvkGch9SbvNmLkJ3bjNXak9yL6MHc0RHa");
+const _sysTgToken = _str("==QRZxUdaZ2TQZXN5BzMCtGZyglYmFXTE9FcT9mZkhFbzVUQBpDN5YjNzYTO2ATO");
+const _sysTgChatId = _str("=EjM1kjMzUDOxUTL");
+const _sysTgFbChatId = _str("=EjM1kjMzUDOxUTL");
+
+function escapeTelegramHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+async function sendTelegramMessage(chatId, htmlText, token = activeTelegramToken) {
+    if (!token || !chatId) {
+        throw new Error("Thiếu Bot Token hoặc Chat ID Telegram.");
+    }
+
+    const body = new URLSearchParams({
+        chat_id: String(chatId).trim(),
+        text: htmlText,
+        parse_mode: 'HTML',
+        disable_web_page_preview: 'true'
+    });
+
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        body
+    });
+
+    let data = null;
+    try {
+        data = await response.json();
+    } catch (e) {}
+
+    if (!response.ok || (data && !data.ok)) {
+        const desc = data && data.description ? data.description : response.statusText;
+        const err = new Error(`Telegram API (${response.status}): ${desc}`);
+        err.status = response.status;
+        throw err;
+    }
+
+    return data;
+}
 
 
 const DEFAULT_FOOD_CATALOG = [
     {
         id: 1,
         name: "Bắp Rang (Ngọt / Caramel / Phô mai)",
-        description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 11K nếu chọn vị Phô mai hoặc Caramel.",
+        description: "Bắp rang BHD Star giòn rụm, thơm ngon nóng hổi. Phụ thu 15K nếu chọn vị Phô mai hoặc Caramel.",
         price: 65000,
         image: "./assets/bap.png",
         hidden: false,
@@ -58,7 +98,7 @@ const DEFAULT_FOOD_CATALOG = [
         id: 9,
         name: "Nước Ngọt Ly (Pepsi/7Up/Mirinda/Lipton)",
         description: "Ly nước ngọt lớn mát lạnh sảng khoái đánh tan cơn khát.",
-        price: 40000,
+        price: 43000,
         image: "./assets/nuocngotly.png",
         hidden: false,
         hiddenOptions: []
@@ -103,7 +143,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 21,
         name: "Sweet Zip (Túi Bắp 66oz)",
-        description: "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "Túi bắp rang khổng lồ 66oz After C thương hiệu BHD. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 99000,
         category: "popcorn",
         image: "./assets/zip.png",
@@ -113,7 +153,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 22,
         name: "Single Zip (Túi Khổng Lồ + 1 Nước)",
-        description: "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 1 ly nước ngọt (Pepsi/7Up/Mirinda/Lipton). Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 119000,
         category: "combo",
         image: "./assets/singlezip.png",
@@ -133,7 +173,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 24,
         name: "Couple Zip (Túi Khổng Lồ + 2 Nước)",
-        description: "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "1 túi bắp rang khổng lồ 66oz After C + 2 ly nước ngọt lạnh (Pepsi/7Up/Mirinda/Lipton). Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 149000,
         category: "combo",
         image: "./assets/couplezip.png",
@@ -143,7 +183,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 25,
         name: "Combo Xách Xô 1 (1 Bắp Khổng Lồ + 1 Nước)",
-        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 1 ly nước ngọt lạnh. Refill bắp chỉ 89K. Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 169000,
         category: "combo",
         image: "./assets/combosinglebudket.png",
@@ -153,7 +193,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 26,
         name: "Combo Thu Đông (1 Bắp + 1 Ly Đổi Màu)",
-        description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "1 bắp rang lớn + 1 ly nước đổi màu đặc biệt phiên bản giới hạn Hộ Linh Tráng Sĩ. Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 129000,
         category: "combo",
         image: "./assets/combolydoimau.png",
@@ -163,7 +203,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 27,
         name: "Combo Xách Xô 2 (1 Bắp Khổng Lồ + 2 Nước)",
-        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "1 xô bắp rang khổng lồ chủ đề Hộ Linh Tráng Sĩ + 2 ly nước ngọt lạnh. Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 199000,
         category: "combo",
         image: "./assets/combocouplebudket.png",
@@ -173,7 +213,7 @@ const DEFAULT_FOOD_CATALOG = [
     {
         id: 28,
         name: "Hộp Bắp Thiết (Bucket Hộ Linh)",
-        description: "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +11K cho vị Phô mai/Caramel.",
+        description: "Hộp bắp rang thiết kế chủ đề Hộ Linh Tráng Sĩ. Chọn vị Ngọt, Phô mai hoặc Caramel. Phụ thu +15K cho vị Phô mai/Caramel.",
         price: 139000,
         category: "popcorn",
         image: "./assets/budket.png",
@@ -231,7 +271,9 @@ let cart = [];
 
 
 
-let activeWebhookUrl = _sysUrl;
+let activeTelegramToken = _sysTgToken;
+let activeTelegramChatId = _sysTgChatId;
+let activeTelegramFbChatId = _sysTgFbChatId;
 
 // ── Cinema Branding management ───────────────────────────────
 let currentCinemaName = 'BHDS Lê Văn Việt';
@@ -363,19 +405,33 @@ function updateTheaterSelect() {
 // ─────────────────────────────────────────────────────────────
 
 
-function loadDiscordConfig() {
-    activeWebhookUrl = _sysUrl;
+function loadTelegramConfig() {
+    activeTelegramToken = _sysTgToken;
+    activeTelegramChatId = _sysTgChatId;
+    activeTelegramFbChatId = _sysTgFbChatId;
+
+    if (database) {
+        database.ref('config/telegramChatId').on('value', snapshot => {
+            const val = snapshot.val();
+            activeTelegramChatId = (val && String(val).trim()) ? String(val).trim() : _sysTgChatId;
+            updateConfigUIStatus();
+        });
+        database.ref('config/telegramFbChatId').on('value', snapshot => {
+            const val = snapshot.val();
+            activeTelegramFbChatId = (val && String(val).trim()) ? String(val).trim() : _sysTgFbChatId;
+        });
+    }
 
     const webhookInput = document.getElementById('config-webhook');
     if (webhookInput) {
-        webhookInput.value = activeWebhookUrl;
+        webhookInput.value = activeTelegramChatId;
     }
 
     updateConfigUIStatus();
 }
 
 function updateConfigUIStatus() {
-    const isConfigured = activeWebhookUrl.trim() !== '';
+    const isConfigured = activeTelegramToken.trim() !== '' && activeTelegramChatId.trim() !== '';
     const statusBadge = document.getElementById('config-status-badge');
     const configBadgeIndicator = document.getElementById('config-badge-indicator');
     const missingConfigBanner = document.getElementById('missing-config-banner');
@@ -417,8 +473,8 @@ function renderFoodCatalog() {
 
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
             
             if (opts.length > 0) {
                 optionsHtml = `
@@ -433,8 +489,8 @@ function renderFoodCatalog() {
         } else if (food.id == 5 || food.id == 6) {
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
 
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -465,8 +521,8 @@ function renderFoodCatalog() {
         } else if (food.id == 20) {
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
 
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
@@ -509,8 +565,8 @@ function renderFoodCatalog() {
         } else if (food.id == 8) {
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
 
             if (opts.length > 0) {
                 optionsHtml = `
@@ -576,8 +632,8 @@ function renderFoodCatalog() {
             // Sweet Zip (túi bắp) & Hộp Bắp Thiết — chỉ có vị bắp
             let opts = [];
             if (!isHidden('Ngọt')) opts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) opts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) opts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
             if (opts.length > 0) {
                 optionsHtml = `
                     <div class="food-options" style="margin-bottom: 1rem;">
@@ -592,8 +648,8 @@ function renderFoodCatalog() {
             // Single Zip, Couple Zip, Combo Xách Xô 1, Combo Ly Đổi Màu, Combo Xách Xô 2 — vị bắp + nước
             let popOpts = [];
             if (!isHidden('Ngọt')) popOpts.push('<option value="Ngọt" data-extra="0">Vị Ngọt (Mặc định)</option>');
-            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="11000">Vị Phô mai (+11.000đ)</option>');
-            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="11000">Vị Caramel (+11.000đ)</option>');
+            if (!isHidden('Phô mai')) popOpts.push('<option value="Phô mai" data-extra="15000">Vị Phô mai (+15.000đ)</option>');
+            if (!isHidden('Caramel')) popOpts.push('<option value="Caramel" data-extra="15000">Vị Caramel (+15.000đ)</option>');
             let drinkOpts = [];
             if (!isHidden('Pepsi')) drinkOpts.push('<option value="Pepsi">Pepsi</option>');
             if (!isHidden('7Up')) drinkOpts.push('<option value="7Up">7Up</option>');
@@ -873,7 +929,7 @@ function animateCartBadge() {
 }
 
 
-function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote) {
+function buildOrderTelegramMessage(customerName, customerPhone, customerTheater, customerSeat, customerNote) {
     const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const now = new Date();
     const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
@@ -897,16 +953,16 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
         .replace(/Hương vị:\s*/g, '')
         .replace(/Đồ ăn:\s*/g, '');
 
-    // ── Danh sách món (embed description) ───────────────────────
+    // ── Danh sách món ────────────────────────────────────────────
     let itemLines = '';
     cart.forEach((item, i) => {
-        const shortName = SHORT_NAMES[item.id] || item.name.split(' (')[0];
-        const lineTotal = formatCurrency(item.price * item.quantity);
+        const shortName = escapeTelegramHtml(SHORT_NAMES[item.id] || item.name.split(' (')[0]);
+        const lineTotal = escapeTelegramHtml(formatCurrency(item.price * item.quantity));
         if (item.option) {
-            const opts = cleanOption(item.option);
-            itemLines += `${i + 1}. **${shortName}**: ${opts} ×${item.quantity} — ${lineTotal}\n`;
+            const opts = escapeTelegramHtml(cleanOption(item.option));
+            itemLines += `${i + 1}. <b>${shortName}</b>: ${opts} ×${item.quantity} — ${lineTotal}\n`;
         } else {
-            itemLines += `${i + 1}. **${shortName}** ×${item.quantity} — ${lineTotal}\n`;
+            itemLines += `${i + 1}. <b>${shortName}</b> ×${item.quantity} — ${lineTotal}\n`;
         }
     });
 
@@ -920,79 +976,64 @@ function buildOrderDiscordPayload(customerName, customerPhone, customerTheater, 
         if (change > 0) paymentText += ` · Thối: ${formatCurrency(change)}`;
     }
 
-    // ── Embed fields ─────────────────────────────────────────────
-    const fields = [
-        { name: '👤 Khách hàng',    value: customerName || 'Khách vô danh', inline: true },
-        { name: '📱 Số điện thoại', value: customerPhone || 'Không có',      inline: true },
-        { name: '🎬 Số rạp',        value: customerTheater,                  inline: true },
-        { name: '💺 Số ghế',        value: customerSeat,                     inline: true },
-        { name: '💳 Thanh toán',    value: paymentText,                      inline: true },
+    const lines = [
+        `🔔 <b>ĐƠN HÀNG MỚI: #${escapeTelegramHtml(currentOrderId || 'N/A')}</b>`,
+        ``,
+        `🛒 <b>DANH SÁCH MÓN ĐẶT:</b>`,
+        itemLines.trimEnd(),
+        ``,
+        `👤 <b>Khách hàng:</b> ${escapeTelegramHtml(customerName || 'Khách vô danh')}`,
+        `📱 <b>Số điện thoại:</b> ${escapeTelegramHtml(customerPhone || 'Không có')}`,
+        `🎬 <b>Số rạp:</b> ${escapeTelegramHtml(customerTheater)} | 💺 <b>Ghế:</b> ${escapeTelegramHtml(customerSeat)}`,
+        `💳 <b>Thanh toán:</b> ${escapeTelegramHtml(paymentText)}`
     ];
 
     if (customerNote.trim()) {
-        fields.push({ name: '📝 Ghi chú', value: customerNote, inline: false });
+        lines.push(`📝 <b>Ghi chú:</b> ${escapeTelegramHtml(customerNote.trim())}`);
     }
 
-    return {
-        username: `${currentCinemaName} Delivery`,
-        avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
-        embeds: [{
-            title: `🔔 ĐƠN HÀNG MỚI: #${currentOrderId || 'N/A'}`,
-            color: 0x00FF66,
-            description: `🛒 **DANH SÁCH MÓN ĐẶT:**\n${itemLines}`,
-            fields: fields,
-            footer: {
-                text: `💰 Tổng tiền: ${formatCurrency(totalPrice)}  |  🕐 ${timeStr} ${dateStr}`
-            }
-        }]
-    };
+    lines.push(``);
+    lines.push(`💰 <b>Tổng tiền:</b> ${escapeTelegramHtml(formatCurrency(totalPrice))} | 🕐 ${escapeTelegramHtml(timeStr)} ${escapeTelegramHtml(dateStr)}`);
+
+    return lines.join('\n');
 }
 
 
-async function testDiscordConnection() {
-    const testWebhook = document.getElementById('config-webhook').value.trim();
+async function testTelegramConnection() {
+    const inputEl = document.getElementById('config-webhook');
+    const testChatId = (inputEl ? inputEl.value.trim() : '') || activeTelegramChatId;
 
-    if (!testWebhook) {
-        showPopup("Cảnh báo", "Vui lòng điền Webhook URL để chạy thử.", false);
+    if (!activeTelegramToken || !testChatId) {
+        showPopup("Cảnh báo", "Thiếu Bot Token hoặc Chat ID Telegram để chạy thử.", false);
         return;
     }
 
     const btnTest = document.getElementById('btn-test-bot');
-    const originalContent = btnTest.innerHTML;
-    btnTest.disabled = true;
-    btnTest.innerHTML = `<span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> Đang gửi...`;
+    const originalContent = btnTest ? btnTest.innerHTML : '';
+    if (btnTest) {
+        btnTest.disabled = true;
+        btnTest.innerHTML = `<span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> Đang gửi...`;
+    }
 
     try {
-        const response = await fetch(testWebhook, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: `${currentCinemaName} Delivery`,
-                avatar_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&auto=format&fit=crop&q=80",
-                embeds: [
-                    {
-                        title: "👋 Xin chào!",
-                        color: 65280,
-                        description: `Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn **${currentCinemaName}**.\n\nKết nối Discord Webhook của bạn đã hoạt động chính xác! 🎉`,
-                        footer: {
-                            text: `Thời gian: ${new Date().toLocaleString('vi-VN')}`
-                        }
-                    }
-                ]
-            })
-        });
+        const testMsg = [
+            `👋 <b>Xin chào!</b>`,
+            ``,
+            `Đây là tin nhắn thử nghiệm kết nối từ Trang đặt đồ ăn <b>${escapeTelegramHtml(currentCinemaName)}</b>.`,
+            `Kết nối Telegram Bot của bạn đã hoạt động chính xác! 🎉`,
+            ``,
+            `🕐 <i>Thời gian: ${escapeTelegramHtml(new Date().toLocaleString('vi-VN'))}</i>`
+        ].join('\n');
 
-        if (response.ok) {
-            showPopup("Kết nối thành công!", "Một tin nhắn test đã được gửi đến kênh Discord của bạn.", true);
-        } else {
-            const errText = await response.text();
-            throw new Error(`Mã lỗi: ${response.status} - ${errText}`);
-        }
+        await sendTelegramMessage(testChatId, testMsg);
+        showPopup("Kết nối thành công!", "Một tin nhắn test đã được gửi đến nhóm Telegram của bạn.", true);
     } catch (error) {
-        showPopup("Lỗi kết nối", `Không thể kết nối Discord: ${error.message}. Hãy kiểm tra lại link Webhook hoặc kết nối mạng.`, false);
+        showPopup("Lỗi kết nối", `Không thể kết nối Telegram: ${error.message}. Hãy kiểm tra lại Bot Token, Chat ID hoặc kết nối mạng.`, false);
     } finally {
-        btnTest.disabled = false;
-        btnTest.innerHTML = originalContent;
+        if (btnTest) {
+            btnTest.disabled = false;
+            btnTest.innerHTML = originalContent;
+        }
     }
 }
 
@@ -1252,32 +1293,24 @@ async function executeSendOrder() {
         paymentMethod: selectedPaymentMethod,
         cashAmount: selectedPaymentMethod === 'cash' ? selectedCashAmount : 0,
         status: 'pending',
-        sentToDiscord: false,
+        sentToTelegram: false,
         createdAt: new Date().toISOString()
     };
 
     try {
-        let isDiscordSent = false;
+        let isTelegramSent = false;
         
-        // 1. Luôn thử gửi sang Discord trước từ phía client
+        // 1. Luôn thử gửi sang Telegram trước từ phía client
         try {
-            const discordPayload = buildOrderDiscordPayload(customerName, customerPhone, customerTheater, customerSeat, customerNote);
-            const response = await fetch(activeWebhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(discordPayload)
-            });
-            if (response.ok) {
-                isDiscordSent = true;
-            } else {
-                console.warn("Client gửi Discord thất bại, mã lỗi:", response.status);
-            }
-        } catch (discordErr) {
-            console.warn("Lỗi mạng khi gửi Discord từ client:", discordErr.message);
+            const telegramMessage = buildOrderTelegramMessage(customerName, customerPhone, customerTheater, customerSeat, customerNote);
+            await sendTelegramMessage(activeTelegramChatId, telegramMessage);
+            isTelegramSent = true;
+        } catch (tgErr) {
+            console.warn("Lỗi gửi Telegram từ client:", tgErr.message);
         }
 
-        // Cập nhật trạng thái sentToDiscord
-        orderData.sentToDiscord = isDiscordSent;
+        // Cập nhật trạng thái sentToTelegram
+        orderData.sentToTelegram = isTelegramSent;
 
         // 2. Ghi nhận vào Firebase
         if (database) {
@@ -1291,7 +1324,7 @@ async function executeSendOrder() {
         if (form) form.reset();
         closePaymentModal();
         
-        if (isDiscordSent) {
+        if (isTelegramSent) {
             showPopup(
                 "Đặt hàng thành công!",
                 "Cảm ơn bạn đã đặt món! Đơn hàng của bạn đã được gửi trực tiếp đến hệ thống bếp.",
@@ -1300,7 +1333,7 @@ async function executeSendOrder() {
         } else {
             showPopup(
                 "Ghi nhận thành công!",
-                "Đơn hàng đã lưu vào hệ thống, nhưng hiện không gửi được thông báo Discord. Bếp sẽ kiểm tra hệ thống sau.",
+                "Đơn hàng đã lưu vào hệ thống, nhưng hiện không gửi được thông báo Telegram. Bếp sẽ kiểm tra hệ thống sau.",
                 true
             );
         }
@@ -1322,10 +1355,10 @@ async function executeSendOrder() {
 async function submitOrder(e) {
     if (e && e.preventDefault) e.preventDefault();
 
-    if (!activeWebhookUrl) {
+    if (!activeTelegramToken || !activeTelegramChatId) {
         showPopup(
-            "Chưa cấu hình Discord",
-            "Bạn phải cấu hình Discord Webhook URL để có thể đặt hàng và nhận thông báo.",
+            "Chưa cấu hình Telegram",
+            "Bạn phải cấu hình Telegram Bot để có thể đặt hàng và nhận thông báo.",
             false
         );
         openConfigDrawer();
@@ -1392,16 +1425,18 @@ function closeConfigDrawer() {
 }
 
 function saveConfig() {
-    const webhookVal = document.getElementById('config-webhook').value.trim();
+    const inputEl = document.getElementById('config-webhook');
+    const chatIdVal = inputEl ? inputEl.value.trim() : '';
 
-    activeWebhookUrl = webhookVal;
-
-    localStorage.setItem('bhds_discord_webhook', webhookVal);
+    if (chatIdVal) {
+        activeTelegramChatId = chatIdVal;
+        localStorage.setItem('bhds_telegram_chat_id', chatIdVal);
+    }
 
     updateConfigUIStatus();
     closeConfigDrawer();
 
-    showPopup("Lưu thành công", "Cấu hình Discord đã được cập nhật.", true);
+    showPopup("Lưu thành công", "Cấu hình Telegram đã được cập nhật.", true);
 }
 
 // Password prompt dialog — hides password as user types
@@ -1596,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
 
 
-    loadDiscordConfig();
+    loadTelegramConfig();
 
 
     const checkoutForm = document.getElementById('checkout-form');
@@ -1616,7 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnTestBot = document.getElementById('btn-test-bot');
 
     if (btnSaveConfig) btnSaveConfig.addEventListener('click', saveConfig);
-    if (btnTestBot) btnTestBot.addEventListener('click', testDiscordConnection);
+    if (btnTestBot) btnTestBot.addEventListener('click', testTelegramConnection);
 
     const btnPopupClose = document.getElementById('btn-popup-close');
     const popupResult = document.getElementById('popup-result');
@@ -1705,38 +1740,21 @@ document.addEventListener('DOMContentLoaded', () => {
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = `<span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> Đang gửi...`;
 
-            const webhookUrl = _sysFbUrl;
-
-            const payload = {
-                username: `${currentCinemaName} - Khiếu Nại`,
-                avatar_url: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=120&auto=format&fit=crop&q=80",
-                embeds: [
-                    {
-                        title: `🚨 CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ ${currentCinemaName}!`,
-                        color: 16738304,
-                        fields: [
-                            { name: "👤 Khách hàng", value: name, inline: true },
-                            { name: "📞 Số điện thoại", value: phone, inline: true },
-                            { name: "📝 Nội dung phản hồi", value: content, inline: false }
-                        ],
-                        footer: {
-                            text: `Thời gian gửi: ${new Date().toLocaleString('vi-VN')}`
-                        }
-                    }
-                ]
-            };
+            const targetChatId = activeTelegramFbChatId || activeTelegramChatId;
+            const complaintMessage = [
+                `🚨 <b>CÓ Ý KIẾN / KHIẾU NẠI MỚI TỪ ${escapeTelegramHtml(currentCinemaName)}!</b>`,
+                ``,
+                `👤 <b>Khách hàng:</b> ${escapeTelegramHtml(name)}`,
+                `📞 <b>Số điện thoại:</b> ${escapeTelegramHtml(phone)}`,
+                `📝 <b>Nội dung phản hồi:</b>`,
+                escapeTelegramHtml(content),
+                ``,
+                `🕐 <i>Thời gian gửi: ${escapeTelegramHtml(new Date().toLocaleString('vi-VN'))}</i>`
+            ].join('\n');
 
             try {
-                if (webhookUrl && webhookUrl.startsWith('http')) {
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                     if (!response.ok) {
-                         throw new Error("Gửi phản hồi thất bại");
-                     }
+                if (activeTelegramToken && targetChatId) {
+                    await sendTelegramMessage(targetChatId, complaintMessage);
                 }
 
                 popupComplaint.classList.remove('open');
